@@ -77,6 +77,17 @@ namespace Dynamic {
 			//FitSizeStr();
 		}
 
+		void Set_Char(const char* new_char){
+			int i = 0;
+			if (i >= capacity_size){
+					SizeUpStr();
+				}
+			Str[i] = new_char[i++];
+			Str[i] = '\0';
+			current_size = i;
+			str_last_focus = i - 1;
+		}
+
 		//문자 1개씩 추가
 		void Append_Char(const char* new_char) {
 			if (current_size <= capacity_size) {
