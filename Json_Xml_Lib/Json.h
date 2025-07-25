@@ -64,10 +64,12 @@ namespace JSON {
 		operator bool*();
 		operator char();
 		operator char*();
-		operator JObj();
-		operator JObj*();
-		operator JArr();
-		operator JArr*();
+		operator JObj();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		operator JObj*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		operator JArr();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		operator JArr*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		operator JNode();
+		operator JNode*();
 
 		//대입
 		void operator=(int);
@@ -78,10 +80,13 @@ namespace JSON {
 		void operator=(bool*);
 		void operator=(char);
 		void operator=(char*);
-		void operator=(JObj);
-		void operator=(JObj*);
-		void operator=(JArr);
-		void operator=(JArr*);
+		void operator=(JObj);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		void operator=(JObj*);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		void operator=(JArr);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		void operator=(JArr*);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+		void operator=(JType);
+		void operator=(JNode);
+		void operator=(JNode*);
 
 		//객체 배열 연산자 오버로딩
 		JsonCallObjArr operator[](const char* key);
@@ -226,6 +231,7 @@ namespace JSON {
 		}
 		JsonCallObjArr(JNode* Cur_Node, int index) : node(Cur_Node), obj(nullptr){
 			//Cur_Node->P_Type(JArr)을 토대로 index 찾기 및 추가
+			
 		}
 
 		//반환 연산자 = ObjArr["Key"] 값을 반환

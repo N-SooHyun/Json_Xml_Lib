@@ -237,6 +237,7 @@ JNode::operator char*(){
 	DynamicStr* str = static_cast<DynamicStr*>(P_Type); 
 	return str->Get_Str();
 }
+//Node를 반화할때 처리
 
 
 //대입 연산자 P_Type = 대입
@@ -325,6 +326,7 @@ void JNode::operator=(char* _str){
 	//문자열 파싱 부분
 	isObjArrCk(str);
 }
+//Node를 받을때 처리
 
 
 //객체와 배열에 대한 연산자
@@ -372,7 +374,7 @@ JsonCallObjArr JNode::operator[](int index){
 //= Arr[1]
 JsonCallObjArr::operator int(){
 	if (obj == nullptr) return -1; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::NUMBER)){
+	if (!obj->Value->isTypeMatch(JNode::JType::NUMBER)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return -1;
 	}
@@ -383,7 +385,7 @@ JsonCallObjArr::operator int(){
 }
 JsonCallObjArr::operator int*(){
 	if (obj == nullptr) return nullptr; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::NUMBER)){
+	if (!obj->Value->isTypeMatch(JNode::JType::NUMBER)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}
@@ -394,7 +396,7 @@ JsonCallObjArr::operator int*(){
 }
 JsonCallObjArr::operator double(){
 	if (obj == nullptr) return -1.0; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
+	if (!obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return -1.0;
 	}
@@ -405,7 +407,7 @@ JsonCallObjArr::operator double(){
 }
 JsonCallObjArr::operator double*(){
 	if (obj == nullptr) return nullptr; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
+	if (!obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}
@@ -416,7 +418,7 @@ JsonCallObjArr::operator double*(){
 }
 JsonCallObjArr::operator bool(){
 	if (obj == nullptr) return false; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::BOOL)){
+	if (!obj->Value->isTypeMatch(JNode::JType::BOOL)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return false;
 	}
@@ -427,7 +429,7 @@ JsonCallObjArr::operator bool(){
 }
 JsonCallObjArr::operator bool*(){
 	if (obj == nullptr) return false; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::BOOL)){
+	if (!obj->Value->isTypeMatch(JNode::JType::BOOL)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}
@@ -438,7 +440,7 @@ JsonCallObjArr::operator bool*(){
 }
 JsonCallObjArr::operator char(){
 	if (obj == nullptr) return '\0'; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::STRING)){
+	if (!obj->Value->isTypeMatch(JNode::JType::STRING)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return '\0';
 	}
@@ -449,7 +451,7 @@ JsonCallObjArr::operator char(){
 }
 JsonCallObjArr::operator char*(){
 	if (obj == nullptr) return nullptr; //실패 하는 경우
-	if (obj->Value->isTypeNull() && !obj->Value->isTypeMatch(JNode::JType::STRING)){
+	if (!obj->Value->isTypeMatch(JNode::JType::STRING)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}

@@ -1,0 +1,64 @@
+<JNode클래스>
+
+setType(enum) 을 통해 P_Type을 생성할 수 있다
+delType(); 을 통해 P_Type을 delete할 수 있다.
+
+setType(NUMBER);
+setType(OBJ); 	이런식으로 덮어쓰기는 불가능하다
+
+덮어쓰기를 하려면
+delType() 이후에 setType()을 해줘야 한다.
+
+
+<대입>
+node = (int, double, bool, char) 대입이 가능하다
+대입시 내부 구조는 타입이 안맞으면
+delType()
+setType()을 통하여 무조건 덮어쓰기가 가능하도록 자유도를 구성해두었다.
+
+<반환>
+(int, double, bool, char) = node 반환이 가능하다
+반환시 내부 구조는 타입이 안맞을때 실패로 return nullptr; 혹은 return -1같은 실패 값을 반환한다
+
+대입과 반환은 전부 단일타입만 구성해놨으며
+포인터에 대한 반환과 대입은 주소를 참조하지 않으며 오직 값만을 "복사"하도록 구현해놨다.
+
+
+
+<JObj 클래스>
+생성이 될때 반드시 JNode *Value가 만들어지며 해당 Value는 소멸하기 전까지는 절대 사라지면 안됨(소멸자 호출시 곤란해짐)
+Value가 가리키는 영역은 절대 건드리지 못하게 const로 상수화 했으며 생성자 호출시에 NULLTYPE으로 생겨남
+Value를 건드리고 싶으면 Value->deltype(); -> Value->setType(); 이런식으로 내부 리소스만 건드리도록 구조를 만들었으니 참고
+
+JObj* getTailObj()  자기자신을 기준으로 next->nullptr 까지 도달한뒤에 마지막 JObj를 반환함
+
+void setkey(const char*) key값을 넣어주거나 변경해줌(변경이 옳은 표현인듯)
+
+void setValue(JNode::JType setNodeType) Value에 enum에 대한 값을 덮어씌워주어 새롭게 만들어줌
+
+JNode* getCurValue() Value가 가리키는 참조 영역을 반환해줌
+
+
+<JsonCallObjArr>
+객체와 배열에 대한 반환과 대입(현재는 단일 타입에 대한 Value만 반환 및 대입이 가능)
+JNode["Key"] 이런식으로 연산자를 호출하게 되면 JsonCallObjArr클래스가 호출이된다.
+
+JNode["Key"] -> 새로운 JsonCallObjArr 인스턴스가 생성됨
+
+생성자는
+키를 기준으로 Value를 만들어주며
+1. Obj가 없으면 0번부터 새로운키와 Value 즉, JObj 새로운 객체를 하나 만들어줌
+2. 키값이 있다면 키에 대한 obj를 반환하고
+3. 키값이 없다면 새로운 JObj를 만들어 키를 넣어주고 해당 obj를 반환해줌
+
+
+
+
+
+
+
+
+
+
+
+

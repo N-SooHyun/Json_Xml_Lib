@@ -189,6 +189,18 @@ void JOBj_JArr_Test(){
 	js["Key0"] = str;
 	js["Key1"] = bl;
 
+	num = js["Key0"];
+	*pnum = js["Key1"];
+	dnum = js["key2"];
+	pdnum = js["key3"];
+	bl = js["key4"];
+	pbl = js["key5"]; 
+	c = js["key6"];
+	str = js["key7"];
+
+	
+
+
 
 }
 
@@ -221,7 +233,6 @@ void JObj_Test(){
 	search_obj = obj.searchKey("Key3");
 
 	
-
 }
 
 int main() {
@@ -231,7 +242,7 @@ int main() {
 	//JsonAPI_Test3();
 	JOBj_JArr_Test();
 
-	//JObj_Test();
+	JObj_Test();
 
 	return 0;
 }
