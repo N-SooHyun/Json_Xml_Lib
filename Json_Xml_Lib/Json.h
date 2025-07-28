@@ -44,6 +44,19 @@ namespace JSON {
 			delType();
 		}
 
+		//복사 생성자
+		JNode(const JNode& other) : Cur_Type(other.Cur_Type), P_Type(other.P_Type){
+
+		}
+		// 이동 생성자
+		JNode(const JNode&& other) : Cur_Type(other.Cur_Type), P_Type(other.P_Type) {
+
+		}
+		
+
+
+		void operator=(JType);
+
 		bool isTypeNull();	//true면 P_Type == nullptr
 		bool isTypeMatch(JType); //true면 P_Type == Type 매치된상태
 		bool isOverWrite();	//덮어쓰기 혹은 생성하기
@@ -64,12 +77,14 @@ namespace JSON {
 		operator bool*();
 		operator char();
 		operator char*();
+	private:
 		operator JObj();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
-		operator JObj*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		operator JArr();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		operator JArr*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
-		operator JNode();
-		operator JNode*();
+		operator JObj*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
+	public:
+		operator JNode();			//JNode = JNode 이런경우 lValue만 사용되기에 반환은 호출이 안됨
+		operator JNode*();			//고로 있으나 마나 반환은 쓰이지 않을예정
 
 		//대입
 		void operator=(int);
@@ -80,12 +95,14 @@ namespace JSON {
 		void operator=(bool*);
 		void operator=(char);
 		void operator=(char*);
+	private:
 		void operator=(JObj);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
-		void operator=(JObj*);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		void operator=(JArr);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
-		void operator=(JArr*);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
-		void operator=(JType);
-		void operator=(JNode);
+		void operator=(JNode);		//rValue를 복사후 rValue.P_Type = nullptr로 만들어주어도 복사생성자로 생성된 객체가 되어서 결국 이중소멸됨
+		void operator=(JObj*);		
+		void operator=(JArr*);		
+	public:
+		//해당 대입들은 rValue가 무조건 nullptr로 변한된다고 가정 즉, lValue = rValue에서 lValue로 완전한 이동인셈
 		void operator=(JNode*);
 
 		//객체 배열 연산자 오버로딩
@@ -243,6 +260,7 @@ namespace JSON {
 		operator bool*();
 		operator char();
 		operator char*();
+		operator JNode*();
 
 		//대입 연산자 ObjArr["Key"] = 값을 대입
 		void operator=(int);
@@ -253,6 +271,7 @@ namespace JSON {
 		void operator=(bool*);
 		void operator=(char);
 		void operator=(char*);
+		void operator=(JNode*);
 
 	private:
 		JNode* node;	//node->P_Type == Obj; 인거임 obj의 Value node 아님

@@ -63,7 +63,7 @@ void JsonAPI_Test2(){
 	bool bl = true;
 	bool* pbl = &bl;
 	char c = 'a';
-	char *str = "Test";
+	const char *str = "Test";
 
 	*pjs = num;
 	*pjs = pnum;
@@ -115,7 +115,7 @@ void JsonAPI_Test3(){
 	bool bl = true;
 	bool* pbl = &bl;
 	char c = 'a';
-	char *str = "Test";
+	const char *str = "Test";
 
 	*pjs = num;
 	js = num;
@@ -168,7 +168,7 @@ void JOBj_JArr_Test(){
 	bool bl = true;
 	bool* pbl = &bl;
 	char c = 'a';
-	char *str = "Test";
+	const char *str = "Test";
 
 	*pjs = 1;
 	js = 1;
@@ -235,14 +235,25 @@ void JObj_Test(){
 	
 }
 
+void JNode_Test() {
+	JNode node1(JNode::JType::NUMBER);
+	JNode node2(JNode::JType::NUMBER);
+	JNode* node3 = new JNode(JNode::JType::NUMBER);
+
+	JObj* obj = new JObj("Key0");
+
+	
+
+	
+}
+
 int main() {
 
 	//JsonAPI_Test();
 	//JsonAPI_Test2();
 	//JsonAPI_Test3();
-	JOBj_JArr_Test();
-
-	JObj_Test();
+	
+	JNode_Test();
 
 	return 0;
 }
