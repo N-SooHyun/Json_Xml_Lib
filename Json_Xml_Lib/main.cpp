@@ -235,14 +235,30 @@ void JObj_Test(){
 	
 }
 
+void JNode_Test(){
+	JNode Def_Node;
+	JNode *pDef_Node = new JNode();
+	JNode L_Node(JNode::JType::NUMBER); 
+	//둘다 p_type이 존재함
+	
+	//JNode::operator =대입이면서 반환
+	Def_Node = pDef_Node;		//포인터일때
+	//Def_Node = L_Node;			//지역변수일때
+
+
+
+}
+
 int main() {
 
 	//JsonAPI_Test();
 	//JsonAPI_Test2();
 	//JsonAPI_Test3();
-	JOBj_JArr_Test();
+	//JOBj_JArr_Test();
 
-	JObj_Test();
+	//JObj_Test();
+
+	JNode_Test();
 
 	return 0;
 }

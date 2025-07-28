@@ -60,5 +60,99 @@ JNode["Key"] -> 새로운 JsonCallObjArr 인스턴스가 생성됨
 
 
 
+사용규칙?
+<뭐든 지역변수를 반환할때 문제가 생길 여지가 존재함>
+JNode* L_node = new JNode();
+JNode* R_node = new JNode();
+JNode R_node_local;
+
+<JNode 대입시 규칙>
+L_node = R_node;		//이거는 가능	대입연산자가 호출이되며 R_node가 무력화됨
+L_node = R_node_local;	//이거는 불가능 ->왜?  L_node->P_Type == R_node_local->P_Type 같은것을 가리키면서 소멸할때 이중 소멸날 수 있음
+
+L_node = JObj;			//불가능	->왜?   이중 포인터 발생 L_node->P_Type == &JObj;   delete P_Type시 에러
+L_node = *JObj;			//불가능	->왜?   이중 포인터 발생 L_node->P_Type == *Obj;	    delete P_Type시 에러는 안나지만 delete Obj하면 에러남 댕글링 포인터 발생
+L_node = JArr;			//불가능	->왜?   위와 마찬가지
+L_node = *JArr;			//불가능	->왜?   위와 마찬가지
+*JObj, *JArr가능하게 하려면 JObj = nullptr로 해주든가 하는 방식으로는 가능
+
+<JNode 반환시 규칙>
+JNode = JNode 시에는 반환이 호출되지 않음 오직 대입만 호출됨
+
+JObj = JNode;
+JObj* = JNode;
+JArr = JNode;
+JArr* = JNode;
+
+ 
+
+
+L_node["Key"] = JNode;
+L_node["Key"] = *JNode;
+L_node["Key"] = 
+
+
+
+
+
+
+
+
+
+
+
+
+대입과 반환에 대한 경우의 수들
+<JNode = JNode>
+JNode = JNode;
+JNode = *JNode;
+*JNode = JNode;
+*JNode = *JNode;
+
+
+
+<JNode - JObj>
+JNode = JObj
+JNode = *JObj
+*JNode = JObj
+*JNode = *JObj
+
+JObj = JNode
+JObj = *JNode
+*JObj = JNode
+*JObj = *JNode
+
+
+<JNode - JArr>
+JNode = JArr
+JNode = *JArr
+*JNode = JArr
+*JNode = *JArr
+
+JArr = JNode
+JArr = *JNode
+*JArr = JNode
+*JArr = *JNode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

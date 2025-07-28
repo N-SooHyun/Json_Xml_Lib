@@ -238,7 +238,14 @@ JNode::operator char*(){
 	return str->Get_Str();
 }
 //Node를 반화할때 처리
-
+//JNode = JNode 일때는 반환이 아닌 lValue로 호출이됨 반환 대입 둘다 호출 안됨
+JNode::operator JNode(){
+	JNode* n = new JNode();
+	return *n;
+}
+JNode::operator JNode*(){
+	return nullptr;
+}
 
 //대입 연산자 P_Type = 대입
 void JNode::operator=(int _num){
@@ -328,6 +335,27 @@ void JNode::operator=(char* _str){
 }
 //Node를 받을때 처리
 
+void JNode::operator=(JNode rNode){	//이중 P_Type의 소멸로 인해서 안쓰는게 좋음
+	//rValue가 JNode가 지역변수일때
+	//아예덮어쓰기
+	this->delType();
+	this->Cur_Type = rNode.Cur_Type;
+	this->P_Type = rNode.P_Type;
+	this->ArrCnt = rNode.ArrCnt;
+	this->ObjCnt = rNode.ObjCnt;
+
+	rNode.P_Type = nullptr; //임시객체 소멸에 대한 이중 소멸을 방지
+}
+void JNode::operator=(JNode* rNode){
+	//아예 덮어쓰기
+	this->delType();
+	this->Cur_Type = rNode->Cur_Type;
+	this->P_Type = rNode->P_Type;
+	this->ArrCnt = rNode->ArrCnt;
+	this->ObjCnt = rNode->ObjCnt;
+
+	rNode->P_Type = nullptr; //임시객체 소멸에 대한 이중 소멸을 방지
+}
 
 //객체와 배열에 대한 연산자
 //Node["Key"]
@@ -460,6 +488,15 @@ JsonCallObjArr::operator char*(){
 	return str->Get_Str();
 }
 
+//JNode를 반환
+JsonCallObjArr::operator JNode(){
+	JsonCallObjArr j;
+	return j;
+}
+JsonCallObjArr::operator JNode*(){
+	return nullptr;
+}
+
 //대입 연산자 Obj["Key"] = 값을 대입 있던값이 어도 덮어쓰기
 // Arr[1] = 
 void JsonCallObjArr::operator=(int _num){
@@ -514,3 +551,5 @@ void JsonCallObjArr::operator=(char* _str){
 	//문자열 파싱 부분
 	obj->Value->isObjArrCk(str);
 }
+
+//JNode를 대입

@@ -43,6 +43,16 @@ namespace JSON {
 		~JNode(){
 			delType();
 		}
+		
+		//복사생성자 이동생성자
+		JNode(const JNode& other) : P_Type(other.P_Type), Cur_Type(other.Cur_Type),
+									ObjCnt(other.ObjCnt), ArrCnt(other.ArrCnt){
+			
+		}
+		JNode(const JNode&& other){
+
+		}
+
 
 		bool isTypeNull();	//true면 P_Type == nullptr
 		bool isTypeMatch(JType); //true면 P_Type == Type 매치된상태
@@ -85,7 +95,9 @@ namespace JSON {
 		void operator=(JArr);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		void operator=(JArr*);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		void operator=(JType);
-		void operator=(JNode);
+	private:
+		void operator=(JNode);	//안쓰는게 좋음 지역변수 대입된 변수 모두 똑같은 P_Type을 가리켜 소멸시 이중 소멸 발생
+	public:
 		void operator=(JNode*);
 
 		//객체 배열 연산자 오버로딩
@@ -243,6 +255,15 @@ namespace JSON {
 		operator bool*();
 		operator char();
 		operator char*();
+		operator JNode();
+		operator JNode*();
+	private:
+		//해당 것들은 사용하지 못하도록 막기
+		operator JObj();
+		operator JObj*();
+		operator JArr();
+		operator JArr*();
+	public:
 
 		//대입 연산자 ObjArr["Key"] = 값을 대입
 		void operator=(int);
@@ -253,6 +274,15 @@ namespace JSON {
 		void operator=(bool*);
 		void operator=(char);
 		void operator=(char*);
+		void operator=(JNode);
+		void operator=(JNode*);
+	private:
+		//해당 것들은 사용하지 못하도록 막기
+		void operator=(JObj);
+		void operator=(JObj*);
+		void operator=(JArr);
+		void operator=(JArr*);
+	public:
 
 	private:
 		JNode* node;	//node->P_Type == Obj; 인거임 obj의 Value node 아님
