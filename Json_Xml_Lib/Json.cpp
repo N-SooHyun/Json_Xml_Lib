@@ -491,9 +491,11 @@ JsonCallObjArr::operator char*(){
 }
 JsonCallObjArr::operator JNode*(){
 	//*JNode = Cur_Obj->Value;  Value를 반환해야함
-	//실패하는경우가 뭘까?
+	//실패하는경우가 뭘까? 없다고 보자
 
-	return nullptr;
+	JNode* rNode = Cur_Obj->Value;
+
+	return rNode;	
 }
 
 

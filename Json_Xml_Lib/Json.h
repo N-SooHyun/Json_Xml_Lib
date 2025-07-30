@@ -278,7 +278,8 @@ namespace JSON {
 			Cur_Arr = Root_Arr;			//nullptr
 		}
 		JsonCallObjArr(JNode* node, int index) : Root_Obj(nullptr){
-			
+			Root_Node = node;
+			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
 		}
 
 
