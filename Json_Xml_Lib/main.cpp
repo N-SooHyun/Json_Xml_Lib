@@ -240,10 +240,12 @@ void JNode_Test() {
 	JNode node2(JNode::JType::NUMBER);
 	JNode* node3 = new JNode(JNode::JType::NUMBER);
 
-	JObj* obj = new JObj("Key0");
+	node1 = JNode::JType::OBJ;
 
+	node1["Key0"] = 1;
 	
-
+	int num = node1["Key0"];
+	int* pnum = node1["Key0"];
 	
 }
 

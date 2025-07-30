@@ -82,8 +82,8 @@ namespace JSON {
 		operator JArr();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		operator JArr*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		operator JObj*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
-	public:
 		operator JNode();			//JNode = JNode 이런경우 lValue만 사용되기에 반환은 호출이 안됨
+	public:
 		operator JNode*();			//고로 있으나 마나 반환은 쓰이지 않을예정
 
 		//대입
@@ -164,28 +164,15 @@ namespace JSON {
 		
 		//키값 생성
 		void setKey(const char* key){
-			if (Value != nullptr) return;//실패
+			if (Value->Cur_Type != JNode::JType::NULLTYPE) 
+				return;//만약에 이런경우면 기존키값이 변경됨 그래서 실패
 			Key.Set_Str(key);
-		}
-
-		void setKeyValue(const char* key, JNode::JType setNodeType){
-			//키값에 해당하는 Value에 덮어쓰기 없으면 추가도 가능하도록 만들기
-			//일단 사용 보류
-			Value->delType();
-			Value->Cur_Type = setNodeType;
-			Value->setType(Value->Cur_Type);
 		}
 
 		void setValue(JNode::JType setNodeType){
 			//덮어쓰는거임
 			Value->delType();
-			Value->Cur_Type = setNodeType;
 			Value->setType(Value->Cur_Type);
-		}
-
-		//무조건 Value건드릴때는 여거 가져와서 건드릴것	
-		JNode* getCurValue(){		
-			return Value;
 		}
 
 	//private:
@@ -197,10 +184,49 @@ namespace JSON {
 
 	class JArr{
 	public:
+		JArr() : curIndex(-1), Value(new JNode()), next(nullptr){}
+		
+		~JArr(){
+			if (Value != nullptr){
+				delete Value;
+				//Value = nullptr;
+			}
+			if (next != nullptr){
+				delete next;
+				next = nullptr;
+			}
+		}
+
+		//Arr기준 next참조해서 index를 반환
+		JArr* searchIndex(int index){
+			JArr* cur_arr = this;
+				
+			do{
+				if (cur_arr->curIndex == index) return cur_arr;
+				cur_arr = cur_arr->next;
+			} while (cur_arr != nullptr);
+
+			return nullptr;
+		}
+
+		//자신의 arr기준 tail위치 반환
+		JArr* getTailArr(){
+			JArr* cur_arr = this;
+
+			if (cur_arr == nullptr) return nullptr;
+
+			for (; cur_arr->next != nullptr;){
+				cur_arr = cur_arr->next;
+			}
+
+			return cur_arr;
+		}
 
 	private:
-		JNode* Value;
+		int curIndex;
+		JNode* const Value;
 		JArr* next;
+		friend JsonCallObjArr;
 	};
 
 	class JsonCtrl {
@@ -209,47 +235,52 @@ namespace JSON {
 
 	class JsonCallObjArr {
 	public:
-		JsonCallObjArr() : node(nullptr){}
-		JsonCallObjArr(JNode* Cur_Node, const char* key) : node(Cur_Node), arr(nullptr){
-			//Cur_Node->P_Type(JObj)를 토대로 키값을 찾기 및 추가
-			JObj* head_obj = static_cast<JObj*>(Cur_Node->P_Type);
-			JObj* ctrl_obj = head_obj;
+		JsonCallObjArr() : Root_Node(nullptr), Root_Obj(nullptr), Root_Arr(nullptr){}
+		JsonCallObjArr(JNode* node, const char* key) : Root_Arr(nullptr){
+			Root_Node = node;
+			Root_Obj = static_cast<JObj*>(Root_Node->P_Type);
+			JObj* search_key_obj = Root_Obj->searchKey(key);
+			JObj* tail_obj = Root_Obj->getTailObj();
 
-			if (Cur_Node->ObjCnt == -1){
-				//0번 Obj부터 키를 넣어줘야함
-				ctrl_obj->Key.Set_Str(key);
-				Cur_Node->ObjCnt++;
+			//1. Root_Node의 상태가 "{}" 이런 상태일때 아무 객체도 없을때
+			if (Root_Node->ObjCnt == -1){
+				Root_Obj->setKey(key);			//키값 설정
+				Root_Obj->setValue(JNode::JType::NULLTYPE);	//일단 초기화니까 NullType넣어주기
+				Root_Obj->next = nullptr;
+				Root_Node->ObjCnt++;
 
-				obj = ctrl_obj;
-				return;
+				//연산자 오버로딩에서 사용할 리소스 초기화 해주기
+				Cur_Obj = Root_Obj; 
 			}
 
-			//키값 찾기
-			ctrl_obj = head_obj->searchKey(key);
-			if (ctrl_obj == nullptr){
-				//키값 없는 상황 키를 추가해줘야함
-				//가장 끝 Obj찾기
-				ctrl_obj = head_obj->getTailObj();
-				//새로운 Obj만들기
+			//2. Root_Node의 상태가 "{...}"일때 객체가 존재할때 해당키인 객체를 찾기
+			
+			else if (search_key_obj != nullptr){	//이미 해당 키를 가진 객체가 존재함
+				//연산자 오버로딩에서 처리하도록 해당 키를 가진 객체를 넘겨주기
+				Cur_Obj = search_key_obj;
+			}
+			else{//해당 키를 가진 객체가 존재하지 않음
+				//새롭게 키를 만들어줘야함
 				JObj* new_obj = new JObj(key);
-				//마지막에 key 이어주기
-				ctrl_obj->next = new_obj;
-				Cur_Node->ObjCnt++; 
+				new_obj->setValue(JNode::JType::NULLTYPE);
+				new_obj->next = nullptr;
+				Root_Node->ObjCnt++;
 
-				//연산자 오버로딩에서 사용할 obj에 obj넣기
-				obj = new_obj;
+				tail_obj->next = new_obj;
+
+				//연산자 오버로딩에서 처리하도록 해당 키를 가진 객체를 넘겨주기
+				Cur_Obj = new_obj;
 			}
-			else{
-				//키값 있는 상황(키값 찾아줘야함)
-				//연산자 오버로딩에서 사용할 obj에 obj넣기
-				obj = ctrl_obj;
-			}	
 
+
+			//연산자 오버로딩에서 사용할 리소스 초기화 해주기
+			Cur_Node = Root_Node;
+			Cur_Arr = Root_Arr;			//nullptr
 		}
-		JsonCallObjArr(JNode* Cur_Node, int index) : node(Cur_Node), obj(nullptr){
-			//Cur_Node->P_Type(JArr)을 토대로 index 찾기 및 추가
+		JsonCallObjArr(JNode* node, int index) : Root_Obj(nullptr){
 			
 		}
+
 
 		//반환 연산자 = ObjArr["Key"] 값을 반환
 		operator int();
@@ -286,9 +317,14 @@ namespace JSON {
 		void operator=(JNode*);
 
 	private:
-		JNode* node;	//node->P_Type == Obj; 인거임 obj의 Value node 아님
+		JNode* Root_Node;	//node->P_Type == Obj; 인거임 obj의 Value node 아님
 						//node->P_Type == Arr; 인거임 arr의 Value node 아님
-		JObj* obj;		//node->P_Type 이 가리키는 key의 Obj임
-		JArr* arr;		//node->P_Type 이 가리키는 index의 Arr임
+		JObj* Root_Obj;		//node->P_Type 이 가리키는 key의 Obj임
+		JArr* Root_Arr;		//node->P_Type 이 가리키는 index의 Arr임
+
+		//operator에서 사용될 포인터 변수들
+		JNode* Cur_Node;
+		JObj* Cur_Obj;
+		JArr* Cur_Arr;
 	};
 }

@@ -68,7 +68,7 @@ JNode = JArr
 JObj = JNode
 JArr = JNode
 
-이들은 가능은 하겠다만 JNode를 기준으로 동작하도록 만든 규칙에 너무 위베가됨
+이들은 가능은 하겠다만 JNode를 기준으로 동작하도록 만든 규칙에 너무 위배가됨
 자유도를 목적으로 했지만 최소한의 선이 존재하긴 해야할것 같음
 이것마저 되버리면 자유성이아닌 모호성이 존재해버림
 
@@ -77,9 +77,25 @@ JArr = JNode
 
 
 
+JsonCallObjArr()에서 Obj, Arr에 따른 생성자 호출 규칙 생성
+JNode["Key"] 일경우 순서
+
+1. JNode [](Key){}	  2. -> JsonCallObjArr 반환  -> 3.
+1. JNode [](int){}	  2. -> JsonCallObjArr 반환  -> 3.
+
+2. JsonCallObjArr(){} 생성자
+
+3. JsonCallObjArr operator 연산자 오버로딩
 
 
 
+1. 만약에 타입이 안맞으면 덮어쓰기(Obj, Arr 이어야만함)
+1. 어떤 생성자를 호출할지 JNode 현재 자기는 Root가 되는거임
+
+2. JNode->Obj가 -1일때 새로운 obj 생성해주기
+2. JNode->Obj가 -1가 아닐경우(새로운 key생성 혹은 key찾아서 덮어쓰기)
+
+3. 반환할때 대입할때 해당 JNode["Key"]가 어떤 타입인지에 따라 갈림
 
 
 
