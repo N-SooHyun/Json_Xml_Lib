@@ -184,7 +184,7 @@ namespace JSON {
 
 	class JArr{
 	public:
-		JArr() : curIndex(-1), Value(new JNode()), next(nullptr){}
+		JArr() : Value(new JNode()), next(nullptr){}
 		
 		~JArr(){
 			if (Value != nullptr){
@@ -197,14 +197,22 @@ namespace JSON {
 			}
 		}
 
-		//Arr기준 next참조해서 index를 반환
-		JArr* searchIndex(int index){
+		//Arr기준 Root라고 가정 next참조해서 index를 반환
+		JArr* RootSearchIndex(int index){
+			if (index <= -1) return nullptr;	//예외처리 -1
+
 			JArr* cur_arr = this;
-				
-			do{
-				if (cur_arr->curIndex == index) return cur_arr;
+			
+			int idx = 0;
+			
+			while (cur_arr != nullptr){
+				if (idx == index){
+					return cur_arr;
+				}
+
 				cur_arr = cur_arr->next;
-			} while (cur_arr != nullptr);
+				idx++;
+			}			
 
 			return nullptr;
 		}
@@ -223,7 +231,6 @@ namespace JSON {
 		}
 
 	private:
-		int curIndex;
 		JNode* const Value;
 		JArr* next;
 		friend JsonCallObjArr;
@@ -280,6 +287,15 @@ namespace JSON {
 		JsonCallObjArr(JNode* node, int index) : Root_Obj(nullptr){
 			Root_Node = node;
 			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
+			JArr* search_idx_arr = Root_Arr->RootSearchIndex(index);
+			JArr* tail_arr = Root_Arr->getTailArr();
+
+			//1. Root_Node의 상태가 "[]" 이런 상태일때 아무 배열에 값도 없을때 
+
+			//2. Root_Node의 상태가 "[...]"이런 상태일때 배열의 값이 존재할때
+
+			
+			
 		}
 
 
