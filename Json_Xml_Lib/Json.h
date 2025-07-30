@@ -262,6 +262,18 @@ namespace JSON {
 		operator char*();
 		operator JNode*();
 
+	private:
+		operator JNode();
+		operator JObj();
+		operator JObj*();
+		operator JArr();
+		void operator=(JNode);
+		void operator=(JObj);
+		void operator=(JObj*);
+		void operator=(JArr);
+		void operator=(JArr*);
+	public:
+
 		//대입 연산자 ObjArr["Key"] = 값을 대입
 		void operator=(int);
 		void operator=(int*);

@@ -369,28 +369,6 @@ void JNode::operator=(JNode* rNode) {
 	rNode->Cur_Type = JType::NULLTYPE; //rNode의 타입을 Null로 변경
 }
 
-void JNode::operator=(JNode rNode){	//이중 P_Type의 소멸로 인해서 안쓰는게 좋음
-	//rValue가 JNode가 지역변수일때
-	//아예덮어쓰기
-	this->delType();
-	this->Cur_Type = rNode.Cur_Type;
-	this->P_Type = rNode.P_Type;
-	this->ArrCnt = rNode.ArrCnt;
-	this->ObjCnt = rNode.ObjCnt;
-
-	rNode.P_Type = nullptr; //임시객체 소멸에 대한 이중 소멸을 방지
-}
-void JNode::operator=(JNode* rNode){
-	//아예 덮어쓰기
-	this->delType();
-	this->Cur_Type = rNode->Cur_Type;
-	this->P_Type = rNode->P_Type;
-	this->ArrCnt = rNode->ArrCnt;
-	this->ObjCnt = rNode->ObjCnt;
-
-	rNode->P_Type = nullptr; //임시객체 소멸에 대한 이중 소멸을 방지
-}
-
 //객체와 배열에 대한 연산자
 //Node["Key"]
 JsonCallObjArr JNode::operator[](const char* key){
@@ -522,11 +500,6 @@ JsonCallObjArr::operator char*(){
 	return str->Get_Str();
 }
 
-//JNode를 반환
-JsonCallObjArr::operator JNode(){
-	JsonCallObjArr j;
-	return j;
-}
 JsonCallObjArr::operator JNode*(){
 	return nullptr;
 }
