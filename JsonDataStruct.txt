@@ -1,0 +1,47 @@
+JSON Data Struct 사용법
+
+//Json 자료구조 변수 생성법
+JNode node;
+JNode node(JNode::JType::selectType);
+JNode* pnode;
+
+//이런식으로 초기화 하는 경우는 내부 리소스 정보는 이렇게 됩니다.
+node->P_Type == nullptr;
+node->Cur_Type == JNode::JType::NULLTYPE;
+
+
+//반환 및 대입에 대한 방법
+본 자료구조는(int, double, bool, char, obj, arr) 총 6개의 타입을 허용하고 있습니다.
+
+//대입		(덮어쓰기가 존재)
+node = 10;
+node = 1.0;
+node = true;
+node = 'a';
+node = "Test";
+node = "{...}";
+node = "[...]";
+
+node->Cur_Type == 해당타입
+node->P_Type = new 해당타입();
+
+
+*해당 대입의 경우 무조건 덮어쓰기를 허용하도록 되어 있기에 
+기존 node의 값이 무엇인지 잘 판단하고 대입하시기 바랍니다.*
+
+
+//반환		(실패 반환이 존재)
+int num = node;
+double dnum = node;
+bool bl = node;
+char c = node;
+char* c = node;
+JNode *NodeObj = node;
+JNode *NodeArr = node;
+
+
+*해당 반환의 경우 실패할경우 -1, false와 같은 실패값을 반환하기에
+반드시 값을 확인하고 사용하시기 바랍니다.*
+
+
+덮어쓰기 대입 삭제를 만들어야 하는데...

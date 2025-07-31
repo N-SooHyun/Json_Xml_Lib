@@ -99,8 +99,17 @@ JNode["Key"] 일경우 순서
 
 
 
+<반환할때>
+= JNode["Key"] 
+ 반환 = JNode->P_Type(JObj)->Value(JNode)->P_Type(??)
+1. 반환타입과 맞지않을경우 실패 반환
+2. 맞으면 안에 값자체를 반환
 
 
+
+<대입할때>
+JNode["Key"] = 
+JNode->P_Type(JObj)->Value(JNode)->P_Type(??) = 대입
 
 
 

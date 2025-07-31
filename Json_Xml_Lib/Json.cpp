@@ -322,7 +322,7 @@ void JNode::operator=(char _c){
 	char* pc = &_c;
 	c->Set_Char(pc);	//복사
 }
-void JNode::operator=(char* _str){
+void JNode::operator=(const char* _str){
 	if (!isTypeMatch(JType::STRING)){
 		//타입이 안맞으면 덮어쓸거니까 지워주셈
 		delType();
@@ -411,87 +411,146 @@ JsonCallObjArr JNode::operator[](int index){
 // = JNode[1]
 // = Cur_Obj->Value->P_Type(???)
 JsonCallObjArr::operator int(){ 
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::NUMBER)){
-		//실패하는 경우
+	if (!getOper_Ctrl(JNode::JType::NUMBER)){	//실패하는경우
 		return -1;
 	}
+	int* num = nullptr;
 
-	int* num = static_cast<int*>(Cur_Obj->Value->P_Type);
+	if (Cur_Obj != nullptr){
+		num = static_cast<int*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		num = static_cast<int*>(Cur_Arr->Value->P_Type);
+	}	
 
 	return *num;
 }
 JsonCallObjArr::operator int*(){
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::NUMBER)){
-		//실패하는 경우
+	if (!getOper_Ctrl(JNode::JType::NUMBER)){	//실패하는경우
 		return nullptr;
 	}
 
-	int* num = static_cast<int*>(Cur_Obj->Value->P_Type);
+	int* num = nullptr;
+
+	if (Cur_Obj != nullptr){
+		num = static_cast<int*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		num = static_cast<int*>(Cur_Arr->Value->P_Type);
+	}
 
 	return num;
 }
 JsonCallObjArr::operator double(){
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
-		//실패하는 경우
+	if (!getOper_Ctrl(JNode::JType::DOUBLE)){	//실패하는경우
 		return -1.0;
 	}
 
-	double* dnum = static_cast<double*>(Cur_Obj->Value->P_Type);
+	double* dnum = nullptr;
+
+	if (Cur_Obj != nullptr){
+		dnum = static_cast<double*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		dnum = static_cast<double*>(Cur_Arr->Value->P_Type);
+	}
 
 	return *dnum;
 }
 JsonCallObjArr::operator double*(){
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
-		//실패하는 경우
+	if (!getOper_Ctrl(JNode::JType::DOUBLE)){	//실패하는경우
 		return nullptr;
 	}
 
-	double* dnum = static_cast<double*>(Cur_Obj->Value->P_Type);
+	double* dnum = nullptr;
+
+	if (Cur_Obj != nullptr){
+		dnum = static_cast<double*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		dnum = static_cast<double*>(Cur_Arr->Value->P_Type);
+	}
 
 	return dnum;
 }
 JsonCallObjArr::operator bool(){
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::BOOL)){
-		//실패하는 경우
+	if (!getOper_Ctrl(JNode::JType::BOOL)){	//실패하는경우
 		return false;
 	}
 
-	bool* bl = static_cast<bool*>(Cur_Obj->Value->P_Type);
+	bool* bl = nullptr;
+
+	if (Cur_Obj != nullptr){
+		bl = static_cast<bool*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		bl = static_cast<bool*>(Cur_Arr->Value->P_Type);
+	}
 
 	return *bl;
 }
 JsonCallObjArr::operator bool*(){
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::BOOL)){
-		//실패하는 경우
-		return false;
+	if (!getOper_Ctrl(JNode::JType::BOOL)){	//실패하는경우
+		return nullptr;
 	}
 
-	bool* bl = static_cast<bool*>(Cur_Obj->Value->P_Type);
+	bool* bl = nullptr;
+
+	if (Cur_Obj != nullptr){
+		bl = static_cast<bool*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		bl = static_cast<bool*>(Cur_Arr->Value->P_Type);
+	}
 
 	return bl;
 }
 JsonCallObjArr::operator char(){
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::STRING)){
-		//실패하는 경우
+	if (!getOper_Ctrl(JNode::JType::STRING)){	//실패하는경우
 		return '\0';
 	}
 
-	DynamicStr* str = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
+	DynamicStr* str = nullptr;
+
+	if (Cur_Obj != nullptr){
+		str = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		str = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);
+	}
+
 	char* c = str->Get_Str();
 	return c[0];
 }
 JsonCallObjArr::operator char*(){
-	if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::STRING)){
-		//실패하는 경우
-		return '\0';
+	if (!getOper_Ctrl(JNode::JType::STRING)){	//실패하는경우
+		return nullptr;
 	}
 
-	DynamicStr* str = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
+	DynamicStr* str = nullptr;
+
+	if (Cur_Obj != nullptr){
+		str = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
+	}
+
+	if (Cur_Arr != nullptr){
+		str = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);
+	}
+
 	return str->Get_Str();
 }
 JsonCallObjArr::operator JNode*(){
 	//*JNode = Cur_Obj->Value;  Value를 반환해야함
-	//실패하는경우가 뭘까? 없다고 보자
+	if (Cur_Obj == nullptr && Cur_Arr == nullptr){
+		return nullptr;
+	}
 
 	JNode* rNode = Cur_Obj->Value;
 
@@ -504,105 +563,75 @@ JsonCallObjArr::operator JNode*(){
 // JNode[1] = 
 // Cur_Obj->Value->P_Type(???) = 
 void JsonCallObjArr::operator=(int _num){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::NUMBER)){
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::NUMBER);
-	}
-
-	int* num = static_cast<int*>(Cur_Obj->Value->P_Type);
-
-	*num = _num;
+	//예외 처리 및 덮어쓰기용도
+	setOper_Ctrl(JNode::JType::NUMBER, &_num);
 }
 void JsonCallObjArr::operator=(int* _num){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::NUMBER)){
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::NUMBER);
-	}
-
-	int* num = static_cast<int*>(Cur_Obj->Value->P_Type);
-
-	*num = *_num;
+	setOper_Ctrl(JNode::JType::NUMBER, _num);
 }
 void JsonCallObjArr::operator=(double _dnum){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::DOUBLE);
-	}
-
-	double* dnum = static_cast<double*>(Cur_Obj->Value->P_Type);
-
-	*dnum = _dnum;
+	setOper_Ctrl(JNode::JType::DOUBLE, &_dnum);
 }
 void JsonCallObjArr::operator=(double* _dnum){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::DOUBLE);
-	}
-
-	double* dnum = static_cast<double*>(Cur_Obj->Value->P_Type);
-
-	*dnum = *_dnum;
+	setOper_Ctrl(JNode::JType::DOUBLE, _dnum);
 }
 void JsonCallObjArr::operator=(bool _bl){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::BOOL)){
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::BOOL);
-	}
-
-	bool* bl = static_cast<bool*>(Cur_Obj->Value->P_Type);
-
-	*bl = _bl;
+	setOper_Ctrl(JNode::JType::BOOL, &_bl);
 }
 void JsonCallObjArr::operator=(bool* _bl){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::BOOL)){
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::BOOL);
-	}
-
-	bool* bl = static_cast<bool*>(Cur_Obj->Value->P_Type);
-
-	*bl = *_bl;
+	setOper_Ctrl(JNode::JType::BOOL, _bl);
 }
 void JsonCallObjArr::operator=(char _c){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::STRING)){
-		//타입이 안맞으면 덮어쓸거니까 지워주셈
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::STRING);
-	}
-	DynamicStr* c = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
-	c->Set_Char(&_c);
+	setOper_Ctrl(JNode::JType::STRING, &_c);
 }
 void JsonCallObjArr::operator=(char* _str){
-	if (!Cur_Obj->Value->isTypeMatch(JNode::JType::STRING)){
-		//타입이 안맞으면 덮어쓸거니까 지워주셈
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::STRING);
-	}
-	DynamicStr* str = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
-	str->Set_Str(_str);	//복사
-
-	//문자열 파싱 할수도 있음 객체나 배열일때 판단?
+	setOper_Ctrl(JNode::JType::STRING, _str, true);
 }
 void JsonCallObjArr::operator=(JNode* jnode){
-	//Cur_Obj->Value = JNode;  Value에 대입하는건데
+	//Cur_Arr->Value = JNode;  Value에 대입하는건데
 	//Value를 덮어씌우고 하는거라고 가정하면 될까?
 
-	if (jnode->isTypeNull()){
-		//jnode->P_Type == nullptr인 경우
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->setType(JNode::JType::NULLTYPE);
+	if (Cur_Obj == nullptr && Cur_Arr == nullptr){
+		return;
 	}
-	else{
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->Cur_Type = jnode->Cur_Type;
-		Cur_Obj->Value->P_Type = jnode->P_Type;
 
-		//이중 소멸을 방지하기 위한 jnode의 P_Type을 참조해제
-		jnode->P_Type = nullptr;
-		jnode->delType();
-		jnode->setType(JNode::JType::NULLTYPE);
+	//2가지로 나누기
+
+	if (Cur_Obj != nullptr){
+		if (jnode->isTypeNull()){
+			//jnode->P_Type == nullptr인 경우
+			Cur_Obj->Value->delType();
+			Cur_Obj->Value->setType(JNode::JType::NULLTYPE);
+		}
+		else{
+			Cur_Obj->Value->delType();
+			Cur_Obj->Value->Cur_Type = jnode->Cur_Type;
+			Cur_Obj->Value->P_Type = jnode->P_Type;
+
+			//이중 소멸을 방지하기 위한 jnode의 P_Type을 참조해제
+			jnode->P_Type = nullptr;
+			jnode->delType();
+			jnode->setType(JNode::JType::NULLTYPE);
+		}
+	}
+
+	if (Cur_Arr != nullptr){
+		if (jnode->isTypeNull()){
+			//jnode->P_Type == nullptr인 경우
+			Cur_Arr->Value->delType();
+			Cur_Arr->Value->setType(JNode::JType::NULLTYPE);
+		}
+		else{
+			Cur_Arr->Value->delType();
+			Cur_Arr->Value->Cur_Type = jnode->Cur_Type;
+			Cur_Arr->Value->P_Type = jnode->P_Type;
+
+			//이중 소멸을 방지하기 위한 jnode의 P_Type을 참조해제
+			jnode->P_Type = nullptr;
+			jnode->delType();
+			jnode->setType(JNode::JType::NULLTYPE);
+		}
 	}
 }
-
 
 

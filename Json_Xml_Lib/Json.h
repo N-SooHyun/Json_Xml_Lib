@@ -83,8 +83,8 @@ namespace JSON {
 		operator JArr*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		operator JObj*();			//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		operator JNode();			//JNode = JNode 이런경우 lValue만 사용되기에 반환은 호출이 안됨
-	public:
 		operator JNode*();			//고로 있으나 마나 반환은 쓰이지 않을예정
+	public:
 
 		//대입
 		void operator=(int);
@@ -94,7 +94,7 @@ namespace JSON {
 		void operator=(bool);
 		void operator=(bool*);
 		void operator=(char);
-		void operator=(char*);
+		void operator=(const char*);
 	private:
 		void operator=(JObj);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		void operator=(JArr);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
@@ -109,11 +109,11 @@ namespace JSON {
 		JsonCallObjArr operator[](const char* key);
 		JsonCallObjArr operator[](int index);
 
-	private:
 		JType Cur_Type;
 		void* P_Type;
 		int ObjCnt;
 		int ArrCnt;
+	private:
 		friend JsonCallObjArr;
 		friend JObj;
 		friend JArr;
@@ -230,7 +230,32 @@ namespace JSON {
 			return cur_arr;
 		}
 
-	private:
+		//자신의 arr기준 tail위치 반환 + idx값도 반환해줄 수 있음 포인터로
+		JArr* getTailArr(int *idx){
+			JArr* cur_arr = this;
+			JArr* prev_arr = nullptr;
+
+			*idx = -1;
+
+			if (cur_arr == nullptr) return nullptr;
+
+			for (; cur_arr != nullptr;){
+				prev_arr = cur_arr;
+				cur_arr = cur_arr->next;
+				*idx += 1;
+			}
+
+			return prev_arr;
+		}
+
+		void setValue(JNode::JType setNodeType){
+			//덮어쓰기
+			Value->delType();
+			Value->setType(Value->Cur_Type);
+		}
+
+
+	//private:
 		JNode* const Value;
 		JArr* next;
 		friend JsonCallObjArr;
@@ -286,16 +311,52 @@ namespace JSON {
 		}
 		JsonCallObjArr(JNode* node, int index) : Root_Obj(nullptr){
 			Root_Node = node;
+			int max_idx = -1;
 			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
 			JArr* search_idx_arr = Root_Arr->RootSearchIndex(index);
-			JArr* tail_arr = Root_Arr->getTailArr();
+			JArr* tail_arr = Root_Arr->getTailArr(&max_idx);
 
 			//1. Root_Node의 상태가 "[]" 이런 상태일때 아무 배열에 값도 없을때 
+			if (Root_Node->ArrCnt == -1){
+				if (index != 0){//실패
+					Cur_Arr = nullptr;
+				}
+				else{
+					Root_Arr->setValue(JNode::JType::NULLTYPE);
+					Root_Arr->next = nullptr;
+					Root_Node->ArrCnt++;
+
+					Cur_Arr = Root_Arr;
+				}
+			}
 
 			//2. Root_Node의 상태가 "[...]"이런 상태일때 배열의 값이 존재할때
 
+			// 해당 idx를 가진 값이 존재할때
+			else if (search_idx_arr != nullptr){
+				Cur_Arr = search_idx_arr;
+			}
+			// 해당 idx를 가진 값이 존재하지 않을때
+			else{
+				if (index > max_idx+1){		//배열의 크기보다 클때 실패
+					//연산자오버로딩에서 실패하도록 만들기
+					Cur_Arr = nullptr;
+				}
+				else{
+					JArr* new_arr = new JArr();
+					new_arr->setValue(JNode::JType::NULLTYPE);
+					new_arr->next = nullptr;
+					Root_Node->ArrCnt++;
+
+					tail_arr->next = new_arr;
+
+					Cur_Arr = new_arr;
+				}
+			}
 			
-			
+			//연산자 오버로딩에서 사용할 리소스 초기화 해주기
+			Cur_Node = Root_Node;
+			Cur_Obj = Root_Obj;		//nullptr
 		}
 
 
@@ -332,6 +393,211 @@ namespace JSON {
 		void operator=(char);
 		void operator=(char*);
 		void operator=(JNode*);
+
+		//반환용 제어 (True 성공, False 실패)
+		bool getOper_Ctrl(JNode::JType curType){
+			//예외처리용도
+			if (Cur_Obj == nullptr && Cur_Arr == nullptr){
+				return false;
+			}
+
+			if (Cur_Obj != nullptr){
+				switch (curType){
+				case JNode::JType::NUMBER:
+					if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::NUMBER))
+						return false;
+					break;
+				case JNode::JType::DOUBLE:
+					if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::DOUBLE))
+						return false;
+					break;
+				case JNode::JType::BOOL:
+					if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::BOOL))
+						return false;
+					break;
+				case JNode::JType::STRING:
+					if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::STRING))
+						return false;
+					break;
+				case JNode::JType::OBJ:
+					if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::OBJ))
+						return false;
+					break;
+				case JNode::JType::ARR:
+					if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::ARR))
+						return false;
+					break;
+				case JNode::JType::NULLTYPE:
+					if (Cur_Obj->Value->isTypeNull() && !Cur_Obj->Value->isTypeMatch(JNode::JType::NULLTYPE))
+						return false;
+					break;
+
+				}
+			}
+
+			if (Cur_Arr != nullptr){
+				switch (curType){
+				case JNode::JType::NUMBER:
+					if (Cur_Arr->Value->isTypeNull() && !Cur_Arr->Value->isTypeMatch(JNode::JType::NUMBER))
+						return false;
+					break;
+				case JNode::JType::DOUBLE:
+					if (Cur_Arr->Value->isTypeNull() && !Cur_Arr->Value->isTypeMatch(JNode::JType::DOUBLE))
+						return false;
+					break;
+				case JNode::JType::BOOL:
+					if (Cur_Arr->Value->isTypeNull() && !Cur_Arr->Value->isTypeMatch(JNode::JType::BOOL))
+						return false;
+					break;
+				case JNode::JType::STRING:
+					if (Cur_Arr->Value->isTypeNull() && !Cur_Arr->Value->isTypeMatch(JNode::JType::STRING))
+						return false;
+					break;
+				case JNode::JType::OBJ:
+					if (Cur_Arr->Value->isTypeNull() && !Cur_Arr->Value->isTypeMatch(JNode::JType::OBJ))
+						return false;
+					break;
+				case JNode::JType::ARR:
+					if (Cur_Arr->Value->isTypeNull() && !Cur_Arr->Value->isTypeMatch(JNode::JType::ARR))
+						return false;
+					break;
+				case JNode::JType::NULLTYPE:
+					if (Cur_Arr->Value->isTypeNull() && !Cur_Arr->Value->isTypeMatch(JNode::JType::NULLTYPE))
+						return false;
+					break;
+
+				}
+			}
+
+			//성공
+			return true;
+		}
+
+		//대입용 제어 (True 성공, False 실패)
+		void setOper_Ctrl(JNode::JType curType, void* rValue, bool str = false){
+			//예외처리용도
+			if (Cur_Obj == nullptr && Cur_Arr == nullptr){
+				return;
+			}
+
+			if (Cur_Obj != nullptr){
+				if (curType == JNode::JType::NUMBER){
+					if (!Cur_Obj->Value->isTypeMatch(JNode::JType::NUMBER)){
+						Cur_Obj->Value->delType();
+						Cur_Obj->Value->setType(JNode::JType::NUMBER);
+					}
+					int* lval = static_cast<int*>(Cur_Obj->Value->P_Type);
+					int* rval = static_cast<int*>(rValue);
+
+					*lval = *rval;
+				}
+				else if (curType == JNode::JType::DOUBLE){
+					if (!Cur_Obj->Value->isTypeMatch(JNode::JType::DOUBLE)){
+						Cur_Obj->Value->delType();
+						Cur_Obj->Value->setType(JNode::JType::DOUBLE);
+					}
+					double* lval = static_cast<double*>(Cur_Obj->Value->P_Type);
+					double* rval = static_cast<double*>(rValue);
+
+					*lval = *rval;
+				}
+				else if (curType == JNode::JType::BOOL){
+					if (!Cur_Obj->Value->isTypeMatch(JNode::JType::BOOL)){
+						Cur_Obj->Value->delType();
+						Cur_Obj->Value->setType(JNode::JType::BOOL);
+					}
+					bool* lval = static_cast<bool*>(Cur_Obj->Value->P_Type);
+					bool* rval = static_cast<bool*>(rValue);
+
+					*lval = *rval;
+				}
+				else if (curType == JNode::JType::STRING){
+					if (!Cur_Obj->Value->isTypeMatch(JNode::JType::STRING)){
+						Cur_Obj->Value->delType();
+						Cur_Obj->Value->setType(JNode::JType::STRING);
+					}
+					if (str){//문자열
+						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
+						char* rval = static_cast<char*>(rValue);
+						lval->Set_Str(rval);
+					}
+					else{//문자
+						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
+						char* rval = static_cast<char*>(rValue);
+						lval->Set_Char(&rval[0]);
+					}
+				}
+				else if (curType == JNode::JType::OBJ){
+
+				}
+				else if (curType == JNode::JType::ARR){
+
+				}
+				else if (curType == JNode::JType::NULLTYPE){
+
+				}
+			}
+
+			if (Cur_Arr != nullptr){
+				if (curType == JNode::JType::NUMBER){
+					if (!Cur_Arr->Value->isTypeMatch(JNode::JType::NUMBER)){
+						Cur_Arr->Value->delType();
+						Cur_Arr->Value->setType(JNode::JType::NUMBER);
+					}
+					int* lval = static_cast<int*>(Cur_Arr->Value->P_Type);
+					int* rval = static_cast<int*>(rValue);
+
+					*lval = *rval;
+				}
+				else if (curType == JNode::JType::DOUBLE){
+					if (!Cur_Arr->Value->isTypeMatch(JNode::JType::DOUBLE)){
+						Cur_Arr->Value->delType();
+						Cur_Arr->Value->setType(JNode::JType::DOUBLE);
+					}
+					double* lval = static_cast<double*>(Cur_Arr->Value->P_Type);
+					double* rval = static_cast<double*>(rValue);
+
+					*lval = *rval;
+				}
+				else if (curType == JNode::JType::BOOL){
+					if (!Cur_Arr->Value->isTypeMatch(JNode::JType::BOOL)){
+						Cur_Arr->Value->delType();
+						Cur_Arr->Value->setType(JNode::JType::BOOL);
+					}
+					bool* lval = static_cast<bool*>(Cur_Arr->Value->P_Type);
+					bool* rval = static_cast<bool*>(rValue);
+
+					*lval = *rval;
+				}
+				else if (curType == JNode::JType::STRING){
+					if (!Cur_Arr->Value->isTypeMatch(JNode::JType::STRING)){
+						Cur_Arr->Value->delType();
+						Cur_Arr->Value->setType(JNode::JType::STRING);
+					}
+					if (str){//문자열
+						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);
+						char* rval = static_cast<char*>(rValue);
+						lval->Set_Str(rval);
+					}
+					else{//문자
+						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);
+						char* rval = static_cast<char*>(rValue);
+						lval->Set_Char(&rval[0]);
+					}
+				}
+				else if (curType == JNode::JType::OBJ){
+
+				}
+				else if (curType == JNode::JType::ARR){
+
+				}
+				else if (curType == JNode::JType::NULLTYPE){
+
+				}
+			}
+			
+
+		}
 
 	private:
 		JNode* Root_Node;	//node->P_Type == Obj; 인거임 obj의 Value node 아님

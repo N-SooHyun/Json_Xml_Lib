@@ -1,252 +1,1020 @@
 #include "Main.h"
 using namespace JSON;
 
-void JsonAPI_Test(){
-	//반환 연산자
-	JNode* pjs = new JNode(JNode::JType::NUMBER);	
-	JNode js(JNode::JType::NUMBER);
+
+//대입 테스트
+void Ver_Set_Test_Before(JNode& node) {
+	printf("<대입 이전>\n");
+	printf("기존 Cur_Type : ");
 	
+	switch (node.Cur_Type){
+		case JNode::JType::NUMBER:
+			std::cout << "NUMBER" << std::endl;
+			break;
+		case JNode::JType::DOUBLE:
+			std::cout << "DOUBLE" << std::endl;
+			break;
+		case JNode::JType::BOOL:
+			std::cout << "BOOL" << std::endl;
+			break;
+		case JNode::JType::STRING:
+			std::cout << "STRING" << std::endl;
+			break;
+		case JNode::JType::OBJ:
+			std::cout << "OBJ" << std::endl;
+			break;
+		case JNode::JType::ARR:
+			std::cout << "ARR" << std::endl;
+			break;
+		case JNode::JType::NULLTYPE:
+			std::cout << "NULLTYPE" << std::endl;
+			break;
+	}
 
-	int num = *pjs;
-	int* pnum = *pjs;
-	num = js;
-	pnum = js;
+	printf("기존 P_Type : ");
 
-	pjs->delType();
-	js.delType();
-	
-	pjs->setType(JNode::JType::DOUBLE);
-	js.setType(JNode::JType::DOUBLE);
-
-	double dnum = *pjs;
-	double *pdnum = *pjs;
-	dnum = js; 
-	pdnum = js;
-
-	pjs->delType();
-	js.delType();
-	pjs->setType(JNode::JType::BOOL);
-	js.setType(JNode::JType::BOOL);
-
-	bool bl = *pjs;
-	bool* pbl = *pjs;
-	bl = js; 
-	pbl = js;
-
-	pjs->delType();
-	js.delType();
-	pjs->setType(JNode::JType::STRING);
-	js.setType(JNode::JType::STRING);
-
-	char c = *pjs;
-	char* str = *pjs;
-	c = js;
-	str = js;
-
-	pjs->delType();
-	js.delType();
-
-	
-
-	delete pjs;
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		printf("new int() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::DOUBLE:
+		printf("new double() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::BOOL:
+		printf("new bool() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::STRING:
+		printf("new char() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::OBJ:
+		printf("new obj() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::ARR:
+		printf("new arr() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::NULLTYPE:
+		printf("nullptr -> %p\n", node.P_Type);
+		break;
+	}
+	printf("---------------------\n");
 }
 
-void JsonAPI_Test2(){
-	//대입 연산자 
-	JNode* pjs = new JNode(JNode::JType::NUMBER);
-	JNode js(JNode::JType::NUMBER);
+void Ver_Set_Test_Before_2(JNode& node){
+	printf("<대입 이전>\n");
+	printf("기존 Cur_Type : ");
 
-	int num = -1;
+	int* pnum = nullptr;
+	double* pdnum = nullptr;
+	bool* pbl = nullptr;
+	DynamicStr* str = nullptr;
+	char* pstr = nullptr;
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		std::cout << "NUMBER" << std::endl;
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		std::cout << "DOUBLE" << std::endl;
+		pdnum = static_cast<double*>(node.P_Type);
+		printf("node.P_Type(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		std::cout << "BOOL" << std::endl;
+		pbl = static_cast<bool*>(node.P_Type);
+		printf("node.P_Type(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		std::cout << "STRING" << std::endl;
+		str = static_cast<DynamicStr*>(node.P_Type);
+		printf("node.P_Type(int) = %s\n", str->Get_Str());
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+	printf("기존 P_Type : ");
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		printf("new int() -> %p\n", node.P_Type);
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		printf("new double() -> %p\n", node.P_Type);
+		pdnum = static_cast<double*>(node.P_Type);
+		printf("node.P_Type(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		printf("new bool() -> %p\n", node.P_Type);
+		pbl = static_cast<bool*>(node.P_Type);
+		printf("node.P_Type(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		printf("new char() -> %p\n", node.P_Type);
+		str = static_cast<DynamicStr*>(node.P_Type);
+		printf("node.P_Type(int) = %s\n", str->Get_Str());
+		break;
+	case JNode::JType::OBJ:
+		printf("new obj() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::ARR:
+		printf("new arr() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::NULLTYPE:
+		printf("nullptr -> %p\n", node.P_Type);
+		break;
+	}
+	printf("---------------------\n");
+}
+
+void Ver_Set_Test_After(JNode& node, JNode::JType curType) {
+	printf("<대입 이후>\n");
+	printf("대입한 타입 : ");
+
+	switch (curType){
+	case JNode::JType::NUMBER:
+		std::cout << "NUMBER" << std::endl;
+		break;
+	case JNode::JType::DOUBLE:
+		std::cout << "DOUBLE" << std::endl;
+		break;
+	case JNode::JType::BOOL:
+		std::cout << "BOOL" << std::endl;
+		break;
+	case JNode::JType::STRING:
+		std::cout << "STRING" << std::endl;
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+	printf("대입 이후 node.Cur_Type : ");
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		std::cout << "NUMBER" << std::endl;
+		break;
+	case JNode::JType::DOUBLE:
+		std::cout << "DOUBLE" << std::endl;
+		break;
+	case JNode::JType::BOOL:
+		std::cout << "BOOL" << std::endl;
+		break;
+	case JNode::JType::STRING:
+		std::cout << "STRING" << std::endl;
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+
+	printf("대입 이후 P_Type : ");
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		printf("new int() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::DOUBLE:
+		printf("new double() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::BOOL:
+		printf("new bool() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::STRING:
+		printf("new char() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::OBJ:
+		printf("new obj() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::ARR:
+		printf("new arr() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::NULLTYPE:
+		printf("nullptr -> %p\n", node.P_Type);
+		break;
+	}
+	printf("---------------------\n");
+}
+
+void Ver_Set_Test_After_2(JNode& node, JNode::JType curType) {
+	printf("<대입 이후>\n");
+	printf("대입한 타입 : ");
+
+	int* pnum = nullptr;
+	double* pdnum = nullptr;
+	bool* pbl = nullptr;
+	DynamicStr* str = nullptr;
+	char* pstr = nullptr;
+
+	switch (curType){
+	case JNode::JType::NUMBER:
+		std::cout << "NUMBER" << std::endl;
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		std::cout << "DOUBLE" << std::endl;
+		pdnum = static_cast<double*>(node.P_Type);
+		printf("node.P_Type(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		std::cout << "BOOL" << std::endl;
+		pbl = static_cast<bool*>(node.P_Type);
+		printf("node.P_Type(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		std::cout << "STRING" << std::endl;
+		str = static_cast<DynamicStr*>(node.P_Type);
+		printf("node.P_Type(str) = %s\n", str->Get_Str());
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+	printf("대입 이후 node.Cur_Type : ");
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		std::cout << "NUMBER" << std::endl;
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		std::cout << "DOUBLE" << std::endl;
+		pdnum = static_cast<double*>(node.P_Type);
+		printf("node.P_Type(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		std::cout << "BOOL" << std::endl;
+		pbl = static_cast<bool*>(node.P_Type);
+		printf("node.P_Type(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		std::cout << "STRING" << std::endl;
+		str = static_cast<DynamicStr*>(node.P_Type);
+		printf("node.P_Type(int) = %s\n", str->Get_Str());
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+
+	printf("대입 이후 P_Type : ");
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		printf("new int() -> %p\n", node.P_Type);
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		printf("new double() -> %p\n", node.P_Type);
+		pdnum = static_cast<double*>(node.P_Type);
+		printf("node.P_Type(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		printf("new bool() -> %p\n", node.P_Type);
+		pbl = static_cast<bool*>(node.P_Type);
+		printf("node.P_Type(bool) = %B\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		printf("new char() -> %p\n", node.P_Type);
+		str = static_cast<DynamicStr*>(node.P_Type);
+		printf("node.P_Type(int) = %s\n", str->Get_Str());
+		break;
+	case JNode::JType::OBJ:
+		printf("new obj() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::ARR:
+		printf("new arr() -> %p\n", node.P_Type);
+		break;
+	case JNode::JType::NULLTYPE:
+		printf("nullptr -> %p\n", node.P_Type);
+		break;
+	}
+	printf("---------------------\n");
+}
+
+
+//반환 테스트
+void Ver_Get_Test_Before(JNode& node, JNode::JType lValueType, void* lValue, bool c_ck=false) {
+	int* pnum = nullptr;
+	double* pdnum = nullptr;
+	bool* pbl = nullptr;
+	DynamicStr* str = nullptr;
+	char* pstr = nullptr;
+	char *c = nullptr;
+	
+	printf("<반환 이전>\n");
+	printf("lValue 상태 : ");
+	switch (lValueType){
+	case JNode::JType::NUMBER:
+		pnum = static_cast<int*>(lValue);
+		printf("lValue(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		pdnum = static_cast<double*>(lValue);
+		printf("lValue(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		pbl = static_cast<bool*>(lValue);
+		printf("lValue(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		if (c_ck){
+			c = static_cast<char*>(lValue);
+			printf("lValue(char) = %c\n", c[0]); 
+			break;
+		}
+		pstr = static_cast<char*>(lValue);
+		printf("lValue(str) = %s\n", pstr);
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+	printf("node.Cur_Type : ");
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		std::cout << "NUMBER" << std::endl;
+		break;
+	case JNode::JType::DOUBLE:
+		std::cout << "DOUBLE" << std::endl;
+		break;
+	case JNode::JType::BOOL:
+		std::cout << "BOOL" << std::endl;
+		break;
+	case JNode::JType::STRING:
+		std::cout << "STRING" << std::endl;
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		pdnum = static_cast<double*>(node.P_Type);
+		printf("node.P_Type(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		pbl = static_cast<bool*>(node.P_Type);
+		printf("node.P_Type(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		str = static_cast<DynamicStr*>(node.P_Type);
+		printf("node.P_Type(str) = %s\n", str->Get_Str());
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+}
+
+void Ver_Get_Test_After(JNode& node, JNode::JType lValueType, void* lValue, bool c_ck = false) {
+	int* pnum = nullptr;
+	double* pdnum = nullptr;
+	bool* pbl = nullptr;
+	DynamicStr* str = nullptr;
+	char* pstr = nullptr;
+	char* c = nullptr;
+
+	if (lValue == nullptr){
+		printf("<반환 이후>\n");
+		printf("lValue 상태 : ");
+		printf("lValue == nullptr 실패\n");
+		return;
+	}
+
+	printf("<반환 이후>\n");
+	printf("lValue 상태 : ");
+	switch (lValueType){
+	case JNode::JType::NUMBER:
+		pnum = static_cast<int*>(lValue);
+		printf("lValue(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		pdnum = static_cast<double*>(lValue);
+		printf("lValue(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		pbl = static_cast<bool*>(lValue);
+		printf("lValue(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		if (c_ck){
+			c = static_cast<char*>(lValue);
+			printf("lValue(char) = %c\n", c[0]);
+			break;
+		}
+		pstr = static_cast<char*>(lValue);
+		printf("lValue(str) = %s\n", pstr);
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+	printf("node.Cur_Type : ");
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		std::cout << "NUMBER" << std::endl;
+		break;
+	case JNode::JType::DOUBLE:
+		std::cout << "DOUBLE" << std::endl;
+		break;
+	case JNode::JType::BOOL:
+		std::cout << "BOOL" << std::endl;
+		break;
+	case JNode::JType::STRING:
+		std::cout << "STRING" << std::endl;
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+
+	switch (node.Cur_Type){
+	case JNode::JType::NUMBER:
+		pnum = static_cast<int*>(node.P_Type);
+		printf("node.P_Type(int) = %d\n", *pnum);
+		break;
+	case JNode::JType::DOUBLE:
+		pdnum = static_cast<double*>(node.P_Type);
+		printf("node.P_Type(double) = %.3f\n", *pdnum);
+		break;
+	case JNode::JType::BOOL:
+		pbl = static_cast<bool*>(node.P_Type);
+		printf("node.P_Type(bool) = %d\n", *pbl);
+		break;
+	case JNode::JType::STRING:
+		str = static_cast<DynamicStr*>(node.P_Type);
+		printf("node.P_Type(str) = %s\n", str->Get_Str());
+		break;
+	case JNode::JType::OBJ:
+		std::cout << "OBJ" << std::endl;
+		break;
+	case JNode::JType::ARR:
+		std::cout << "ARR" << std::endl;
+		break;
+	case JNode::JType::NULLTYPE:
+		std::cout << "NULLTYPE" << std::endl;
+		break;
+	}
+}
+
+
+void JNode_Fin_Set_Test() {
+	JNode node;
+	JNode *pnode = new JNode();
+
+	JNode* obj_node = new JNode(JNode::JType::OBJ);
+	JNode* arr_node = new JNode(JNode::JType::ARR);
+
+
+	//int 테스트 대입
+	Ver_Set_Test_Before(node);
+	printf("node = 10\n");
+	node = 10;
+	Ver_Set_Test_After(node, JNode::JType::NUMBER);
+
+	printf("\n\n");
+
+	//double 테스트 대입
+	Ver_Set_Test_Before(node);
+	printf("node = 1.0\n");
+	node = 1.0;
+	Ver_Set_Test_After(node, JNode::JType::DOUBLE);
+
+	printf("\n\n");
+
+	//bool 테스트 대입
+	Ver_Set_Test_Before(node);
+	printf("node = true\n");
+	node = true;
+	Ver_Set_Test_After(node, JNode::JType::BOOL);
+
+	printf("\n\n");
+
+	//string 테스트 대입
+	Ver_Set_Test_Before(node);
+	printf("node = 't'\n");
+	node = 't';
+	Ver_Set_Test_After(node, JNode::JType::STRING);
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before(node);
+	printf("node = OBJ\n");
+	node = JNode::JType::OBJ;
+	Ver_Set_Test_After(node, JNode::JType::OBJ);
+
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before(node);
+	printf("node = ARR\n");
+	node = JNode::JType::ARR;
+	Ver_Set_Test_After(node, JNode::JType::ARR);
+
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before(node);
+	printf("node = obj_node(JNode)\n");
+	node = obj_node;
+	Ver_Set_Test_After(node, JNode::JType::OBJ);
+	printf("obj_node->P_Type : %p\n", obj_node->P_Type);
+
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before(node);
+	printf("node = arr_node(JNode)\n");
+	node = arr_node;
+	Ver_Set_Test_After(node, JNode::JType::ARR);
+	printf("arr_node->P_Type : %p\n", arr_node->P_Type);
+
+	int num = 10;
 	int* pnum = &num;
-	double dnum = -1.0;
+	double dnum = 10.0;
 	double* pdnum = &dnum;
 	bool bl = true;
 	bool* pbl = &bl;
-	char c = 'a';
-	const char *str = "Test";
+	char c = 't';
+	const char* str = "Test";
+	
+	Ver_Set_Test_Before_2(node);
+	printf("node = num\n");
+	node = num;
+	Ver_Set_Test_After_2(node, JNode::JType::NUMBER);
 
-	*pjs = num;
-	*pjs = pnum;
-	js = num;
-	js = pnum;
+	printf("\n\n");
 
-	pjs->delType();
-	js.delType();
-	pjs->setType(JNode::JType::DOUBLE);
-	js.setType(JNode::JType::DOUBLE);
+	Ver_Set_Test_Before_2(node);
+	printf("node = pnum\n");
+	node = pnum;
+	Ver_Set_Test_After_2(node, JNode::JType::NUMBER);
 
-	*pjs = dnum;
-	*pjs = pdnum;
-	js = dnum;
-	js = pdnum;
+	printf("\n\n");
 
-	pjs->delType();
-	js.delType();
-	pjs->setType(JNode::JType::BOOL);
-	js.setType(JNode::JType::BOOL);
+	Ver_Set_Test_Before_2(node);
+	printf("node = dnum\n");
+	node = dnum;
+	Ver_Set_Test_After_2(node, JNode::JType::DOUBLE);
 
-	*pjs = bl;
-	*pjs = pbl;
-	js = bl; 
-	js = pbl;
+	printf("\n\n");
 
-	pjs->delType();
-	js.delType();
-	pjs->setType(JNode::JType::STRING);
-	js.setType(JNode::JType::STRING);
+	Ver_Set_Test_Before_2(node);
+	printf("node = pdnum\n");
+	node = pdnum;
+	Ver_Set_Test_After_2(node, JNode::JType::DOUBLE);
 
-	*pjs = c;
-	*pjs = str;
-	js = c;
-	js = str;
+	printf("\n\n");
 
-	delete pjs;
+	Ver_Set_Test_Before_2(node);
+	printf("node = bl\n");
+	node = bl;
+	Ver_Set_Test_After_2(node, JNode::JType::BOOL);
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before_2(node);
+	printf("node = pbl\n");
+	node = pbl;
+	Ver_Set_Test_After_2(node, JNode::JType::BOOL);
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before_2(node);
+	printf("node = *str\n");
+	node = str;
+	Ver_Set_Test_After_2(node, JNode::JType::STRING);
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before_2(node);
+	printf("node = c\n");
+	node = c;
+	Ver_Set_Test_After_2(node, JNode::JType::STRING);
+
+	printf("\n\n");
+
+	Ver_Set_Test_Before_2(node);
+	printf("node = str\n");
+	node = *str;
+	Ver_Set_Test_After_2(node, JNode::JType::STRING);
+
+	printf("\n\n");
 }
 
-void JsonAPI_Test3(){
-	//대입 연산자 덮어쓰기 가능여부 확인
-	JNode* pjs = new JNode(JNode::JType::DOUBLE);
-	JNode js(JNode::JType::DOUBLE);
+void JNode_Fin_Get_Test(){
+	JNode node;
+	JNode* pnode = new JNode();
 
-	int num = -1;
+	int num = 10;
 	int* pnum = &num;
-	double dnum = -1.0;
+	double dnum = 10.0;
 	double* pdnum = &dnum;
 	bool bl = true;
 	bool* pbl = &bl;
-	char c = 'a';
-	const char *str = "Test";
+	char c = 't';
+	char* str = "Test";
 
-	*pjs = num;
-	js = num;
+	//반환 테스트 실패만
+	printf("<실패의 경우만> \n\n");
+	Ver_Get_Test_Before(node, JNode::JType::NUMBER, &num);
+	printf("------------------------------\n");
+	printf("★ num(%d) = node(P_Type==nullptr)\n", num);
+	printf("------------------------------\n");
+	num = node;
+	Ver_Get_Test_After(node, JNode::JType::NUMBER, &num);
 
-	pjs->delType();
-	js.delType();
+	printf("\n\n");
+	num = 100;
 
-	*pjs = pnum;
-	js = pnum;
+	Ver_Get_Test_Before(node, JNode::JType::NUMBER, pnum);
+	printf("------------------------------\n");
+	printf("★ pnum(%d) = node(P_Type==nullptr)\n", *pnum);
+	printf("------------------------------\n");
+	pnum = node;
+	Ver_Get_Test_After(node, JNode::JType::NUMBER, pnum);
 
-	pjs->delType();
-	js.delType();
+	printf("\n\n");
 
-	*pjs = 2;
-	js = 3;
+	Ver_Get_Test_Before(node, JNode::JType::DOUBLE, &dnum);
+	printf("------------------------------\n");
+	printf("★ dnum(%.3f) = node(P_Type==nullptr)\n", dnum);
+	printf("------------------------------\n");
+	dnum = node;
+	Ver_Get_Test_After(node, JNode::JType::DOUBLE, &dnum);
 
-	*pjs = 1.0;
-	js = 2.0;
+	printf("\n\n");
+	dnum = 100.00;
 
-	pjs->delType();
-	js.delType();
+	Ver_Get_Test_Before(node, JNode::JType::DOUBLE, pdnum);
+	printf("------------------------------\n");
+	printf("★ pdnum(%.3f) = node(P_Type==nullptr)\n", *pdnum);
+	printf("------------------------------\n");
+	pdnum = node;
+	Ver_Get_Test_After(node, JNode::JType::DOUBLE, pdnum);
 
-	*pjs = 2.0;
-	js = 3.0;
+	printf("\n\n");
 
-	*pjs = true;
-	js = true;
+	Ver_Get_Test_Before(node, JNode::JType::BOOL, &bl);
+	printf("------------------------------\n");
+	printf("★ bl(%d) = node(P_Type==nullptr)\n", bl);
+	printf("------------------------------\n");
+	bl = node;
+	Ver_Get_Test_After(node, JNode::JType::BOOL, &bl);
 
-	*pjs = 'a';
-	js = 'a'; 
+	printf("\n\n");
+	bl = true;
 
-	pjs->delType();
-	js.delType();
+	Ver_Get_Test_Before(node, JNode::JType::BOOL, pbl);
+	printf("------------------------------\n");
+	printf("★ pbl(%d) = node(P_Type==nullptr)\n", *pbl);
+	printf("------------------------------\n");
+	pbl = node;
+	Ver_Get_Test_After(node, JNode::JType::BOOL, pbl);
 
-	*pjs = "str";
-	js = "Test";
+	printf("\n\n");
 
+	Ver_Get_Test_Before(node, JNode::JType::STRING, &c, true);
+	printf("------------------------------\n");
+	printf("★ c(%c) = node(P_Type==nullptr)\n", c);
+	printf("------------------------------\n");
+	c = node;
+	Ver_Get_Test_After(node, JNode::JType::STRING, &c, true);
+
+	printf("\n\n");
+
+	Ver_Get_Test_Before(node, JNode::JType::STRING, str);
+	printf("------------------------------\n");
+	printf("★ str(%s) = node(P_Type==nullptr)\n", str);
+	printf("------------------------------\n");
+	str = node;
+	Ver_Get_Test_After(node, JNode::JType::STRING, str);
 
 }
 
-void JOBj_JArr_Test(){
-	//대입 반환 API 설계 테스트
-	JNode* pjs = new JNode(JNode::JType::DOUBLE);
-	JNode js(JNode::JType::DOUBLE);
 
-	int num = -1;
-	int* pnum = &num;
-	double dnum = -1.0;
-	double* pdnum = &dnum;
+
+void obj_prt(JNode& obj_node){
+	JObj* root_obj = static_cast<JObj*>(obj_node.P_Type);
+	JObj* cur_obj = root_obj;
+
+	int* num = nullptr;
+	double* dnum = nullptr;
+	bool* bl = nullptr;
+	char* c = nullptr;
+	DynamicStr* str = nullptr;
+
+
+	if (obj_node.ObjCnt == -1) {
+		printf("{}\n");
+		return;
+	}
+	printf("{");
+	for (;;){
+		printf("%s : ", cur_obj->Key.Get_Str());
+
+		
+		switch(cur_obj->Value->Cur_Type){
+		case JNode::JType::NUMBER:
+			num = static_cast<int*>(cur_obj->Value->P_Type);
+			printf("%d", *num);
+			break;
+		case JNode::JType::DOUBLE:
+			dnum = static_cast<double*>(cur_obj->Value->P_Type);
+			printf("%.3f", *dnum);
+			break;
+		case JNode::JType::BOOL:
+			bl = static_cast<bool*>(cur_obj->Value->P_Type);
+			printf("%s", bl ? "true" : "false");
+			break;
+		case JNode::JType::STRING:
+			str = static_cast<DynamicStr*>(cur_obj->Value->P_Type);
+			printf("%s", str->Get_Str());
+			break;
+		case JNode::JType::OBJ:
+			printf("{}");
+			break;
+		case JNode::JType::ARR:
+			printf("[]");
+			break;
+		case JNode::JType::NULLTYPE:
+			printf(" ");
+			break;
+		}
+
+		if (cur_obj->next == nullptr){
+			printf("}\n");
+			break;
+		}
+
+		printf(", ");
+
+		cur_obj = cur_obj->next;
+	}
+}
+
+void arr_prt(JNode& arr_node){
+	JArr* root_arr = static_cast<JArr*>(arr_node.P_Type);
+	JArr* cur_arr = root_arr;
+
+	int* num = nullptr;
+	double* dnum = nullptr;
+	bool* bl = nullptr;
+	char* c = nullptr;
+	DynamicStr* str = nullptr;
+
+	if (arr_node.ArrCnt == -1){
+		printf("[]\n");
+		return;
+	}
+
+	printf("[");
+	for (;;){
+		switch (cur_arr->Value->Cur_Type){
+		case JNode::JType::NUMBER:
+			num = static_cast<int*>(cur_arr->Value->P_Type);
+			printf("%d", *num);
+			break;
+		case JNode::JType::DOUBLE:
+			dnum = static_cast<double*>(cur_arr->Value->P_Type);
+			printf("%.3f", *dnum);
+			break;
+		case JNode::JType::BOOL:
+			bl = static_cast<bool*>(cur_arr->Value->P_Type);
+			printf("%s", bl ? "true" : "false");
+			break;
+		case JNode::JType::STRING:
+			str = static_cast<DynamicStr*>(cur_arr->Value->P_Type);
+			printf("%s", str->Get_Str());
+			break;
+		case JNode::JType::OBJ:
+			printf("{}");
+			break;
+		case JNode::JType::ARR:
+			printf("[]");
+			break;
+		case JNode::JType::NULLTYPE:
+			printf(" ");
+			break;
+		}
+
+		if (cur_arr->next == nullptr){
+			printf("]\n");
+			break;
+		}
+
+		printf(", ");
+
+		cur_arr = cur_arr->next;
+	}
+
+}
+
+void JNode_Obj_Test(){
+	//JNode["Key"]에 대한 대입
+	JNode obj_node(JNode::JType::OBJ);
+
+	//obj_node["Key0"] = 1;
+
+	obj_prt(obj_node);
+
+	printf("\n\n");
+
+	obj_node["Key0"] = 1;
+	obj_node["Key1"] = 1.0;
+
+	obj_prt(obj_node);
+
+	obj_node["Key0"] = 'T';
+	obj_node["Key1"] = "Test";
+
+	obj_prt(obj_node);
+
+	obj_node["Key0"] = true;
+	obj_node["Key1"] = 1000;
+
+	obj_prt(obj_node);
+
+	int num = 10;
+	double dnum = 1.0;
 	bool bl = true;
+	char c = 'A';
+
+	obj_node["Key0"] = num;
+	obj_node["Key1"] = dnum;
+	obj_node["Key2"] = bl;
+	obj_node["Key3"] = c;
+
+	obj_prt(obj_node);
+
+	int* pnum = &num;
+	double* pdnum = &dnum;
 	bool* pbl = &bl;
-	char c = 'a';
-	const char *str = "Test";
+	char* str = "Test";
 
-	*pjs = 1;
-	js = 1;
+	obj_node["Key0"] = pnum;
+	obj_node["Key1"] = pdnum;
+	obj_node["Key2"] = pbl;
+	obj_node["Key3"] = str;
 
-	num = js;
+	obj_prt(obj_node);
 
+	JNode node_obj(JNode::JType::OBJ);
+	JNode node_arr(JNode::JType::ARR);
+	//obj_node["Key0"] = node_arr;
+	//obj_node["Key0"] = node_obj; 안되는거 맞음 내가 막아놓음
 
-	//객체를 호출하는 호출자 API 인터페이스
-	js["Key0"] = num;
-	js["Key1"] = pnum;
-	js["key2"] = dnum;
-	js["key3"] = pdnum;
-	js["key4"] = bl;
-	js["key5"] = pbl;
-	js["key6"] = c;
-	js["key7"] = str;
+	JNode* pnode_obj = new JNode(JNode::JType::OBJ);
+	JNode* pnode_arr = new JNode(JNode::JType::ARR);
+	obj_node["Key0"] = pnode_obj;
+	obj_node["Key1"] = pnode_arr;
 
-	js["Key0"] = str;
-	js["Key1"] = bl;
+	obj_prt(obj_node);
 
-	num = js["Key0"];
-	*pnum = js["Key1"];
-	dnum = js["key2"];
-	pdnum = js["key3"];
-	bl = js["key4"];
-	pbl = js["key5"]; 
-	c = js["key6"];
-	str = js["key7"];
+	obj_node["Key0"] = 10;
+	obj_node["Key1"] = 10.0;
+	obj_node["Key2"] = true;
+	obj_node["Key3"] = 'T';
+	obj_node["Key4"] = "Test";
 
-	
+	obj_prt(obj_node);
+
+	num = obj_node["Key0"];
+	dnum = obj_node["Key1"];
+	bl = obj_node["Key2"];
+	c = obj_node["Key3"];
+	str = obj_node["Key4"];
+
+	printf("num : %d\n", num);
+	printf("dnum : %.3f\n", dnum);
+	printf("bl : %s\n", bl ? "True" : "False");
+	printf("c : %c\n", c);
+	printf("str : %s\n", str);
+
+	pnum = obj_node["Key0"];
+	pdnum = obj_node["Key1"];
+	pbl = obj_node["Key2"];
+
+	printf("num : %d\n", *pnum);
+	printf("dnum : %.3f\n", *pdnum);
+	printf("bl : %s\n", *pbl ? "True" : "False");
 
 
 
 }
 
-void JObj_Test(){
-	JNode node1(JNode::JType::NUMBER);
-	JNode node2(JNode::JType::NUMBER);
-	JNode node3(JNode::JType::NUMBER);
+void JNode_Arr_Test(){
+	JNode arr_node(JNode::JType::ARR);
 
-	JObj obj;		//Key0번
-	JObj* root_obj = &obj;	//head
-	JObj* cur_obj = &obj;	//tail
-	
-	cur_obj->setKey("Key0");
+	arr_prt(arr_node);
 
-	//새노드 추가
-	cur_obj->next = new JObj();
-	cur_obj = cur_obj->next;
+	arr_node[0] = 10;
+	arr_node[1] = 1.0;
+	arr_node[2] = true;
+	arr_node[3] = 'T';
+	arr_node[4] = "Test";
 
-	cur_obj->setKey("Key1");
+	arr_prt(arr_node);
 
-	//새노드 추가
-	cur_obj->next = new JObj();
-	cur_obj = cur_obj->next;
+	arr_node[0] = 1.0;
+	arr_node[1] = 10;
+	arr_node[2] = 'T';
+	arr_node[3] = "Test";
+	arr_node[4] = false;
 
-	cur_obj->setKey("Key2");
-	
+	arr_prt(arr_node);
 
-	JObj* search_obj;
+	JNode* obj = new JNode(JNode::JType::OBJ);
 
-	search_obj = obj.searchKey("Key3");
+	arr_node[5] = obj;
 
-	
-}
+	JNode* arr = new JNode(JNode::JType::ARR); 
 
-void JNode_Test() {
-	JNode node1(JNode::JType::NUMBER);
-	JNode node2(JNode::JType::NUMBER);
-	JNode* node3 = new JNode(JNode::JType::NUMBER);
+	arr_node[6] = arr;
 
-	node1 = JNode::JType::OBJ;
+	arr_prt(arr_node);
 
-	node1["Key0"] = 1;
-	
-	int num = node1["Key0"];
-	int* pnum = node1["Key0"];
-	
 }
 
 int main() {
@@ -255,7 +1023,27 @@ int main() {
 	//JsonAPI_Test2();
 	//JsonAPI_Test3();
 	
-	JNode_Test();
+	//JNode_Test();
+
+
+	//JNode_Fin_Set_Test();
+
+	//JNode_Fin_Get_Test();
+
+	//JNode_Obj_Test();
+
+	JNode_Arr_Test();
+
+	char c = 'a';
+
+	while (1){
+		fflush(stdin);
+		std::cout << "프로그램 종료(q or Q) : ";
+		scanf_s("%c", &c);
+		if (c == 'q' || c == 'Q') break;
+		fflush(stdin);
+		
+	}
 
 	return 0;
 }
