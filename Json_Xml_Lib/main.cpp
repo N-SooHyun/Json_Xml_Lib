@@ -1069,6 +1069,8 @@ void JNode_Arr_Test(){
 
 	arr_prt(arr_node);
 
+	arr_node[4] = DEL;
+
 }
 
 int main() {

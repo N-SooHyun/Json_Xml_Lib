@@ -4,6 +4,9 @@
 #include <iostream>
 #include "Str.h"
 
+#define DEL "del"
+#define del "del"		//이거는 없어야 할지 고민중 나중에 충돌이 생길가능성이 있을듯
+
 using namespace std;
 using namespace Dynamic;
 
@@ -55,6 +58,9 @@ namespace JSON {
 		
 		JsonCallObjArr arr_push();	//추후 생성 예정
 		JsonCallObjArr obj_push();	//추후 생성 예정
+
+		JsonCallObjArr arr_del(int index);			//추후 생성 예정
+		JsonCallObjArr obj_del(const char* key);	//추후 생성 예정
 
 		void operator=(JType);
 
