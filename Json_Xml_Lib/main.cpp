@@ -1015,6 +1015,58 @@ void JNode_Arr_Test(){
 
 	arr_prt(arr_node);
 
+	int num = 10;
+	double dnum = 1.0;
+	bool bl = true;
+	char c = 'A';
+
+	arr_node[0] = num;
+	arr_node[1] = dnum;
+	arr_node[2] = bl;
+	arr_node[3] = c;
+
+	arr_prt(arr_node);
+
+	int* pnum = &num;
+	double* pdnum = &dnum;
+	bool* pbl = &bl;
+	char* str = "Test";
+
+	arr_node[0] = pnum;
+	arr_node[1] = pdnum;
+	arr_node[2] = pbl;
+	arr_node[3] = str;
+
+	arr_prt(arr_node);
+
+	arr_node[0] = 10;
+	arr_node[1] = 10.0;
+	arr_node[2] = true;
+	arr_node[3] = 'T';
+	arr_node[4] = "Test";
+
+	num = arr_node[0];
+	dnum = arr_node[1];
+	bl = arr_node[2];
+	c = arr_node[3];
+	str = arr_node[4];
+
+	printf("num : %d\n", num);
+	printf("dnum : %.3f\n", dnum);
+	printf("bl : %s\n", bl ? "True" : "False");
+	printf("c : %c\n", c);
+	printf("str : %s\n", str);
+
+	pnum = arr_node[0];
+	pdnum = arr_node[1];
+	pbl = arr_node[2];
+
+	printf("num : %d\n", *pnum);
+	printf("dnum : %.3f\n", *pdnum);
+	printf("bl : %s\n", *pbl ? "True" : "False");
+
+	
+
 }
 
 int main() {
