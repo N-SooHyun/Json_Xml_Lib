@@ -53,7 +53,8 @@ namespace JSON {
 
 		}
 		
-
+		JsonCallObjArr arr_push();	//추후 생성 예정
+		JsonCallObjArr obj_push();	//추후 생성 예정
 
 		void operator=(JType);
 
