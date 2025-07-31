@@ -315,7 +315,7 @@ namespace JSON {
 			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
 			JArr* search_idx_arr = Root_Arr->RootSearchIndex(index);
 			JArr* tail_arr = Root_Arr->getTailArr(&max_idx);
-
+			if (index == -1) index = max_idx + 1;		//-1이면 그냥 뒤에 추가
 			//1. Root_Node의 상태가 "[]" 이런 상태일때 아무 배열에 값도 없을때 
 			if (Root_Node->ArrCnt == -1){
 				if (index != 0){//실패
@@ -337,6 +337,7 @@ namespace JSON {
 				Cur_Arr = search_idx_arr;
 			}
 			// 해당 idx를 가진 값이 존재하지 않을때
+			
 			else{
 				if (index > max_idx+1){		//배열의 크기보다 클때 실패
 					//연산자오버로딩에서 실패하도록 만들기

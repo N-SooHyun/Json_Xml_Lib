@@ -1065,7 +1065,9 @@ void JNode_Arr_Test(){
 	printf("dnum : %.3f\n", *pdnum);
 	printf("bl : %s\n", *pbl ? "True" : "False");
 
-	
+	arr_node[-1] = false;
+
+	arr_prt(arr_node);
 
 }
 
