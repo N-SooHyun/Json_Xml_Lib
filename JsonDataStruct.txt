@@ -45,3 +45,43 @@ JNode *NodeArr = node;
 
 
 덮어쓰기 대입 삭제를 만들어야 하는데...
+
+
+
+
+JNode* node = JNode["Key"] or JNode[1]; 이런경우
+
+node == JNode->P_Type->Value(JNode) 를 가리키게 됨
+
+delete node; 하면 기존 JNode가 소멸될때 이중 소멸이 발생할 가능성이 높음
+
+그렇기때문에 참조정도만 해주는게 좋을듯
+
+
+
+
+
+
+
+
+
+
+
+<Push 및 Del 대한 부분>
+-Push
+arr_push()	-	끝값에 값을 집어넣는거
+JNode.arr_push() = 10;
+
+obj_push(const char* key)	-	끝값에 넣는건데 안쓸예정 막을 예정 key의존적이라 중복발생하면 감당안됨
+
+
+-Delete
+arr_del(int index)	-	정해진 index를 삭제하기
+
+obj_del(const char* key)	-	정해진 key에 객체를 삭제하기
+
+arr_del()	-	끝에 있는 index를 삭제하기
+
+obj_del()	-	끝에 있는 객체를 삭제하기
+
+

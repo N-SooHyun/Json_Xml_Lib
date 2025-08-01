@@ -785,6 +785,7 @@ void obj_prt(JNode& obj_node){
 	char* c = nullptr;
 	DynamicStr* str = nullptr;
 
+	printf("\n <개수 : %d>\n", obj_node.ObjCnt);
 
 	if (obj_node.ObjCnt == -1) {
 		printf("{}\n");
@@ -843,6 +844,8 @@ void arr_prt(JNode& arr_node){
 	bool* bl = nullptr;
 	char* c = nullptr;
 	DynamicStr* str = nullptr;
+
+	printf("\n <개수 : %d>\n", arr_node.ArrCnt);
 
 	if (arr_node.ArrCnt == -1){
 		printf("[]\n");
@@ -1069,7 +1072,119 @@ void JNode_Arr_Test(){
 
 	arr_prt(arr_node);
 
-	arr_node[4] = DEL;
+	//arr_node[4] = DEL;
+
+	JNode* lNode;
+
+	lNode = arr_node[4];
+
+	if (lNode->Cur_Type == JNode::JType::STRING){
+		printf("lNode String 타입\n");
+		char* new_str = *lNode;
+		printf("lNode->P_Type == %s\n", new_str);
+	}
+
+	lNode->push() = 10;
+
+	arr_prt(arr_node);
+
+	arr_prt(*lNode);
+
+	//삭제
+
+	printf("\n\n<삭제 부분>\n");
+
+	arr_prt(arr_node);
+	
+
+	
+
+
+}
+
+void JNode_Obj_Arr_Del_Test(){
+	JNode obj_node(JNode::JType::OBJ);
+	JNode arr_node(JNode::JType::ARR);
+
+	obj_node["Key0"] = 1;
+	obj_node["Key1"] = 2;
+	obj_node["Key2"] = "A";
+	obj_node["Key3"] = true;
+	obj_node["Key4"] = "Obj_Test";
+
+	arr_node.push() = 1;
+	arr_node.push() = 2;
+	arr_node.push() = "A";
+	arr_node.push() = true;
+	arr_node.push() = "Arr_Test";
+
+	obj_prt(obj_node);
+	arr_prt(arr_node);
+
+	//삭제 진행
+	arr_node.arr_del(1);
+
+	arr_prt(arr_node);
+
+	arr_node.arr_del();
+
+	arr_prt(arr_node);
+
+	arr_node.arr_del();
+	arr_node.arr_del();
+	arr_node.arr_del();
+	arr_node.arr_del();
+
+	arr_prt(arr_node);
+
+	obj_prt(obj_node);
+
+	obj_node.obj_del();
+
+	obj_prt(obj_node);
+
+	obj_node.obj_del("Key0");
+	obj_node.obj_del("Key1");
+	obj_node.obj_del("Key3");
+	obj_node.obj_del("Key4");
+
+	obj_prt(obj_node);
+
+	arr_node.push() = 1;
+	arr_node.push() = 2;
+	arr_node.push() = "A";
+	arr_node.push() = true;
+	arr_node.push() = "Arr_Test";
+
+	arr_prt(arr_node);
+
+	arr_node[0] = "T";
+
+	arr_prt(arr_node);
+
+	arr_node.arr_del(0);
+
+	obj_node["Key0"] = 1;
+	obj_node["Key10"] = true;
+
+
+	printf("\n\n\n last Test\n");
+	arr_prt(arr_node);
+	obj_prt(obj_node);
+
+
+	obj_node.del();
+	arr_node.del();
+
+	arr_prt(arr_node);
+	obj_prt(obj_node);
+	
+	arr_node.push() = 10;
+	obj_node.push() = 10;
+
+	arr_prt(arr_node);
+
+
 
 }
 
@@ -1088,7 +1203,8 @@ int main() {
 
 	//JNode_Obj_Test();
 
-	JNode_Arr_Test();
+	//JNode_Arr_Test(); 
+	JNode_Obj_Arr_Del_Test();
 
 	char c = 'a';
 

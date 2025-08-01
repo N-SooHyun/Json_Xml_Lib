@@ -6,6 +6,7 @@ using namespace JSON;
 
 
 //<JNode class>--------------------------------------------------------------------------------------
+
 void JNode::delType(){
 	//이중소멸을 막기 위한 예외
 	if (isTypeNull()){
@@ -58,6 +59,21 @@ void JNode::delType(){
 	}
 	P_Type = nullptr;
 	Cur_Type = JType::NULLTYPE;
+
+	//if (prev_Node != nullptr){
+	//	//prev_Node한테 del된 상태를 알려줘야함 
+	//	//안그러면 이중 소멸 발생함
+	//	//어떤 객체가 소멸했는지 알아야 할것
+	//	//어떤 배열이 소멸했는지 알아야 할것
+	//	if (prev_obj != nullptr){
+	//		
+	//	} 
+	//	if (prev_arr != nullptr){
+
+	//	}
+
+	//	
+	//}
 }
 
 void JNode::setType(JType Set_Node_Type){
@@ -329,11 +345,11 @@ void JNode::operator=(const char* _str){
 		Cur_Type = JType::STRING;
 		setType(Cur_Type);
 	}
-	DynamicStr* str = static_cast<DynamicStr*>(P_Type);
-	str->Set_Str(_str);	//복사
+DynamicStr* str = static_cast<DynamicStr*>(P_Type);
+str->Set_Str(_str);	//복사
 
-	//문자열 파싱 부분
-	isObjArrCk(str);
+//문자열 파싱 부분
+isObjArrCk(str);
 }
 //Node를 받을때 처리
 //rNode를 lNode로 대입하는 상황인데
@@ -395,6 +411,88 @@ JsonCallObjArr JNode::operator[](int index){
 	JsonCallObjArr Call(this, index);
 	return Call;
 }
+
+//가장 끝 index에 값 넣기
+JsonCallObjArr JNode::push(){
+	if (this->Cur_Type == JNode::JType::OBJ){
+		JsonCallObjArr fail;
+		return fail;
+	}
+	//Arr타입이 아닌경우 덮어쓰기
+	if (!isTypeMatch(JType::ARR)){
+		delType();
+		setType(JType::ARR);
+		JsonCallObjArr call(this, JNode::JType::ARR);
+		return call;
+	}
+	JsonCallObjArr call(this, JNode::JType::ARR);
+	return call;
+}
+
+//가장 끝 객체에 값 넣기 안쓰는게 좋을거 같기도 함 key중복생길 수 있어서
+JsonCallObjArr JNode::obj_push(const char* key){
+	JsonCallObjArr j;
+	return j;
+}
+
+//해당 인덱스 삭제하기
+JsonCallObjArr JNode::arr_del(int index){
+	//Arr타입이 아닌경우? 그냥 삭제 실패해버리셈
+	if (!isTypeMatch(JType::ARR)){
+		JsonCallObjArr failcall;
+		return failcall;
+	}
+	JsonCallObjArr call(this, index, true);
+	return call;
+}
+
+//해당 키가진 객체 삭제하기
+JsonCallObjArr JNode::obj_del(const char* key){
+	//Obj 타입이 아닌 경우? 그냥 삭제 실패해버리셈
+	if (!isTypeMatch(JType::OBJ)){
+		JsonCallObjArr failcall;
+		return failcall;
+	}
+	JsonCallObjArr call(this, key, true);
+	return call;
+}
+
+//끝에만 삭제
+JsonCallObjArr JNode::arr_del(){
+	//Arr타입이 아닌경우? 그냥 삭제 실패해버리셈
+	if (!isTypeMatch(JType::ARR)){
+		JsonCallObjArr failcall;
+		return failcall;
+	}
+	JsonCallObjArr call(this, JNode::JType::ARR, true);
+	return call;
+}
+
+//끝에만 삭제
+JsonCallObjArr JNode::obj_del(){
+	//Obj 타입이 아닌 경우? 그냥 삭제 실패해버리셈
+	if (!isTypeMatch(JType::OBJ)){
+		JsonCallObjArr failcall;
+		return failcall;
+	}
+	JsonCallObjArr call(this, JNode::JType::OBJ, true);
+	return call;
+}
+
+JsonCallObjArr* JNode::del(){
+	if (this->Cur_Type == JNode::JType::ARR){
+		JsonCallObjArr* arr = &arr_del();
+		//return &arr_del();
+		return arr;
+	}
+	else if (this->Cur_Type == JNode::JType::OBJ){
+		JsonCallObjArr* obj = &obj_del();
+		//return &obj_del();
+		return obj;
+	}
+	return nullptr;
+}
+
 
 //<JObj class>--------------------------------------------------------------------------------------
 
@@ -552,9 +650,41 @@ JsonCallObjArr::operator JNode*(){
 		return nullptr;
 	}
 
-	JNode* rNode = Cur_Obj->Value;
+	if (Cur_Node == nullptr){
+		return nullptr;
+	}
+	
+	JNode* lNode = new JNode();
+	
 
-	return rNode;	
+	//복사가아닌 이동을 해주어야함 기존 lNode <- rNode(JNode[..])
+	//lNode = rNode[4] 는 곧
+	//lNode = rNode->P_Type->4번째 Value(Jnode)를 참조하는거임
+	//즉, 복사가 아닌 참조용도이기에 lNode는 delete하면 안됨
+	
+	if (Cur_Obj != nullptr){
+		delete lNode;
+		// lNode = Cur_Obj -> Value 참조
+		/*lNode->Cur_Type = Cur_Obj->Value->Cur_Type;
+		lNode->P_Type = Cur_Obj->Value->P_Type;
+		lNode->ArrCnt = Cur_Obj->Value->ArrCnt;
+		lNode->ObjCnt = Cur_Obj->Value->ObjCnt;*/
+		lNode = Cur_Obj->Value;
+	} 
+	if (Cur_Arr != nullptr){
+		delete lNode;
+		// lNode = Cur_Arr -> Value 참조
+		/*lNode->Cur_Type = Cur_Arr->Value->Cur_Type;
+		lNode->P_Type = Cur_Arr->Value->P_Type;
+		lNode->ArrCnt = Cur_Arr->Value->ArrCnt;
+		lNode->ObjCnt = Cur_Arr->Value->ObjCnt;*/
+		lNode = Cur_Arr->Value;
+	}
+
+	/*lNode->prev_Node = Cur_Node;
+	lNode->prev_obj = Cur_Obj;
+	lNode->prev_arr = Cur_Arr;*/
+	return lNode;
 }
 
 
@@ -630,6 +760,34 @@ void JsonCallObjArr::operator=(JNode* jnode){
 			jnode->P_Type = nullptr;
 			jnode->delType();
 			jnode->setType(JNode::JType::NULLTYPE);
+		}
+	}
+}
+
+
+
+
+
+//생성자 부분
+JsonCallObjArr::JsonCallObjArr(JNode* node, JNode::JType curType, bool trg_del){
+	if (trg_del){
+		//del
+		//1. Obj인지 Arr인지 판단
+		if (curType == JNode::JType::ARR){
+			arr_del(node);
+		}
+		else if (curType == JNode::JType::OBJ){
+			obj_del(node);
+		}
+	}
+	else{
+		//push
+		//1. Obj인지 Arr인지 판단
+		if (curType == JNode::JType::ARR){
+			arr_push(node);
+		}
+		else if (curType == JNode::JType::OBJ){
+			obj_push(node);
 		}
 	}
 }

@@ -4,8 +4,6 @@
 #include <iostream>
 #include "Str.h"
 
-#define DEL "del"
-#define del "del"		//이거는 없어야 할지 고민중 나중에 충돌이 생길가능성이 있을듯
 
 using namespace std;
 using namespace Dynamic;
@@ -56,11 +54,18 @@ namespace JSON {
 
 		}
 		
-		JsonCallObjArr arr_push();	//추후 생성 예정
-		JsonCallObjArr obj_push();	//추후 생성 예정
+		JsonCallObjArr push();
+	private:
+		JsonCallObjArr obj_push(const char* key);	//추후 생성 예정 안쓰는게 좋을거 같기도 하고
+	public:
 
-		JsonCallObjArr arr_del(int index);			//추후 생성 예정
-		JsonCallObjArr obj_del(const char* key);	//추후 생성 예정
+		JsonCallObjArr arr_del(int index);			//선택해서 삭제
+		JsonCallObjArr arr_del();					//끝에만 삭제
+		JsonCallObjArr obj_del(const char* key);	//선택해서 삭제
+		JsonCallObjArr obj_del();					//끝에만 삭제
+
+		//push del 통합 메소드 호출용 메소드
+		JsonCallObjArr* del();
 
 		void operator=(JType);
 
@@ -118,6 +123,9 @@ namespace JSON {
 
 		JType Cur_Type;
 		void* P_Type;
+		//JNode* prev_Node;
+		//JObj* prev_obj;
+		//JArr* prev_arr;
 		int ObjCnt;
 		int ArrCnt;
 	private:
@@ -169,6 +177,24 @@ namespace JSON {
 			return cur_obj;
 		}
 		
+		JObj* getPrevObj(JObj* cur_obj, JNode* root_node){
+			JObj* root_obj = static_cast<JObj*>(root_node->P_Type);
+			
+			if (cur_obj == nullptr) return nullptr;
+			
+			if (root_obj->next == nullptr)
+				return nullptr;
+
+			if (root_obj == cur_obj) return nullptr;
+
+			for (;;){
+				if (root_obj->next == cur_obj) break;
+				root_obj = root_obj->next;
+			}
+
+			return root_obj;	//cur_obj == root_obj->next
+		}
+
 		//키값 생성
 		void setKey(const char* key){
 			if (Value->Cur_Type != JNode::JType::NULLTYPE) 
@@ -255,6 +281,24 @@ namespace JSON {
 			return prev_arr;
 		}
 
+		JArr* getPrevArr(JArr* cur_arr, JNode* root_node){
+			JArr* root_arr = static_cast<JArr*>(root_node->P_Type);
+
+			if (cur_arr == nullptr) return nullptr;
+
+			if (root_arr->next == nullptr)
+				return nullptr;
+
+			if (root_arr == cur_arr) return nullptr;
+
+			for (;;){
+				if (root_arr->next == cur_arr) break;
+				root_arr = root_arr->next;
+			}
+
+			return root_arr;
+		}
+
 		void setValue(JNode::JType setNodeType){
 			//덮어쓰기
 			Value->delType();
@@ -268,14 +312,10 @@ namespace JSON {
 		friend JsonCallObjArr;
 	};
 
-	class JsonCtrl {
-
-	};
-
 	class JsonCallObjArr {
 	public:
 		JsonCallObjArr() : Root_Node(nullptr), Root_Obj(nullptr), Root_Arr(nullptr){}
-		JsonCallObjArr(JNode* node, const char* key) : Root_Arr(nullptr){
+		JsonCallObjArr(JNode* node, const char* key, bool trg_del = false) : Root_Arr(nullptr){
 			Root_Node = node;
 			Root_Obj = static_cast<JObj*>(Root_Node->P_Type);
 			JObj* search_key_obj = Root_Obj->searchKey(key);
@@ -283,22 +323,67 @@ namespace JSON {
 
 			//1. Root_Node의 상태가 "{}" 이런 상태일때 아무 객체도 없을때
 			if (Root_Node->ObjCnt == -1){
+				if (trg_del == true){
+					//삭제 할 객체가 존재하지 않을때
+					Cur_Obj = nullptr;
+					Cur_Arr = nullptr;
+					Cur_Node = nullptr;
+					return;
+				}
 				Root_Obj->setKey(key);			//키값 설정
 				Root_Obj->setValue(JNode::JType::NULLTYPE);	//일단 초기화니까 NullType넣어주기
 				Root_Obj->next = nullptr;
 				Root_Node->ObjCnt++;
 
 				//연산자 오버로딩에서 사용할 리소스 초기화 해주기
-				Cur_Obj = Root_Obj; 
+				Cur_Obj = Root_Obj;
 			}
 
 			//2. Root_Node의 상태가 "{...}"일때 객체가 존재할때 해당키인 객체를 찾기
 			
 			else if (search_key_obj != nullptr){	//이미 해당 키를 가진 객체가 존재함
+				if (trg_del == true){
+					//삭제할 객체가 존재할때
+					JObj* prev_obj = search_key_obj->getPrevObj(search_key_obj, Root_Node);
+					//1. 1개 혹은 여러개 있으나 0번 객체일때
+					if (prev_obj == nullptr){
+						//1. 1개만 있을때
+						if (search_key_obj->next == nullptr){
+							Root_Node->delType();
+							Root_Node->setType(JNode::JType::OBJ);
+						}
+						//2. 여러개 있으나 0번 객체를 지우려고 할때
+						else{
+							JObj* next_root_obj = search_key_obj->next;
+							search_key_obj->next = nullptr;
+							Root_Node->delType();
+							Root_Node->Cur_Type = JNode::JType::OBJ;
+							Root_Node->P_Type = next_root_obj;
+							Root_Node->ObjCnt--;
+						}
+					}
+					//2. 여러개 있을때
+					else{
+						prev_obj->next = search_key_obj->next;
+						search_key_obj->next = nullptr;
+						delete search_key_obj;
+						Root_Node->ObjCnt--;
+					}
+
+					return;
+				}
 				//연산자 오버로딩에서 처리하도록 해당 키를 가진 객체를 넘겨주기
 				Cur_Obj = search_key_obj;
 			}
 			else{//해당 키를 가진 객체가 존재하지 않음
+				if (trg_del == true){
+					//삭제할 객체가 존재하지 않을때
+					Cur_Obj = nullptr;
+					Cur_Arr = nullptr;
+					Cur_Node = nullptr;
+					return;
+				}
+
 				//새롭게 키를 만들어줘야함
 				JObj* new_obj = new JObj(key);
 				new_obj->setValue(JNode::JType::NULLTYPE);
@@ -316,15 +401,25 @@ namespace JSON {
 			Cur_Node = Root_Node;
 			Cur_Arr = Root_Arr;			//nullptr
 		}
-		JsonCallObjArr(JNode* node, int index) : Root_Obj(nullptr){
+		JsonCallObjArr(JNode* node, int index, bool trg_del = false) : Root_Obj(nullptr){
 			Root_Node = node;
 			int max_idx = -1;
 			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
 			JArr* search_idx_arr = Root_Arr->RootSearchIndex(index);
 			JArr* tail_arr = Root_Arr->getTailArr(&max_idx);
+
 			if (index == -1) index = max_idx + 1;		//-1이면 그냥 뒤에 추가
+
 			//1. Root_Node의 상태가 "[]" 이런 상태일때 아무 배열에 값도 없을때 
 			if (Root_Node->ArrCnt == -1){
+				if (trg_del == true){
+					//삭제할 배열이 존재하지 않을때
+					Cur_Obj = nullptr;
+					Cur_Arr = nullptr;
+					Cur_Node = nullptr;
+					return;
+				}
+
 				if (index != 0){//실패
 					Cur_Arr = nullptr;
 				}
@@ -341,11 +436,50 @@ namespace JSON {
 
 			// 해당 idx를 가진 값이 존재할때
 			else if (search_idx_arr != nullptr){
+				if (trg_del == true){
+					//삭제할 인덱스의 요소가 존재할때
+					JArr* prev_arr = search_idx_arr->getPrevArr(search_idx_arr, Root_Node);
+					//1. 1개 혹은 여러개 있으나 0번 객체일때
+					if (prev_arr == nullptr){
+						//1. 1개만 있을때
+						if (search_idx_arr->next == nullptr){
+							Root_Node->delType();
+							Root_Node->setType(JNode::JType::ARR);
+						}
+
+						//2. 여러개 있으나 0번 객체를 지우려고 할때
+						else{
+							JArr* next_root_arr = search_idx_arr->next;
+							search_idx_arr->next = nullptr;
+							Root_Node->delType();
+							Root_Node->Cur_Type = JNode::JType::ARR;
+							Root_Node->P_Type = next_root_arr;
+							Root_Node->ArrCnt--;
+						}
+					}
+					//2. 여러개 있을때
+					else{
+						prev_arr->next = search_idx_arr->next;
+						search_idx_arr->next = nullptr;
+						delete search_idx_arr;
+						Root_Node->ArrCnt--;
+					}
+					
+					return;
+				}
 				Cur_Arr = search_idx_arr;
 			}
 			// 해당 idx를 가진 값이 존재하지 않을때
 			
 			else{
+				if (trg_del == true){
+					//삭제할 인덱스의 요소가 존재하지 않을때
+					Cur_Obj = nullptr;
+					Cur_Arr = nullptr;
+					Cur_Node = nullptr;
+					return;
+				}
+
 				if (index > max_idx+1){		//배열의 크기보다 클때 실패
 					//연산자오버로딩에서 실패하도록 만들기
 					Cur_Arr = nullptr;
@@ -365,6 +499,124 @@ namespace JSON {
 			//연산자 오버로딩에서 사용할 리소스 초기화 해주기
 			Cur_Node = Root_Node;
 			Cur_Obj = Root_Obj;		//nullptr
+		}
+
+		//그냥 맨뒤에 push 혹은 del 하기 위한 생성자
+		JsonCallObjArr(JNode* node, JNode::JType curType, bool trg_del = false);
+
+		
+		
+
+		//끝에만 push or del 하기
+		//obj는 안쓸예정
+		void obj_push(JNode* node){
+			Root_Arr = nullptr;
+			//1. obj만 처리해주기
+			Root_Node = node;
+			Root_Obj = static_cast<JObj*>(Root_Node->P_Type);
+			JObj* tail_obj = Root_Obj->getTailObj();
+			//2. 객체에 아무값도 존재하지 않을때 그냥 새롭게 하나 만들기
+			if (Root_Node->ObjCnt == -1){
+				
+			}
+
+			//3. 값이 존재해서 맨뒤까지 도달해야할때
+		}
+
+		void arr_push(JNode* node){
+			Root_Obj = nullptr;
+			//1. arr만 처리해주기
+			Root_Node = node;
+			int max_idx = -1;
+			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
+			JArr* tail_arr = Root_Arr->getTailArr(&max_idx);
+			//2. 배열에 아무값도 존재하지 않을때 그냥 새롭게 하나 만들기
+			if (Root_Node->ArrCnt == -1){
+				Root_Arr->setValue(JNode::JType::NULLTYPE);
+				Root_Arr->next = nullptr;
+				Root_Node->ArrCnt++;
+
+				Cur_Arr = Root_Arr;
+			}
+
+			//3. 값이 존재해서 맨뒤까지 도달해야할때
+			else if(Root_Node->ArrCnt >= 0){
+				JArr* new_arr = new JArr();
+				new_arr->setValue(JNode::JType::NULLTYPE);
+				new_arr->next = nullptr;
+				Root_Node->ArrCnt++;
+
+				tail_arr->next = new_arr;
+
+				Cur_Arr = new_arr;
+			}
+			//연산자 오버로딩에서 사용할 리소스 초기화 해주기
+			Cur_Node = Root_Node;
+			Cur_Obj = Root_Obj;		//nullptr
+		}
+
+		void obj_del(JNode* node){
+			Root_Arr = nullptr;
+			//1. obj만 처리해주기
+			Root_Node = node;
+			Root_Obj = static_cast<JObj*>(Root_Node->P_Type);
+			
+			//2. 객체 상태가 "{}"일때
+			if (Root_Node->ObjCnt == -1){
+				return;
+				//삭제못함 그냥 반환
+			}
+
+			//3. 객체 상태가 "{..}"일때
+			else{
+				JObj* tail_obj = Root_Obj->getTailObj();
+				JObj* prev_obj = Root_Obj->getPrevObj(tail_obj, Root_Node);
+
+				if (prev_obj == nullptr){
+					//1개가 남아있을때
+					Root_Node->delType();
+					Root_Node->setType(JNode::JType::OBJ);
+				}
+				else{
+					//여러개가 남아있을때
+					prev_obj->next = nullptr;
+					Root_Node->ObjCnt--;
+					delete tail_obj;
+				}
+			}
+		}
+
+		void arr_del(JNode* node){
+			Root_Obj = nullptr;
+			//1. Arr만 처리해주기
+			Root_Node = node;
+			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
+
+			//2. 배열 상태가 "[]"일때
+			if (Root_Node->ArrCnt == -1) {
+				return;
+				//삭제못함 그냥 반환
+			}
+
+			//3. 배열 상태가 "[..]"일때
+			else{
+				JArr* tail_arr = Root_Arr->getTailArr();
+				JArr* prev_arr = Root_Arr->getPrevArr(tail_arr, Root_Node);
+
+				if (prev_arr == nullptr){
+					//1개남아있을때
+					Root_Node->delType();
+					Root_Node->setType(JNode::JType::ARR);
+				}
+				else{
+					//여러개 남아있을때
+					prev_arr->next = nullptr;
+					Root_Node->ArrCnt--;
+					delete tail_arr;
+				}
+				
+
+			}
 		}
 
 
