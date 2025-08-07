@@ -1,12 +1,21 @@
-# Json_Xml Library
+# JSON 설명서
 
-이 프로젝트는 **JSON**과 **XML** 데이터를 다룰 수 있는 로우레벨 기반의 C/C++ 라이브러리입니다.
+## 개요
 
-- `.lib` 및 `.dll` 파일을 직접 생성하여, 다양한 플랫폼에서 활용 가능하도록 설계되었습니다.
-- 외부 종속성을 최소화하고, 시스템 단에서도 작동 가능하도록 최대한 로우레벨에서 개발을 진행하고 있습니다.
-- 본 라이브러리는 학습과 멀티플랫폼 실험 목적을 겸하여 개발되었습니다.
+이 문서는 `Json_Xml Library`에서 JSON 관련 기능에 대해 설명합니다.
 
-## 📚 문서
-- [JSON 설명서](./JsonManual.md)
-- [XML 설명서](./XmlManual.md)
+## 주요 기능
 
+- JSON 문자열 파싱
+- JSON 객체 생성 및 수정
+- 직렬화 (Serialize) 및 역직렬화 (Deserialize)
+- 키-값 탐색, 삭제, 추가 기능
+
+## 사용 예시
+
+```c
+const char* jsonStr = "{\"name\": \"OpenAI\", \"type\": \"AI\"}";
+JsonObject* obj = json_parse(jsonStr);
+const char* name = json_get_string(obj, "name");
+printf("Name: %s\n", name);
+json_free(obj);
