@@ -1204,7 +1204,8 @@ int main() {
 	//JNode_Obj_Test();
 
 	//JNode_Arr_Test(); 
-	JNode_Obj_Arr_Del_Test();
+
+	//JNode_Obj_Arr_Del_Test();
 
 	char c = 'a';
 
