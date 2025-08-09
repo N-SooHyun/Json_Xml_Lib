@@ -186,7 +186,7 @@ bool JNode::isTypeMatch(JType match_type){
 
 //반환 연산자 = P_Type을 반환
 JNode::operator int(){
-	if (isTypeNull() && !isTypeMatch(JType::NUMBER)){
+	if (!isTypeMatch(JType::NUMBER)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return -1;
 	}
@@ -196,7 +196,7 @@ JNode::operator int(){
 	return *num;
 }
 JNode::operator int*(){
-	if (isTypeNull() && !isTypeMatch(JType::NUMBER)){
+	if (!isTypeMatch(JType::NUMBER)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}
@@ -206,7 +206,7 @@ JNode::operator int*(){
 	return num;	
 }
 JNode::operator double(){
-	if (isTypeNull() && !isTypeMatch(JType::DOUBLE)){
+	if (!isTypeMatch(JType::DOUBLE)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return -1.0;
 	}
@@ -215,7 +215,7 @@ JNode::operator double(){
 	return *dnum;
 }
 JNode::operator double*(){
-	if (isTypeNull() && !isTypeMatch(JType::DOUBLE)){
+	if (!isTypeMatch(JType::DOUBLE)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}
@@ -223,7 +223,7 @@ JNode::operator double*(){
 	return dnum;
 }
 JNode::operator bool(){
-	if (isTypeNull() && !isTypeMatch(JType::BOOL)){
+	if (!isTypeMatch(JType::BOOL)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return false;
 	}
@@ -231,7 +231,7 @@ JNode::operator bool(){
 	return *bl;
 }
 JNode::operator bool*(){
-	if (isTypeNull() && !isTypeMatch(JType::BOOL)){
+	if (!isTypeMatch(JType::BOOL)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}
@@ -239,7 +239,7 @@ JNode::operator bool*(){
 	return pbl;
 }
 JNode::operator char(){
-	if (isTypeNull() && !isTypeMatch(JType::STRING)){
+	if (!isTypeMatch(JType::STRING)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return '\0';
 	}
@@ -248,7 +248,7 @@ JNode::operator char(){
 	return c[0];
 }
 JNode::operator char*(){
-	if (isTypeNull() && !isTypeMatch(JType::STRING)){
+	if (!isTypeMatch(JType::STRING)){
 		//실패하는 경우 타입이 Null이거나 타입매치가 안맞는경우
 		return nullptr;
 	}
@@ -466,7 +466,7 @@ JsonCallObjArr* JNode::arr_del(){
 	return new JsonCallObjArr(this, JNode::JType::ARR, true);
 }
 
-//끝에만 삭제
+//끝에만 삭제(이거는 모호해서 안쓰는게 좋을거 같음)
 JsonCallObjArr* JNode::obj_del(){
 	//Obj 타입이 아닌 경우? 그냥 삭제 실패해버리셈
 	if (!isTypeMatch(JType::OBJ)){
@@ -760,6 +760,9 @@ void JsonCallObjArr::operator=(JNode* jnode){
 	}
 }
 
+void JsonCallObjArr::operator=(JNode::JType curType) {
+
+}
 
 
 

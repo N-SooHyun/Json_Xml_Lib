@@ -1206,18 +1206,13 @@ int main() {
 	//JNode_Arr_Test(); 
 
 	//JNode_Obj_Arr_Del_Test();
-	JNode lValue;
-	JNode rValue;
+	JNode obj(JNode::JType::OBJ);
 
-	lValue = 10; 
-	rValue = 20;
-
-	lValue = &rValue;
-
-	int num = 10;
-	int* pnum = lValue;
-
-	std::cout << *pnum << std::endl;
+	//obj["Key0"] = JNode::JType::OBJ;		이거 추가해주기
+	obj["Key0"] = 1;
+	JObj* jobj = static_cast<JObj*>(obj.P_Type);
+	
+	JNode* obj2 = obj["Key0"];
 
 	char c = 'a';
 

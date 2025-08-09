@@ -653,6 +653,7 @@ namespace JSON {
 		void operator=(char);
 		void operator=(char*);
 		void operator=(JNode*);
+		void operator=(JNode::JType curType);
 
 		//반환용 제어 (True 성공, False 실패)
 		bool getOper_Ctrl(JNode::JType curType){
