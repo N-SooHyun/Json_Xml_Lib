@@ -694,7 +694,7 @@ void JNode_Fin_Get_Test(){
 	bool bl = true;
 	bool* pbl = &bl;
 	char c = 't';
-	char* str = "Test";
+	const char* str = "Test";
 
 	//반환 테스트 실패만
 	printf("<실패의 경우만> \n\n");
@@ -764,12 +764,12 @@ void JNode_Fin_Get_Test(){
 
 	printf("\n\n");
 
-	Ver_Get_Test_Before(node, JNode::JType::STRING, str);
+	Ver_Get_Test_Before(node, JNode::JType::STRING, &str);
 	printf("------------------------------\n");
 	printf("★ str(%s) = node(P_Type==nullptr)\n", str);
 	printf("------------------------------\n");
 	str = node;
-	Ver_Get_Test_After(node, JNode::JType::STRING, str);
+	Ver_Get_Test_After(node, JNode::JType::STRING, &str);
 
 }
 
@@ -934,7 +934,7 @@ void JNode_Obj_Test(){
 	int* pnum = &num;
 	double* pdnum = &dnum;
 	bool* pbl = &bl;
-	char* str = "Test";
+	const char* str = "Test";
 
 	obj_node["Key0"] = pnum;
 	obj_node["Key1"] = pdnum;
@@ -1033,7 +1033,7 @@ void JNode_Arr_Test(){
 	int* pnum = &num;
 	double* pdnum = &dnum;
 	bool* pbl = &bl;
-	char* str = "Test";
+	const char* str = "Test";
 
 	arr_node[0] = pnum;
 	arr_node[1] = pdnum;

@@ -60,9 +60,9 @@ namespace JSON {
 	public:
 
 		JsonCallObjArr arr_del(int index);			//선택해서 삭제
-		JsonCallObjArr arr_del();					//끝에만 삭제
+		JsonCallObjArr* arr_del();					//끝에만 삭제
 		JsonCallObjArr obj_del(const char* key);	//선택해서 삭제
-		JsonCallObjArr obj_del();					//끝에만 삭제
+		JsonCallObjArr* obj_del();					//끝에만 삭제
 
 		//push del 통합 메소드 호출용 메소드
 		JsonCallObjArr* del();

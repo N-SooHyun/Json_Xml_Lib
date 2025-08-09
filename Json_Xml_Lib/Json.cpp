@@ -16,7 +16,7 @@ void JNode::delType(){
 	JType Del_Node_Type= this->Cur_Type;
 	switch (Del_Node_Type){
 		case JType::OBJ:
-		{
+		{  
 			JObj* obj = static_cast<JObj*>(P_Type);
 			delete obj;
 			break;
@@ -458,35 +458,31 @@ JsonCallObjArr JNode::obj_del(const char* key){
 }
 
 //끝에만 삭제
-JsonCallObjArr JNode::arr_del(){
+JsonCallObjArr* JNode::arr_del(){
 	//Arr타입이 아닌경우? 그냥 삭제 실패해버리셈
 	if (!isTypeMatch(JType::ARR)){
-		JsonCallObjArr failcall;
-		return failcall;
+		return nullptr;
 	}
-	JsonCallObjArr call(this, JNode::JType::ARR, true);
-	return call;
+	return new JsonCallObjArr(this, JNode::JType::ARR, true);
 }
 
 //끝에만 삭제
-JsonCallObjArr JNode::obj_del(){
+JsonCallObjArr* JNode::obj_del(){
 	//Obj 타입이 아닌 경우? 그냥 삭제 실패해버리셈
 	if (!isTypeMatch(JType::OBJ)){
-		JsonCallObjArr failcall;
-		return failcall;
+		return nullptr;
 	}
-	JsonCallObjArr call(this, JNode::JType::OBJ, true);
-	return call;
+	return new JsonCallObjArr(this, JNode::JType::OBJ, true);
 }
 
 JsonCallObjArr* JNode::del(){
 	if (this->Cur_Type == JNode::JType::ARR){
-		JsonCallObjArr* arr = &arr_del();
+		JsonCallObjArr* arr = arr_del();
 		//return &arr_del();
 		return arr;
 	}
 	else if (this->Cur_Type == JNode::JType::OBJ){
-		JsonCallObjArr* obj = &obj_del();
+		JsonCallObjArr* obj = obj_del();
 		//return &obj_del();
 		return obj;
 	}
