@@ -1206,6 +1206,18 @@ int main() {
 	//JNode_Arr_Test(); 
 
 	//JNode_Obj_Arr_Del_Test();
+	JNode lValue;
+	JNode rValue;
+
+	lValue = 10; 
+	rValue = 20;
+
+	lValue = &rValue;
+
+	int num = 10;
+	int* pnum = lValue;
+
+	std::cout << *pnum << std::endl;
 
 	char c = 'a';
 
