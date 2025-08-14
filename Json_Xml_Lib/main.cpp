@@ -1214,6 +1214,10 @@ int main() {
 	
 	JNode* obj2 = obj["Key0"];
 
+	obj["Key1"] = JNode::JType::ARR;
+
+	obj.all_del();
+
 	char c = 'a';
 
 	while (1){

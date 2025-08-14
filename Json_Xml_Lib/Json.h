@@ -13,12 +13,6 @@ namespace JSON {
 	class JArr;
 	class JsonCallObjArr;
 
-	class JObj_JArr_Del{
-	public:
-		JObj_JArr_Del(){}
-		virtual ~JObj_JArr_Del(){}
-	};
-
 	class JNode {
 	public:
 		enum class JType {
@@ -66,6 +60,7 @@ namespace JSON {
 
 		//push del 통합 메소드 호출용 메소드
 		JsonCallObjArr* del();
+		void all_del();		//모든 객체 삭제
 
 		void operator=(JType);
 

@@ -489,6 +489,17 @@ JsonCallObjArr* JNode::del(){
 	return nullptr;
 }
 
+void JNode::all_del() {
+	if (this->Cur_Type == JNode::JType::ARR) {
+		delType();
+		setType(JType::ARR);
+	}
+	else if (this->Cur_Type == JNode::JType::OBJ) {
+		delType();
+		setType(JType::OBJ);
+	}
+}
+
 
 //<JObj class>--------------------------------------------------------------------------------------
 
@@ -761,7 +772,12 @@ void JsonCallObjArr::operator=(JNode* jnode){
 }
 
 void JsonCallObjArr::operator=(JNode::JType curType) {
-
+	if (!Cur_Obj->Value->isTypeMatch(curType)) {
+		//타입이 안맞으면 덮어쓸꺼니까 지워주셈
+		Cur_Obj->Value->delType();
+		Cur_Obj->Value->Cur_Type = curType;
+		Cur_Obj->Value->setType(curType);
+	}
 }
 
 
