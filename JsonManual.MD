@@ -106,6 +106,7 @@ data["Key0"] = 10;                      //{"Key0" : 10}
 data["Key0"] = true;                    //{"Key0" : true}
 data["Key1"] = "Test";                  //{"Key0" : true, "Key1" : "Test"}
 data["Key2"] = JNode::JType::OBJ;       //{"Key0" : true, "Key1" : "Test", "Key2" : {}}
+//data["Key3"] = JNode::JType::ARR;       //{"Key0" : true, "Key1" : "Test", "Key2" : {}, "Key3" : []} 참고로 이것도 가능
 JNode* key2 = data["Key2"];
 key2["key2_0"] = 10;                    //{"Key0" : true, "Key1" : "Test", "Key2" : {"key2_0" : 10}}
 key2 = data["Key1"];
@@ -116,7 +117,8 @@ key2["TestKey"] = true;                 //{"Key0" : true, "Key1" : {"TestKey" : 
 ```cpp
 data.obj_del("Key0");                   //특정 키-값 삭제 {"Key1" : {"TestKey" : true}, "Key2" : {"key2_0" : 10}}
 data.obj_del();                         //맨뒤 키-값 삭제 {"Key1" : {"TestKey" : true}}
-data.del();                             //맨뒤 키-값 삭제 {}        혹은 전체삭제로 만드는것도 좋을거 같음
+data.del();                             //맨뒤 키-값 삭제 {}
+data.all_del();                         //전체 삭제
 ```
 
 ##### 2.3.5 키-값 읽기 및 단일 타입 지원
@@ -133,6 +135,53 @@ JNode* key_obj = data["Key0"];      //이런 행위를 통해서 Key0의 Value�
                                     //이런식으로 접근할때 주의할점은 delete key_obj를 하면 이중 delete 소멸이 일어납니다.
                                     //반드시 참조용도로만 사용하도록 주의해주세요
 ```
+
+
+### 2.4 기본 사용 예시(배열 타입)
+##### 2.3.1 배열 생성
+```cpp
+JNode data(JNode::JType::ARR);
+JNode data;
+data = JNode::JType::ARR;
+//이런식으로 만들어진 객체는 [] 이런 형태로 존재
+```
+
+##### 2.3.2 단일 값 덮어쓰기
+```cpp
+data = 10;                      //배열 타입에서 단일값으로 덮어쓰기 가능 ARR->NUMBER타입 덮어씌워짐
+data = JNode::JType::ARR;       //NUMBER->ARR로 타입 덮어쓰기
+```
+
+##### 2.3.3 인덱스 접근 및 자동 생성
+```cpp
+data = 10;
+data[0];                                //NUMBER->ARR 타입으로 덮어쓰기 및 인덱스 생성 내부생김새 [null] 이런 구조
+data[0] = true;                         //[true]
+data[1] = "Test";                       //[true, "Test"]
+data[2] = JNode::JType::ARR;            //[true, "Test", []]
+data[3] = JNode::JType::OBJ;            //[true, "Test", [], {}]
+JNode* arr_2 = data[2];                 
+arr_2[0] = 10;                          //[true, "Test", [10], {}]
+arr_2 = data[1];
+arr_2[1] = true;                        //[true, true, [10], {}]
+arr_2.push("JustPush");                 //[true, true, [10], {}, "JustPush"]
+```
+
+##### 2.3.4 인덱스 삭제
+```cpp
+data.arr_del(2);                        //[true, true,{}, "JustPush"]       특정인덱스 삭제
+data.arr_del();                         //[true, true, "JustPush"]          맨뒤삭제
+data.del();                             //[true, true]                      맨뒤삭제
+data.all_del();                         //[]                                전체삭제
+```
+
+##### 2.3.5 인덱스 읽기 및 단일 타입 지원
+```cpp
+JNode* arr = data[0];       //이런 행위를 통해서 인덱스의 Value에 접근이 가능합니다.
+                            //이런식으로 접근할때 주의할점은 delete arr을 하면 이중 delete소멸이 일어납니다.
+                            //반드시 참조용으로만 사용하도록 주의해주세요
+```
+
 
 ---
 

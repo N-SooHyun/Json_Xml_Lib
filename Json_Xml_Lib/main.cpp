@@ -1216,7 +1216,13 @@ int main() {
 
 	obj["Key1"] = JNode::JType::ARR;
 
-	obj.all_del();
+	obj[0];
+
+	obj[0] = true;
+
+	JNode* arr = obj[0];
+
+	JArr* jarr = static_cast<JArr*>(arr->P_Type);
 
 	char c = 'a';
 
