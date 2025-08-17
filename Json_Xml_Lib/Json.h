@@ -874,4 +874,20 @@ namespace JSON {
 		JObj* Cur_Obj;
 		JArr* Cur_Arr;
 	};
+
+	class StrParser {
+	public:
+		//StrParser() : parserToJsonNode(nullptr), parserStr(nullptr){}
+		StrParser(JNode* node, Dynamic::DynamicStr* str) : parserToJsonNode(node), parserStr(str) {}
+		~StrParser() {}
+
+		//parse ¸Þ¼Òµå
+		void parser() {
+
+		}
+
+	private:
+		JNode* parserToJsonNode;
+		Dynamic::DynamicStr* parserStr;
+	};
 }
