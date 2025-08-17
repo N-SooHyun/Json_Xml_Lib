@@ -69,7 +69,13 @@ namespace Dynamic {
 					SizeUpStr();
 				}
 				Str[i] = new_str[i];
+				if (new_str[i + 1] == '\0') {
+					if (i+1 >= capacity_size) {
+						SizeUpStr();
+					}
+				}
 			}
+
 			Str[i] = new_str[i];	// \0삽입
 			current_size = i;
 			str_last_focus = i - 1;
@@ -79,9 +85,10 @@ namespace Dynamic {
 
 		void Set_Char(const char* new_char){
 			int i = 0;
-			if (i >= capacity_size){
-					SizeUpStr();
-				}
+			if (i >= capacity_size || (capacity_size <= 1)){
+				SizeUpStr();
+			}
+			
 			Str[i] = new_char[i++];
 			Str[i] = '\0';
 			current_size = i;
@@ -90,7 +97,7 @@ namespace Dynamic {
 
 		//문자 1개씩 추가
 		void Append_Char(const char* new_char) {
-			if (current_size <= capacity_size) {
+			if (current_size+1 <= capacity_size) {
 				SizeUpStr();
 			}
 			Str[current_size++] = new_char[0];

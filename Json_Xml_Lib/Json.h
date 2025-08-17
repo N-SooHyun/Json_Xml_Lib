@@ -102,6 +102,7 @@ namespace JSON {
 		void operator=(bool*);
 		void operator=(char);
 		void operator=(const char*);
+		void operator=(char*);//변수로 들어오는 경우를 위함
 	private:
 		void operator=(JObj);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
 		void operator=(JArr);		//안만들 예정 소멸할때 골치아픔(지역변수 동적변수 구분해야함)
@@ -646,6 +647,7 @@ namespace JSON {
 		void operator=(bool);
 		void operator=(bool*);
 		void operator=(char);
+		void operator= (const char*);
 		void operator=(char*);
 		void operator=(JNode*);
 		void operator=(JNode::JType curType);
@@ -776,6 +778,9 @@ namespace JSON {
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
 						char* rval = static_cast<char*>(rValue);
 						lval->Set_Str(rval);
+						
+						//문자열 파싱 해주는거 필요
+						Cur_Obj->Value->isObjArrCk(lval);
 					}
 					else{//문자
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
@@ -834,6 +839,9 @@ namespace JSON {
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);
 						char* rval = static_cast<char*>(rValue);
 						lval->Set_Str(rval);
+
+						//문자열 파싱 해주는거 필요
+						Cur_Arr->Value->isObjArrCk(lval);
 					}
 					else{//문자
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);

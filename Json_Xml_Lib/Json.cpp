@@ -345,12 +345,26 @@ void JNode::operator=(const char* _str){
 		Cur_Type = JType::STRING;
 		setType(Cur_Type);
 	}
-DynamicStr* str = static_cast<DynamicStr*>(P_Type);
-str->Set_Str(_str);	//복사
+	DynamicStr* str = static_cast<DynamicStr*>(P_Type);
+	str->Set_Str(_str);	//복사
 
-//문자열 파싱 부분
-isObjArrCk(str);
+	//문자열 파싱 부분
+	isObjArrCk(str);
 }
+void JNode::operator=(char* _str) {
+	if (!isTypeMatch(JType::STRING)) {
+		//타입이 안맞으면 덮어쓸거니까 지워주셈
+		delType();
+		Cur_Type = JType::STRING;
+		setType(Cur_Type);
+	}
+	DynamicStr* str = static_cast<DynamicStr*>(P_Type);
+	str->Set_Str(_str);	//복사
+
+	//문자열 파싱 부분
+	isObjArrCk(str);
+}
+
 //Node를 받을때 처리
 //rNode를 lNode로 대입하는 상황인데
 //이런경우 rNode->P_Type을 lNode->P_Type에 대입하게 되는데
@@ -723,6 +737,9 @@ void JsonCallObjArr::operator=(char _c){
 }
 void JsonCallObjArr::operator=(char* _str){
 	setOper_Ctrl(JNode::JType::STRING, _str, true);
+}
+void JsonCallObjArr::operator=(const char* _str) {
+	setOper_Ctrl(JNode::JType::STRING, (void*)_str, true);
 }
 void JsonCallObjArr::operator=(JNode* jnode){
 	//Cur_Arr->Value = JNode;  Value에 대입하는건데
