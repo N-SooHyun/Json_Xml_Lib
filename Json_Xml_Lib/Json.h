@@ -875,19 +875,71 @@ namespace JSON {
 		JArr* Cur_Arr;
 	};
 
+
+	//문자열 파싱 -> JNode로 변환
 	class StrParser {
 	public:
 		//StrParser() : parserToJsonNode(nullptr), parserStr(nullptr){}
-		StrParser(JNode* node, Dynamic::DynamicStr* str) : parserToJsonNode(node), parserStr(str) {}
+		StrParser(JNode* node, Dynamic::DynamicStr* str, bool isObjArr) 
+			: parserToJsonNode(node), parserStr(str), isObjArr(isObjArr) {
+			ctrl_parser();
+		}
 		~StrParser() {}
 
 		//parse 메소드
-		void parser() {
+		void ctrl_parser() {
+			if( isObjArr) {
+				obj_parser();
+			} else {
+				arr_parser();
+			}
+		}
+
+		void obj_parser() {
+			//모드 4개
+			//1. '"' 키의 시작 부분 무조건 ':' 이거전에 '"'가 나와야 함
+			//2. ':' 값의 시작 부분
+			//3. ',' 다음에 오는 객체의 시작부분 ',' 다음은 무조건 '"'가 나와야함
+			//4. '}' 객체의 끝부분 이거는 이미 인지를 하고 있는 상황임
+
+			int glb_csr = 0;		//전체 문자열의 커서 역할
+			while (1) {
+
+			}
+			
+
+		}
+
+		void arr_parser() {
+			//허용 타입 7개
+			//1. string 시작값 '"' 끝값 '"'
+			//2. number
+			//3. double
+			//4. bool true false
+			//5. null
+			//6. {}		시작값 '{' 끝값 '}'
+			//7. []		시작값 '[' 끝값 ']'
+			//끝값은 무조건 ','혹은 ']'가 다음에 와야함
+			
 
 		}
 
 	private:
 		JNode* parserToJsonNode;
 		Dynamic::DynamicStr* parserStr;
+		bool isObjArr;		// true면 obj false면 arr
 	};
+
+
+
+	//JNode 파싱 -> Json으로 변환
+	class JsonMaker {
+	public:
+		JsonMaker() {}
+		~JsonMaker() {}
+
+	private:
+
+	};
+	
 }

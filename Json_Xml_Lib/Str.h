@@ -53,7 +53,12 @@ namespace Dynamic {
 			return Str;
 		}
 
+
 		char Char_Get_Str(int focus) {
+			if(focus < 0 || focus >= current_size) {
+				//예외처리
+				return '\0';	//범위 벗어나면 Null 반환
+			}
 			return Str[focus];
 		}
 

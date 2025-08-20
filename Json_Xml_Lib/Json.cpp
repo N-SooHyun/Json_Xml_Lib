@@ -156,18 +156,32 @@ void JNode::isObjArrCk(DynamicStr* str){
 	short first_focus = 0;
 	short last_focus = str->str_last_focus;
 
-	if (Str[first_focus] == '\"' && Str[last_focus] == '\"'){
+	//문자열이 들어올때 확인하는 용도
+	/*
+	if (Str[first_focus] == '\"' && Str[last_focus] == '\"') {
 		first_focus++;
 		last_focus--;
 	}
+	*/
+
+	while (Str[first_focus] == ' ' || Str[first_focus] == '\n') {
+		first_focus++;
+	}
+
+	while(Str[last_focus] == ' ' || Str[last_focus] == '\n') {
+		last_focus--;
+	}
+
 
 	if (Str[first_focus] == '{' && Str[last_focus] == '}'){
-		//객체임 
+		//객체 Mode
 		//Parsing 시작 함수 호출 하든가 하셈
+		StrParser obj_parser(this, str, true);
 	}
 	else if (Str[first_focus] == '[' && Str[last_focus] == ']'){
-		//배열임
+		//배열 Mode
 		//Parsing 시작 함수 호출 하든가 하셈
+		StrParser arr_parser(this, str, false);
 	}	
 }
 

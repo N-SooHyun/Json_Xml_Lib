@@ -12,6 +12,9 @@ void test_str() {
 	node["Key2"] = true;
 	node["Key0"] = test;
 
+	node["Key3"] = "Test";
+	node["Key4"] = R"("Test")";
+
 
 	
 
