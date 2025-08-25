@@ -102,9 +102,12 @@ namespace Dynamic {
 
 		//문자 1개씩 추가
 		void Append_Char(const char* new_char) {
-			if (current_size+1 <= capacity_size) {
+			if (current_size+1 >= capacity_size) {
 				SizeUpStr();
 			}
+			if (current_size == -1)
+				current_size++;
+
 			Str[current_size++] = new_char[0];
 			Str[current_size] = '\0';
 		}

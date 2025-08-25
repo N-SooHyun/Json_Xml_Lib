@@ -886,6 +886,35 @@ namespace JSON {
 		}
 		~StrParser() {}
 
+		void value_ascii_parser(DynamicStr* val) {
+			int result_int;
+			double result_double;
+			bool result_bool;
+			
+			char prev_word = val->Char_Get_Str(-1);
+			char word = val->Char_Get_Str(0);
+			char next_word = val->Char_Get_Str(1);
+
+			//문자열일경우
+			if (word == '\"') {
+
+			}
+			//음의 숫자일 경우(음의 정수, 음의 실수)
+			else if (word == '-' && (next_word >= '0' && next_word <= '9')) {
+
+			}
+			//양의 숫자일 경우(양의 정수, 양의 실수)
+			else if (word >= '0' && word <= '9') {
+			
+			}
+			//bool일 경우
+			else if (word == 't' || word == 'f') {
+
+			}
+			
+		}
+
+
 		//parse 메소드
 		void ctrl_parser() {
 			if( isObjArr) {
@@ -902,9 +931,75 @@ namespace JSON {
 			//3. ',' 다음에 오는 객체의 시작부분 ',' 다음은 무조건 '"'가 나와야함
 			//4. '}' 객체의 끝부분 이거는 이미 인지를 하고 있는 상황임
 
-			int glb_csr = 0;		//전체 문자열의 커서 역할
-			while (1) {
+			parserToJsonNode->P_Type = nullptr;
+			parserToJsonNode->Cur_Type = JNode::JType::NULLTYPE;
+			parserToJsonNode->setType(JNode::JType::OBJ);
 
+			int glb_csr = 0;		//전체 문자열의 커서 역할
+			char prev_word;			//이전 커서가 가리키는 문자
+			char next_word;			//다음 커서가 가리키는 문자
+			char word;				//현재 커서가 가리키는 문자
+
+			while (1) {
+				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
+				word = parserStr->Char_Get_Str(glb_csr);
+				next_word = parserStr->Char_Get_Str(glb_csr + 1);
+
+				if (word == '\"') {
+					//키값이 들어옴
+					DynamicStr* key = new DynamicStr(128);
+					glb_csr++;
+					
+					for (;; glb_csr++) {
+						prev_word = parserStr->Char_Get_Str(glb_csr - 1);
+						word = parserStr->Char_Get_Str(glb_csr);
+						next_word = parserStr->Char_Get_Str(glb_csr + 1);
+						key->Append_Char(&word);
+
+						if (next_word == '\"') break;
+					}
+					(*parserToJsonNode)[key->Get_Str()];
+					delete key;
+					glb_csr++;
+				}
+				else if (word == ':') {
+					//값이 들어옴 ascii를 통해서 파싱을 해줘야함
+					DynamicStr* val = new DynamicStr(128);
+					glb_csr++;
+
+					for (;; glb_csr++) {
+						prev_word = parserStr->Char_Get_Str(glb_csr - 1);
+						word = parserStr->Char_Get_Str(glb_csr);
+						next_word = parserStr->Char_Get_Str(glb_csr + 1);
+						if (word == ' ' || word == '\n' || word == '\t') continue;
+
+						if (word == '{') {
+							StrParser obj_parser(static_cast<JObj*>(parserToJsonNode->P_Type)->getTailObj()->Value, parserStr, true);
+						}
+						else if (word == '[') {
+							StrParser arr_parser(static_cast<JObj*>(parserToJsonNode->P_Type)->getTailObj()->Value, parserStr, false);
+						}
+
+						val->Append_Char(&word);
+
+						if (next_word == ',' || next_word == '}') break;
+					}
+
+					//아스키 파싱
+					value_ascii_parser(val);
+
+					delete val;
+
+
+				}
+				else if (word == ',') {
+
+				}
+				else if (word == '}') {
+					break;
+				}
+
+				glb_csr++;
 			}
 			
 
