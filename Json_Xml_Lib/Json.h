@@ -890,26 +890,54 @@ namespace JSON {
 			int result_int;
 			double result_double;
 			bool result_bool;
-			
-			char prev_word = val->Char_Get_Str(-1);
-			char word = val->Char_Get_Str(0);
-			char next_word = val->Char_Get_Str(1);
+			int glb_csr = 0;
+
+			char prev_word = val->Char_Get_Str(glb_csr - 1);
+			char word = val->Char_Get_Str(glb_csr);
+			char next_word = val->Char_Get_Str(glb_csr + 1);
+
+			enum ck_word {
+				DEFAULT,
+				STR,
+				M_NUM,		//양의 숫자
+				P_NUM,		//음의 숫자
+				BL
+			};
+
+			ck_word crnt_value = DEFAULT;
+
 
 			//문자열일경우
 			if (word == '\"') {
-
+				crnt_value = STR;
 			}
 			//음의 숫자일 경우(음의 정수, 음의 실수)
 			else if (word == '-' && (next_word >= '0' && next_word <= '9')) {
-
+				crnt_value = M_NUM;
 			}
 			//양의 숫자일 경우(양의 정수, 양의 실수)
 			else if (word >= '0' && word <= '9') {
-			
+				crnt_value = P_NUM;
 			}
 			//bool일 경우
 			else if (word == 't' || word == 'f') {
+				crnt_value = BL;
+			}
 
+
+			for (;; glb_csr++) {
+				if (crnt_value == STR) {
+
+				}
+				else if (crnt_value == M_NUM) {
+
+				}
+				else if (crnt_value == P_NUM) {
+
+				}
+				else if (crnt_value == BL) {
+
+				}
 			}
 			
 		}
