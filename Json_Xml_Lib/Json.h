@@ -889,6 +889,7 @@ namespace JSON {
 		void value_ascii_parser(DynamicStr* val) {
 			int result_int = 0;
 			double result_double = 0.0;
+			bool is_double = false;		//false -> int, true -> double
 			bool result_bool = false;
 			int glb_csr = 0;
 
@@ -943,7 +944,9 @@ namespace JSON {
 				next_word = val->Char_Get_Str(glb_csr + 1);
 
 				if (crnt_value == STR) {
-
+					obj->getTailObj()->Value->setType(JNode::JType::STRING);
+					DynamicStr* str_val = static_cast<DynamicStr*>(obj->getTailObj()->Value->P_Type);
+					str_val->Append_Char(&word);
 
 					//종료판별
 					if (next_word == '\"') break;
@@ -953,6 +956,7 @@ namespace JSON {
 
 					//소수판별
 					if (next_word == '.') {
+						is_double = true;
 						glb_csr += 2;
 						double decimal_part = 0;
 						int divisor = 10;		//소수점 뒤 숫자를 10으로 나누는데 사용할 변수
@@ -975,7 +979,7 @@ namespace JSON {
 
 						//값 넣어주기
 						if (obj != nullptr) {
-							if (result_double >= 0.1) {
+							if (is_double == true) {
 								obj->getTailObj()->Value->setType(JNode::JType::DOUBLE);
 								double* val = static_cast<double*>(obj->getTailObj()->Value->P_Type);
 								*val = result_double;
@@ -1020,6 +1024,18 @@ namespace JSON {
 
 					//종료판별
 					if (five_word == '\0' || six_word == '\0') {
+						//값 넣어주기
+						if (obj != nullptr) {
+							obj->getTailObj()->Value->setType(JNode::JType::BOOL);
+							bool* val = static_cast<bool*>(obj->getTailObj()->Value->P_Type);
+							*val = result_bool;
+						}else if(arr != nullptr) {
+
+						}
+						else {
+							return;
+						}
+
 						break;
 					}
 				}
@@ -1087,15 +1103,30 @@ namespace JSON {
 						if (word == ' ' || word == '\n' || word == '\t') continue;
 
 						if (word == '{') {
-							StrParser obj_parser(static_cast<JObj*>(parserToJsonNode->P_Type)->getTailObj()->Value, parserStr, true);
+							//obj 만들어주기
+							DynamicStr* obj_str = new DynamicStr(128);
+							for (int i = 0; ; i++, glb_csr++) {
+								
+							}
+
+							delete obj_str;
 						}
 						else if (word == '[') {
-							StrParser arr_parser(static_cast<JObj*>(parserToJsonNode->P_Type)->getTailObj()->Value, parserStr, false);
+							//arr 만들어주기
+							DynamicStr* arr_str = new DynamicStr(128);
+							for (int i = 0; ; i++, glb_csr++) {
+
+							}
+
+							delete arr_str;
 						}
 
 						val->Append_Char(&word);
 
-						if (next_word == ',' || next_word == '}') break;
+						if (next_word == ',' || next_word == '}') {
+							if (next_word == '}' || word == ']') val->Append_Char(&next_word);
+							break;
+						}
 					}
 
 					//아스키 파싱
