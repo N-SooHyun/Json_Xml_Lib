@@ -887,10 +887,20 @@ namespace JSON {
 		~StrParser() {}
 
 		void value_ascii_parser(DynamicStr* val) {
-			int result_int;
-			double result_double;
-			bool result_bool;
+			int result_int = 0;
+			double result_double = 0.0;
+			bool result_bool = false;
 			int glb_csr = 0;
+
+			JObj* obj = nullptr;
+			JArr* arr = nullptr;
+
+			if (parserToJsonNode->Cur_Type == JNode::JType::OBJ) {
+				obj = static_cast<JObj*>(parserToJsonNode->P_Type);
+			}
+			else if (parserToJsonNode->Cur_Type == JNode::JType::ARR) {
+				arr = static_cast<JArr*>(parserToJsonNode->P_Type);
+			}
 
 			char prev_word = val->Char_Get_Str(glb_csr - 1);
 			char word = val->Char_Get_Str(glb_csr);
@@ -899,9 +909,10 @@ namespace JSON {
 			enum ck_word {
 				DEFAULT,
 				STR,
-				M_NUM,		//양의 숫자
-				P_NUM,		//음의 숫자
-				BL
+				M_NUM,
+				P_NUM,
+				BL,
+				END
 			};
 
 			ck_word crnt_value = DEFAULT;
@@ -914,6 +925,7 @@ namespace JSON {
 			//음의 숫자일 경우(음의 정수, 음의 실수)
 			else if (word == '-' && (next_word >= '0' && next_word <= '9')) {
 				crnt_value = M_NUM;
+				glb_csr++;
 			}
 			//양의 숫자일 경우(양의 정수, 양의 실수)
 			else if (word >= '0' && word <= '9') {
@@ -925,18 +937,91 @@ namespace JSON {
 			}
 
 
-			for (;; glb_csr++) {
+			for (; word != '\0'; glb_csr++) {
+				prev_word = val->Char_Get_Str(glb_csr - 1);
+				word = val->Char_Get_Str(glb_csr);
+				next_word = val->Char_Get_Str(glb_csr + 1);
+
 				if (crnt_value == STR) {
 
-				}
-				else if (crnt_value == M_NUM) {
 
+					//종료판별
+					if (next_word == '\"') break;
 				}
-				else if (crnt_value == P_NUM) {
+				else if (crnt_value == M_NUM || crnt_value == P_NUM) {
+					result_int = result_int * 10 + (word - '0');
 
+					//소수판별
+					if (next_word == '.') {
+						glb_csr += 2;
+						double decimal_part = 0;
+						int divisor = 10;		//소수점 뒤 숫자를 10으로 나누는데 사용할 변수
+						for (;; glb_csr++) {
+							prev_word = val->Char_Get_Str(glb_csr - 1);
+							word = val->Char_Get_Str(glb_csr);
+							next_word = val->Char_Get_Str(glb_csr + 1);
+							decimal_part = decimal_part + (word - '0') / (double)divisor;
+							divisor *= 10;
+							if (next_word == '\0') break;
+						}
+						result_double = result_int + decimal_part;
+					}
+					//종료 판별
+					if (next_word == '\0') {
+						if (crnt_value == M_NUM) {
+							result_int = result_int * -1;
+							result_double = result_double * -1;
+						}
+
+						//값 넣어주기
+						if (obj != nullptr) {
+							if (result_double >= 0.1) {
+								obj->getTailObj()->Value->setType(JNode::JType::DOUBLE);
+								double* val = static_cast<double*>(obj->getTailObj()->Value->P_Type);
+								*val = result_double;
+							}
+							else {
+								obj->getTailObj()->Value->setType(JNode::JType::NUMBER);
+								int* val = static_cast<int*>(obj->getTailObj()->Value->P_Type);
+								*val = result_int;
+							}
+						}
+						else if (arr != nullptr) {
+
+						}
+						else {
+							return;
+						}
+						break;
+					}
 				}
 				else if (crnt_value == BL) {
+					char first_word = val->Char_Get_Str(0);
+					char second_word = val->Char_Get_Str(1);
+					char third_word = val->Char_Get_Str(2);
+					char four_word = val->Char_Get_Str(3);
+					char five_word = val->Char_Get_Str(4);	//true면 '\0'
+					char six_word = val->Char_Get_Str(5);	//false면 '\0'
+					if (first_word == 't') {
+						if (second_word == 'r' &&
+							third_word == 'u' &&
+							four_word == 'e') {
+							result_bool = true;
+						}
+					}
+					else if (first_word == 'f') {
+						if (second_word == 'a' &&
+							third_word == 'l' &&
+							four_word == 's' &&
+							five_word == 'e') {
+							result_bool = false;
+						}
+					}
 
+					//종료판별
+					if (five_word == '\0' || six_word == '\0') {
+						break;
+					}
 				}
 			}
 			
@@ -1017,8 +1102,6 @@ namespace JSON {
 					value_ascii_parser(val);
 
 					delete val;
-
-
 				}
 				else if (word == ',') {
 
