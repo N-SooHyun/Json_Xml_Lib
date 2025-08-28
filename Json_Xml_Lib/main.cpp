@@ -57,13 +57,13 @@ void test_str() {
 
     //const char* json_str_2 = R"({"ueser": 123, "Test": true, "Test2": 10.2, "Test3" : "good"})";
     //const char* json_str_2 = R"({"Key0" : 123, "Key1" : -123, "Key2" : 123.123, "Key3" : -123.123})"; 
-    const char* json_str_2 = R"({"Key0" : {"Key1" : 123} })";
+    const char* json_str_2 = R"({"Key0" : {"Key1" : 123}, "Key1" : {"Key1" : -123} })";
 
     json_obj = json_str_2;
 
 	JObj* jobj = static_cast<JObj*>(json_obj.P_Type);
 
-    
+    JObj* user_obj = static_cast<JObj*>(jobj->getTailObj()->Value->P_Type);
 
 
 }

@@ -781,6 +781,7 @@ namespace JSON {
 						
 						//문자열 파싱 해주는거 필요
 						Cur_Obj->Value->isObjArrCk(lval);
+
 					}
 					else{//문자
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
@@ -912,6 +913,8 @@ namespace JSON {
 				STR,
 				M_NUM,
 				P_NUM,
+				OBJ,
+				ARR,
 				BL,
 				END
 			};
@@ -936,6 +939,12 @@ namespace JSON {
 			else if (word == 't' || word == 'f') {
 				crnt_value = BL;
 			}
+			else if (word == '{') {
+				crnt_value = OBJ;
+			}
+			else if (word == '[') {
+				crnt_value = ARR;
+			}
 
 
 			for (; word != '\0'; glb_csr++) {
@@ -943,6 +952,7 @@ namespace JSON {
 				word = val->Char_Get_Str(glb_csr);
 				next_word = val->Char_Get_Str(glb_csr + 1);
 
+				//문자열일 경우
 				if (crnt_value == STR) {
 					obj->getTailObj()->Value->setType(JNode::JType::STRING);
 					DynamicStr* str_val = static_cast<DynamicStr*>(obj->getTailObj()->Value->P_Type);
@@ -951,6 +961,7 @@ namespace JSON {
 					//종료판별
 					if (next_word == '\"') break;
 				}
+				//숫자일경우
 				else if (crnt_value == M_NUM || crnt_value == P_NUM) {
 					result_int = result_int * 10 + (word - '0');
 
@@ -999,6 +1010,7 @@ namespace JSON {
 						break;
 					}
 				}
+				//논리형일경우
 				else if (crnt_value == BL) {
 					char first_word = val->Char_Get_Str(0);
 					char second_word = val->Char_Get_Str(1);
@@ -1039,6 +1051,17 @@ namespace JSON {
 						break;
 					}
 				}
+				//OBJ일 경우
+				else if (crnt_value == OBJ) {
+					
+					const char* tail_key_str = obj->getTailObj()->Key.Get_Str();
+					(*parserToJsonNode)[tail_key_str] = val->Get_Str();
+				}
+				//ARR일 경우
+				else if (crnt_value == ARR) {
+
+				}
+				
 			}
 			
 		}
@@ -1046,7 +1069,7 @@ namespace JSON {
 
 		//parse 메소드
 		void ctrl_parser() {
-			if( isObjArr) {
+			if(isObjArr) {
 				obj_parser();
 			} else {
 				arr_parser();
@@ -1095,38 +1118,91 @@ namespace JSON {
 					//값이 들어옴 ascii를 통해서 파싱을 해줘야함
 					DynamicStr* val = new DynamicStr(128);
 					glb_csr++;
+					enum val_mode {
+						DEFAULT,
+						STR,
+						OBJ,
+						ARR,
+						NUM,
+						BL,
+						END
+					};
 
+					val_mode crnt_mode = DEFAULT;
 					for (;; glb_csr++) {
 						prev_word = parserStr->Char_Get_Str(glb_csr - 1);
 						word = parserStr->Char_Get_Str(glb_csr);
 						next_word = parserStr->Char_Get_Str(glb_csr + 1);
 						if (word == ' ' || word == '\n' || word == '\t') continue;
 
-						if (word == '{') {
-							//obj 만들어주기
-							DynamicStr* obj_str = new DynamicStr(128);
-							for (int i = 0; ; i++, glb_csr++) {
-								
+						if (crnt_mode == DEFAULT) {
+							if (word == '\"') {//Str Mode
+								//오직 문자열만 존재하 "{Test}" 이렇게 들어와도 이건 객체라고 볼 수 없음
+								//{"Key0" : "{Key1 : 123}"} 이거 Value가 객체일까? 놉 문자열임
+								val->Append_Char(&word);
+								crnt_mode = STR;
 							}
-
-							delete obj_str;
-						}
-						else if (word == '[') {
-							//arr 만들어주기
-							DynamicStr* arr_str = new DynamicStr(128);
-							for (int i = 0; ; i++, glb_csr++) {
-
+							else if (word == '{') { //Obj Mode
+								val->Append_Char(&word);
+								crnt_mode = OBJ;
+							}else if(word == '[') { //Arr Mode
+								val->Append_Char(&word);
+								crnt_mode = ARR;
 							}
-
-							delete arr_str;
+							else if (word == '-' || (word >= '0' && word <= '9')) { //Num Mode
+								val->Append_Char(&word);
+								crnt_mode = NUM;
+							}
+							else if(word == 't' || word == 'f') { //Bool Mode
+								val->Append_Char(&word);
+								crnt_mode = BL;
+							}
+							continue;
 						}
 
-						val->Append_Char(&word);
-
-						if (next_word == ',' || next_word == '}') {
-							if (next_word == '}' || word == ']') val->Append_Char(&next_word);
+						switch (crnt_mode) {
+						case STR:
+							val->Append_Char(&word);
+							if(next_word == '\"') {
+								val->Append_Char(&next_word);
+								glb_csr++;
+								crnt_mode = END;
+							}
+							break;
+						case OBJ:
+							val->Append_Char(&word);
+							if(next_word == '}') {
+								val->Append_Char(&next_word);
+								glb_csr++;
+								crnt_mode = END;
+							}
+							break;
+						case ARR:
+							val->Append_Char(&word);
+							if (next_word == ']') {
+								val->Append_Char(&next_word);
+								glb_csr++;
+								crnt_mode = END;
+							}
+							break;
+						case NUM:
+							val->Append_Char(&word);
+							if(!((next_word >= '0' && next_word <= '9') || next_word == '.')) {
+								crnt_mode = END;
+							}
+							break;
+						case BL:
+							val->Append_Char(&word);
+							if(next_word == '\0' || next_word == ',' || next_word == '}') {
+								crnt_mode = END;
+							}
+							break;
+						default:
 							break;
 						}
+						
+						//종료판별
+						if (crnt_mode == END) break;
 					}
 
 					//아스키 파싱
@@ -1135,7 +1211,7 @@ namespace JSON {
 					delete val;
 				}
 				else if (word == ',') {
-
+					//다음 키값이 들어옴 무조건 '"'가 나와야함
 				}
 				else if (word == '}') {
 					break;
