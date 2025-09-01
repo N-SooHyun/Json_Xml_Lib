@@ -57,13 +57,36 @@ void test_str() {
 
     //const char* json_str_2 = R"({"ueser": 123, "Test": true, "Test2": 10.2, "Test3" : "good"})";
     //const char* json_str_2 = R"({"Key0" : 123, "Key1" : -123, "Key2" : 123.123, "Key3" : -123.123})"; 
-    const char* json_str_2 = R"({"Key0" : {"Key1" : 123}, "Key1" : {"Key1" : -123} })";
+    //const char* json_str_2 = R"({"Key0" : {"Key1" : 123}, "Key1" : {"Key1" : -123} })";
+
+    const char* json_str_2 = R"({
+  "company": {
+    "name": "ABC Corp",
+    "address": {
+      "street": "Seoul GongLo",
+      "zipcode": "03000"
+    },
+    "contact": {
+      "phone": "010-1234-5678",
+      "email": "info@abc.com"
+    }
+  },
+  "registered": true
+})";
 
     json_obj = json_str_2;
 
 	JObj* jobj = static_cast<JObj*>(json_obj.P_Type);
 
-    JObj* user_obj = static_cast<JObj*>(jobj->getTailObj()->Value->P_Type);
+    JNode* user_node = json_obj["company"];
+
+	JObj* user_obj = static_cast<JObj*>(user_node->P_Type);
+
+    JNode* address_node = (*user_node)["address"];
+
+	JObj* address_obj = static_cast<JObj*>(address_node->P_Type);
+
+    int num = 10;
 
 
 }
