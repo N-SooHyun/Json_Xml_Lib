@@ -1279,7 +1279,11 @@ namespace JSON {
 			//6. {}		시작값 '{' 끝값 '}'
 			//7. []		시작값 '[' 끝값 ']'
 			//끝값은 무조건 ','혹은 ']'가 다음에 와야함
-			
+			//모드 2개 Key Value
+			parserToJsonNode->P_Type = nullptr;
+			parserToJsonNode->Cur_Type = JNode::JType::NULLTYPE;
+			parserToJsonNode->setType(JNode::JType::ARR);
+
 
 		}
 
