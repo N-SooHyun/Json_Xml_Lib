@@ -59,20 +59,23 @@ void test_str() {
     //const char* json_str_2 = R"({"Key0" : 123, "Key1" : -123, "Key2" : 123.123, "Key3" : -123.123})"; 
     //const char* json_str_2 = R"({"Key0" : {"Key1" : 123}, "Key1" : {"Key1" : -123} })";
 
-    const char* json_str_2 = R"({
-  "company": {
-    "name": "ABC Corp",
-    "address": {
-      "street": "Seoul GongLo",
-      "zipcode": "03000"
-    },
-    "contact": {
-      "phone": "010-1234-5678",
-      "email": "info@abc.com"
-    }
+    const char* json_str_2 = R"([
+  {
+    "name": "aa",
+    "age": 25,
+    "email": "hong@example.com"
   },
-  "registered": true
-})";
+  {
+    "name": "cc",
+    "age": 30,
+    "email": "kim@example.com"
+  },
+  {
+    "name": "bb",
+    "age": 28,
+    "email": "park@example.com"
+  }
+])";
 
     json_obj = json_str_2;
 

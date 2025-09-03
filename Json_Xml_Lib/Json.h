@@ -1076,7 +1076,7 @@ namespace JSON {
 						crnt_value = END;
 					}
 					else if (crnt_value == ARR) {
-
+						(*parserToJsonNode).push() = val->Get_Str();
 					}
 					
 				}
@@ -1113,7 +1113,46 @@ namespace JSON {
 		}
 
 		void flattenArray(DynamicStr* value) {
+			//value->Str[glb_csr] == '[' 이거임 쌍을 찾아야함
+			int bracket_count = 1; // 여는 대괄호의 개수	이게 0이 되는 순간 쌍이 맞는 순간임
 
+			while(bracket_count >= 1) { //bracket_count 가 0이 되면 종료 해주는거임
+				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
+				word = parserStr->Char_Get_Str(glb_csr);
+				next_word = parserStr->Char_Get_Str(glb_csr + 1);
+
+				value->Append_Char(&word);
+				glb_csr++;
+				if (next_word == '[')
+					bracket_count++;
+				else if (next_word == ']')
+					bracket_count--;
+			}
+			value->Append_Char(&next_word);
+		}
+
+		void processArray(DynamicStr* value) {
+			//앞과 뒤에 대한 ' ' '\n' '\t' 제거하여 Value만 딱 가져오기
+			//해당 value는 '  123 ,' 이런식으로 공백이라던가 뉴라인이 포함된 value임
+			short first_focus = 0;
+			short last_focus = value->current_size-1;
+			const char* Str = value->Get_Str();
+
+			while (Str[first_focus] == ' ' || Str[first_focus] == '\n') {
+				first_focus++;
+			}
+
+			while (Str[last_focus] == ' ' || Str[last_focus] == '\n') {
+				last_focus--;
+			}
+
+
+			DynamicStr* new_value = new DynamicStr(128);
+			for (int i = first_focus; i <= last_focus; i++) {
+				new_value->Append_Char(&Str[i]);
+			}
+
+			value_ascii_parser(new_value);
 		}
 
 		void processValue(DynamicStr* value) {
@@ -1270,20 +1309,49 @@ namespace JSON {
 		}
 
 		void arr_parser() {
-			//허용 타입 7개
-			//1. string 시작값 '"' 끝값 '"'
-			//2. number
-			//3. double
-			//4. bool true false
-			//5. null
-			//6. {}		시작값 '{' 끝값 '}'
-			//7. []		시작값 '[' 끝값 ']'
-			//끝값은 무조건 ','혹은 ']'가 다음에 와야함
-			//모드 2개 Key Value
 			parserToJsonNode->P_Type = nullptr;
 			parserToJsonNode->Cur_Type = JNode::JType::NULLTYPE;
-			parserToJsonNode->setType(JNode::JType::ARR);
+			parserToJsonNode->setType(JNode::JType::ARR); 
 
+			DynamicStr* value = new DynamicStr(128);
+
+			int bracket_count = 1; // 여는 대괄호의 개수	이게 0이 되는 순간 쌍이 맞는 순간임
+			int brace_count = 0; // 여는 중괄호의 개수
+			glb_csr++; //처음 '[' 지나가기
+			for(;;glb_csr++) {
+				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
+				word = parserStr->Char_Get_Str(glb_csr);				//처음에는 무조건 '['
+				next_word = parserStr->Char_Get_Str(glb_csr + 1);
+				if (word == ' ' || word == '\n' || word == '\t') continue;
+
+				if (word == '[') {
+					bracket_count++;
+				}
+				else if (word == '{') {
+					brace_count++;
+				}
+				else if (word == ']') {
+					bracket_count--;
+					if (bracket_count == 0) {
+						//[] 배열자체를 종료
+						break;
+					}
+				}
+				else if (word == '}') {
+					brace_count--; 
+				}
+
+				if (word == ',') {
+					if (bracket_count == 1 && brace_count == 0) {
+						//1개의 인수를 종료
+						processArray(value);
+						delete value;
+						value = new DynamicStr(128);
+					}
+				}
+
+				value->Append_Char(&word);
+			}
 
 		}
 
