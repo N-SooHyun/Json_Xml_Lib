@@ -164,7 +164,7 @@ JNode* arr_2 = data[2];
 arr_2[0] = 10;                          //[true, "Test", [10], {}]
 arr_2 = data[1];
 arr_2[1] = true;                        //[true, true, [10], {}]
-arr_2.push("JustPush");                 //[true, true, [10], {}, "JustPush"]
+arr_2.push() = "JustPush";                 //[true, true, [10], {}, "JustPush"]
 ```
 
 ##### 2.3.4 인덱스 삭제
