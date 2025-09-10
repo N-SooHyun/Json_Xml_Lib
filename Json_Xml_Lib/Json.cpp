@@ -176,13 +176,13 @@ void JNode::isObjArrCk(DynamicStr* str){
 	if (Str[first_focus] == '{' && Str[last_focus] == '}'){
 		//객체 Mode
 		//Parsing 시작 함수 호출 하든가 하셈
-		StrParser obj_parser(this, str, true);
+		StrParser obj_parser(this, str, JNode::JType::OBJ);
 	}
 	else if (Str[first_focus] == '[' && Str[last_focus] == ']'){
 		//배열 Mode
 		//Parsing 시작 함수 호출 하든가 하셈
-		StrParser arr_parser(this, str, false);
-	}	
+		StrParser arr_parser(this, str, JNode::JType::ARR);
+	}
 }
 
 
@@ -775,6 +775,8 @@ void JsonCallObjArr::operator=(JNode* jnode){
 			Cur_Obj->Value->delType();
 			Cur_Obj->Value->Cur_Type = jnode->Cur_Type;
 			Cur_Obj->Value->P_Type = jnode->P_Type;
+			Cur_Obj->Value->ObjCnt = jnode->ObjCnt;
+			Cur_Obj->Value->ArrCnt = jnode->ArrCnt;
 
 			//이중 소멸을 방지하기 위한 jnode의 P_Type을 참조해제
 			jnode->P_Type = nullptr;
@@ -793,6 +795,8 @@ void JsonCallObjArr::operator=(JNode* jnode){
 			Cur_Arr->Value->delType();
 			Cur_Arr->Value->Cur_Type = jnode->Cur_Type;
 			Cur_Arr->Value->P_Type = jnode->P_Type;
+			Cur_Arr->Value->ObjCnt = jnode->ObjCnt;
+			Cur_Arr->Value->ArrCnt = jnode->ArrCnt;
 
 			//이중 소멸을 방지하기 위한 jnode의 P_Type을 참조해제
 			jnode->P_Type = nullptr;

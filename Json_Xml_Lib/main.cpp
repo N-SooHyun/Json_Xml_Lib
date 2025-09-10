@@ -94,9 +94,25 @@ void test_str() {
 
 }
 
+void Test_Json() {
+    JNode node;
+
+    node.push() = "Test";
+    node.push() = 123;
+
+	JArr* arr = static_cast<JArr*>(node.P_Type);
+
+    JNode* arr_node = static_cast<JNode*>(arr->getTailArr()->Value);
+
+	int* arr_num = static_cast<int*>(arr_node->P_Type);
+
+}
+
 int main() {
 
-	test_str();
+	//test_str();
+
+    Test_Json();
 
 	char c = 'a';
 

@@ -851,10 +851,12 @@ namespace JSON {
 					}
 				}
 				else if (curType == JNode::JType::OBJ){
-
+					//필요없을 확률 99
+					//대입시 JNode["Key"] = JArr로 넘기는건 금지할거기 때문 무조건 대입은 JNode만 넘길 수 있음
 				}
 				else if (curType == JNode::JType::ARR){
-
+					//필요없을 확률 99
+					//대입시 JNode["Key"] = JArr로 넘기는건 금지할거기 때문 무조건 대입은 JNode만 넘길 수 있음
 				}
 				else if (curType == JNode::JType::NULLTYPE){
 
@@ -877,494 +879,254 @@ namespace JSON {
 	};
 
 
-	//문자열 파싱 -> JNode로 변환
-	class StrParser {
-	public:
-		//StrParser() : parserToJsonNode(nullptr), parserStr(nullptr){}
-		StrParser(JNode* node, Dynamic::DynamicStr* str, bool isObjArr) 
-			: parserToJsonNode(node), parserStr(str), isObjArr(isObjArr), glb_csr(0) {
-			ctrl_parser();
-		}
-		~StrParser() {}
-
-		void value_ascii_parser(DynamicStr* val) {
-			//Value 파싱
-			//:->다음 문자열이 들어옴 숫자인지 문자열인지 bool인지 obj인지 arr인지 판단하기 위한 메소드
-			int result_int = 0;
-			double result_double = 0.0;
-			bool is_double = false;		//false -> int, true -> double
-			bool result_bool = false;
-
-			int stack_glb_csr = 0;
-
-			JObj* obj = nullptr;
-			JArr* arr = nullptr;
-
-			if (parserToJsonNode->Cur_Type == JNode::JType::OBJ) {
-				obj = static_cast<JObj*>(parserToJsonNode->P_Type);
-			}
-			else if (parserToJsonNode->Cur_Type == JNode::JType::ARR) {
-				arr = static_cast<JArr*>(parserToJsonNode->P_Type);
-			}
-
-			enum ck_word {
-				DEFAULT,
-				STR,
-				M_NUM,
-				P_NUM,
-				OBJ,
-				ARR,
-				BL,
-				END
-			};
-
-			ck_word crnt_value = DEFAULT;
-
-			for (; ; stack_glb_csr++) {
-				prev_word = val->Char_Get_Str(stack_glb_csr - 1);
-				word = val->Char_Get_Str(stack_glb_csr);
-				next_word = val->Char_Get_Str(stack_glb_csr + 1);
-
-				//시작판별
-				if (crnt_value == DEFAULT) {
-					//문자열일경우
-					if (word == '\"') {
-						crnt_value = STR;
-						stack_glb_csr--;
-					}
-					//음의 숫자일 경우(음의 정수, 음의 실수)
-					else if (word == '-' && (next_word >= '0' && next_word <= '9')) {
-						crnt_value = M_NUM;
-					}
-					//양의 숫자일 경우(양의 정수, 양의 실수)
-					else if (word >= '0' && word <= '9') {
-						crnt_value = P_NUM;
-						stack_glb_csr--;
-					}
-					//bool일 경우
-					else if (word == 't' || word == 'f') {
-						crnt_value = BL;
-						stack_glb_csr--;
-					}
-					else if (word == '{') {
-						crnt_value = OBJ;
-						stack_glb_csr--;
-					}
-					else if (word == '[') {
-						crnt_value = ARR;
-						stack_glb_csr--;
-					}
-					continue;
-				}
-				//종료판별
-				else if (crnt_value == END) {
-					break;
-				}
-				else {
-					if (crnt_value == STR) {
-						obj->getTailObj()->Value->setType(JNode::JType::STRING);
-						DynamicStr* str_val = static_cast<DynamicStr*>(obj->getTailObj()->Value->P_Type);
-						str_val->Append_Char(&word);
-						//종료판별
-						if (next_word == '\"') {
-							str_val->Append_Char(&next_word);
-							crnt_value = END;
-						}
-					}
-					else if (crnt_value == M_NUM || crnt_value == P_NUM) {
-						result_int = result_int * 10 + (word - '0');
-
-						//소수판별
-						if (next_word == '.') {
-							is_double = true;
-							stack_glb_csr += 2;
-							double decimal_part = 0;
-							int divisor = 10;		//소수점 뒤 숫자를 10으로 나누는데 사용할 변수
-							for (;; stack_glb_csr++) {
-								prev_word = val->Char_Get_Str(stack_glb_csr - 1);
-								word = val->Char_Get_Str(stack_glb_csr);
-								next_word = val->Char_Get_Str(stack_glb_csr + 1);
-								decimal_part = decimal_part + (word - '0') / (double)divisor;
-								divisor *= 10;
-								if (next_word == '\0') break;
-							}
-							result_double = result_int + decimal_part;
-						}
-
-						//종료 판별
-						if (next_word == '\0') {
-							if (crnt_value == M_NUM) {
-								result_int = result_int * -1;
-								result_double = result_double * -1;
-							}
-
-							//값 넣어주기
-							if (obj != nullptr) {
-								if (is_double == true) {
-									obj->getTailObj()->Value->setType(JNode::JType::DOUBLE);
-									double* val = static_cast<double*>(obj->getTailObj()->Value->P_Type);
-									*val = result_double;
-								}
-								else {
-									obj->getTailObj()->Value->setType(JNode::JType::NUMBER);
-									int* val = static_cast<int*>(obj->getTailObj()->Value->P_Type);
-									*val = result_int;
-								}
-							}
-							else if (arr != nullptr) {
-								//이거는 검수가 필요할듯
-								if (is_double == true) {
-									arr->getTailArr()->Value->setType(JNode::JType::DOUBLE);
-									double* val = static_cast<double*>(arr->getTailArr()->Value->P_Type);
-									*val = result_double;
-								}
-								else {
-									arr->getTailArr()->Value->setType(JNode::JType::NUMBER);
-									int* val = static_cast<int*>(arr->getTailArr()->Value->P_Type);
-									*val = result_int;
-								}
-							}
-							else {
-								return;
-							}
-							crnt_value = END;
-						}
-					}
-					else if (crnt_value == BL) {
-						char first_word = val->Char_Get_Str(0);
-						char second_word = val->Char_Get_Str(1);
-						char third_word = val->Char_Get_Str(2);
-						char four_word = val->Char_Get_Str(3);
-						char five_word = val->Char_Get_Str(4);	//true면 '\0'
-						char six_word = val->Char_Get_Str(5);	//false면 '\0'
-						if (first_word == 't') {
-							if (second_word == 'r' &&
-								third_word == 'u' &&
-								four_word == 'e') {
-								result_bool = true;
-							}
-						}
-						else if (first_word == 'f') {
-							if (second_word == 'a' &&
-								third_word == 'l' &&
-								four_word == 's' &&
-								five_word == 'e') {
-								result_bool = false;
-							}
-						}
-
-						//종료판별
-						if (five_word == '\0' || six_word == '\0') {
-							//값 넣어주기
-							if (obj != nullptr) {
-								obj->getTailObj()->Value->setType(JNode::JType::BOOL);
-								bool* val = static_cast<bool*>(obj->getTailObj()->Value->P_Type);
-								*val = result_bool;
-							}
-							else if (arr != nullptr) {
-
-							}
-							else {
-								return;
-							}
-							crnt_value = END;
-						}
-					}
-					else if (crnt_value == OBJ) {
-						const char* tail_key_str = obj->getTailObj()->Key.Get_Str();
-						(*parserToJsonNode)[tail_key_str] = val->Get_Str();
-						crnt_value = END;
-					}
-					else if (crnt_value == ARR) {
-						(*parserToJsonNode).push() = val->Get_Str();
-					}
-					
-				}
-			}
-		}
 
 
-		//parse 메소드
-		void ctrl_parser() {
-			if(isObjArr) {
-				obj_parser();
-			} else {
-				arr_parser();
-			}
-		}
-
-		void flattenObject(DynamicStr* value) {
-			//value->Str[glb_csr] == '{' 이거임 쌍을 찾아야함
-			int brace_count = 1; // 여는 중괄호의 개수	이게 0이 되는 순간 쌍이 맞는 순간임
-
-			while (brace_count >= 1) { //brace_count 가 0이 되면 종료 해주는거임
-				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
-				word = parserStr->Char_Get_Str(glb_csr);
-				next_word = parserStr->Char_Get_Str(glb_csr + 1);
-
-				value->Append_Char(&word);
-				glb_csr++;
-				if (next_word == '{')
-					brace_count++;
-				else if (next_word == '}')
-					brace_count--;
-			}
-			value->Append_Char(&next_word);
-		}
-
-		void flattenArray(DynamicStr* value) {
-			//value->Str[glb_csr] == '[' 이거임 쌍을 찾아야함
-			int bracket_count = 1; // 여는 대괄호의 개수	이게 0이 되는 순간 쌍이 맞는 순간임
-
-			while(bracket_count >= 1) { //bracket_count 가 0이 되면 종료 해주는거임
-				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
-				word = parserStr->Char_Get_Str(glb_csr);
-				next_word = parserStr->Char_Get_Str(glb_csr + 1);
-
-				value->Append_Char(&word);
-				glb_csr++;
-				if (next_word == '[')
-					bracket_count++;
-				else if (next_word == ']')
-					bracket_count--;
-			}
-			value->Append_Char(&next_word);
-		}
-
-		void processArray(DynamicStr* value) {
-			//앞과 뒤에 대한 ' ' '\n' '\t' 제거하여 Value만 딱 가져오기
-			//해당 value는 '  123 ,' 이런식으로 공백이라던가 뉴라인이 포함된 value임
-			short first_focus = 0;
-			short last_focus = value->current_size-1;
-			const char* Str = value->Get_Str();
-
-			while (Str[first_focus] == ' ' || Str[first_focus] == '\n') {
-				first_focus++;
-			}
-
-			while (Str[last_focus] == ' ' || Str[last_focus] == '\n') {
-				last_focus--;
-			}
-
-
-			DynamicStr* new_value = new DynamicStr(128);
-			for (int i = first_focus; i <= last_focus; i++) {
-				new_value->Append_Char(&Str[i]);
-			}
-
-			value_ascii_parser(new_value);
-		}
-
-		void processValue(DynamicStr* value) {
-			//value->Str[glb_csr] ':' -> 다음임 그래서 ' '일수도 있고 '\n'일수도 모름			
-			enum val_type {
-				DEFAULT,
-				STR,
-				NUM,
-				OBJ,
-				ARR,
-				BL,
-				END
-			};
-
-			val_type crnt_val = DEFAULT;
-
-			for (;; glb_csr++) {
-				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
-				word = parserStr->Char_Get_Str(glb_csr);
-				next_word = parserStr->Char_Get_Str(glb_csr + 1);
-				//if (word == ' ' || word == '\n' || word == '\t') continue;
-
-				if (crnt_val == DEFAULT) {
-					if (word == '\"') {
-						value->Append_Char(&word);
-						crnt_val = STR;
-					}
-					else if (word == '{') {
-						flattenObject(value);
-						crnt_val = END; 
-						break;
-					}
-					else if (word == '[') {
-						flattenArray(value);
-						crnt_val = END;
-						break;
-					}
-					else if (word == '-' || (word >= '0' && word <= '9')) { //Num Mode
-						value->Append_Char(&word);
-						crnt_val = NUM;
-					}
-					else if (word == 't' || word == 'f') { //Bool Mode
-						value->Append_Char(&word);
-						crnt_val = BL;
-					}
-					continue;
-				}
-
-				switch (crnt_val) {
-				case STR:
-					value->Append_Char(&word);
-					if (next_word == '\"') {
-						value->Append_Char(&next_word);
-						glb_csr++;
-						crnt_val = END;
-					}
-					break;
-				case NUM:
-					value->Append_Char(&word);
-					if (!((next_word >= '0' && next_word <= '9') || next_word == '.')) {
-						crnt_val = END;
-					}
-					break;
-				case BL:
-					value->Append_Char(&word);
-					if (next_word == '\0' || next_word == ',' || next_word == '}') {
-						crnt_val = END;
-					}
-					break;
-				default:
-					break;
-				}
-
-				//종료판별
-				if (crnt_val == END) break;
-			}
-
-			//아스키 파싱
-			value_ascii_parser(value);
-		}
-
-		void obj_parser() {
-			//모드 2개 Key Value
-			parserToJsonNode->P_Type = nullptr;
-			parserToJsonNode->Cur_Type = JNode::JType::NULLTYPE;
-			parserToJsonNode->setType(JNode::JType::OBJ);
-
-			//DynamicStr* ck = static_cast<DynamicStr*>(parserToJsonNode->P_Type); //디버깅용
-
-			int brace_count = 1;	// 여는 중괄호의 개수 이게 0이 되는 순간 쌍이 끝나는 순간임
-
-			enum crnt_mode {
-				DEFAULT,
-				KEY,
-				VALUE,
-				END
-			};
-			
-			crnt_mode mode = DEFAULT;
-
-			DynamicStr* key = nullptr;
-			DynamicStr* value = nullptr;
-
-			while (1) {
-				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
-				word = parserStr->Char_Get_Str(glb_csr);				//처음에는 '{'
-				next_word = parserStr->Char_Get_Str(glb_csr + 1);
-
-				if (mode == DEFAULT) {
-					//1. Key 파싱
-					if (word == '\"') {
-						key = new DynamicStr(128);
-						mode = KEY;
-					}
-					//2. Value 파싱
-					else if (word == ':') {
-						value = new DynamicStr(128);
-						mode = VALUE;
-					}
-					else if (word == '}') {
-						mode = END;
-					}
-				}
-				else if (mode == END)
-					break;	//종료
-				else {
-					switch (mode) {
-					case KEY:
-						key->Append_Char(&word);
-						if (next_word == '\"') {
-							mode = DEFAULT;
-							glb_csr++;
-							(*parserToJsonNode)[key->Get_Str()];//Key값 넣어주기
-							delete key;
-							key = nullptr;
-							mode = DEFAULT;
-						}
-						break;
-					case VALUE:
-						//함수해서 따로 해주기
-						processValue(value);
-						delete value;
-						value = nullptr;
-						mode = DEFAULT;
-						break;
-					default:
-						break;
-					}
-				}
-				glb_csr++;
-			}
-			
-
-		}
-
-		void arr_parser() {
-			parserToJsonNode->P_Type = nullptr;
-			parserToJsonNode->Cur_Type = JNode::JType::NULLTYPE;
-			parserToJsonNode->setType(JNode::JType::ARR); 
-
-			DynamicStr* value = new DynamicStr(128);
-
-			int bracket_count = 1; // 여는 대괄호의 개수	이게 0이 되는 순간 쌍이 맞는 순간임
-			int brace_count = 0; // 여는 중괄호의 개수
-			glb_csr++; //처음 '[' 지나가기
-			for(;;glb_csr++) {
-				prev_word = parserStr->Char_Get_Str(glb_csr - 1);
-				word = parserStr->Char_Get_Str(glb_csr);				//처음에는 무조건 '['
-				next_word = parserStr->Char_Get_Str(glb_csr + 1);
-				if (word == ' ' || word == '\n' || word == '\t') continue;
-
-				if (word == '[') {
-					bracket_count++;
-				}
-				else if (word == '{') {
-					brace_count++;
-				}
-				else if (word == ']') {
-					bracket_count--;
-					if (bracket_count == 0) {
-						//[] 배열자체를 종료
-						break;
-					}
-				}
-				else if (word == '}') {
-					brace_count--; 
-				}
-
-				if (word == ',') {
-					if (bracket_count == 1 && brace_count == 0) {
-						//1개의 인수를 종료
-						processArray(value);
-						delete value;
-						value = new DynamicStr(128);
-					}
-				}
-
-				value->Append_Char(&word);
-			}
-
-		}
-
-	private:
-		JNode* parserToJsonNode;
-		Dynamic::DynamicStr* parserStr;
-		bool isObjArr;		// true면 obj false면 arr
-		char word;
-		char prev_word;
-		char next_word;
-		int glb_csr;		//전체 문자열의 커서 역할
+	class ValRss{
+	public :
+		ValRss() : FullVal(128), Key(128), Value(128), curType(JNode::JType::NULLTYPE){}
+		~ValRss(){}
+		Dynamic::DynamicStr FullVal;
+		Dynamic::DynamicStr Key;
+		Dynamic::DynamicStr Value;
+		JNode::JType curType;
 	};
 
+	//동적 배열
+	class ValArr{
+	public:
+		ValArr(){
+			Val = new ValRss[128];
+			curCsr = 0;
+		}
+		ValArr(int capacity) {
+			Val = new ValRss[capacity];
+			curCsr = 0;
+		}
+		~ValArr(){
+			if (Val != nullptr){
+				delete[] Val;
+			}
+		}
+
+		//사이즈 늘리기
+		void UpBuf(int _capacity){
+			if (capacity >= _capacity){
+				//기존 용량보다 작아서 불가능
+				return;
+			}
+			ValRss* newVal = new ValRss[_capacity];
+			for (int i = 0; i <= capacity; i ++){
+				newVal[i].FullVal.Set_Str(Val[i].FullVal.Get_Str());
+				newVal[i].Key.Set_Str(Val[i].Key.Get_Str());
+				newVal[i].Value.Set_Str(Val[i].Value.Get_Str());
+			}
+			delete[] Val;
+			Val = nullptr;
+			Val = newVal;
+			capacity = _capacity;
+		}
+
+		//맨뒤에 삽입
+		void setObjRss(Dynamic::DynamicStr* FullVal, Dynamic::DynamicStr* Key, Dynamic::DynamicStr* Value){
+			if (curCsr >= capacity - 1){
+				//마지막 커서 UpBuf해줘야함
+				UpBuf(capacity * 2);
+			}
+			Val[curCsr].Key.Set_Str(Key->Get_Str());
+			Val[curCsr].Value.Set_Str(Value->Get_Str());
+			Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
+			Val[curCsr++].curType = JNode::JType::OBJ;
+		}
+
+		void setArrRss(Dynamic::DynamicStr* FullVal, Dynamic::DynamicStr* Value){
+			if (curCsr >= capacity - 1){
+				//마지막 커서 UpBuf해줘야함
+				UpBuf(capacity * 2);
+			}
+			Val[curCsr].Value.Set_Str(Value->Get_Str());
+			Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
+			Val[curCsr++].curType = JNode::JType::ARR;
+		}
+
+	protected:
+		int capacity;		//용량	동적으로 늘릴예정
+		int curCsr;
+		ValRss* Val;
+	};
+
+	//문자열 파싱 -> JNode로 변환
+	class StrParser : public ValArr {
+	public:
+		StrParser(JNode* RootNode, Dynamic::DynamicStr* RootStr, JNode::JType RootNodeType) : ValArr(64),
+					RootNode(RootNode), RootStr(RootStr), RootNodeType(RootNodeType), gCsr(0), 
+					Key(nullptr), Value(nullptr), FullVal(nullptr){
+			ParserMain();
+		}
+
+		enum class WrdInfo{
+			Init,
+			KEY,
+			STR,
+			VALUE,
+			IDLE,		//아직 어떠한 확정도 없는 상태
+		};
+
+		void Test(){
+			
+		}
+		
+		void ParserMain(){
+			//if (RootNodeType == JNode::JType::OBJ){
+			//	//RootNode의 P_Type(Str) 생김새가 Obj "{}" 생김새 파싱진행
+			//	ObjParser();
+			//}
+			//else if (RootNodeType == JNode::JType::ARR){
+			//	//RootNode의 P_Type(Str) 생김새가 Arr "[]" 생김새 파싱진행
+			//	ArrParser();
+			//}
+
+			Parser();
+		}
+
+		//objValue.Value 혹은 arrValue.Value를 실제 값으로 타입변환 해주기
+		void ValueAsciiParser(){
+
+			//만약에 중첩된게 들어왔다면
+			//JNode 새롭게 만들고 JNode = Str; 넣어서 중첩된걸 파싱하면 됨
+		}
+
+
+		// FullVal - (Key:Value), FullVal - (Value)
+		void ValueParser(){
+			
+
+		}	
+
+
+		void Parser(){
+			short BrcCnt = 0;		//'{'의 개수 추적
+			short BrkCnt = 0;		//'['의 개수 추적
+			bool qtStt = false;		//'"'상태 추적
+
+			FullVal = new DynamicStr(128);
+			Key = new DynamicStr(128);
+			Value = new DynamicStr(128);
+
+			JNode::JType curType = RootNodeType;
+			WrdInfo curWrdType = WrdInfo::Init;
+
+			while (1){
+				PrvWrd = RootStr->Char_Get_Str(gCsr - 1);
+				CurWrd = RootStr->Char_Get_Str(gCsr);
+				NxtWrd = RootStr->Char_Get_Str(gCsr + 1);
+
+				if (CurWrd == '{') BrcCnt++; continue;
+				if (CurWrd == '[') BrkCnt++; continue;
+				if (CurWrd == '"' && PrvWrd != '\\') {
+					if (qtStt == true) qtStt = false;
+					else if (qtStt == false) qtStt = true;
+				}
+
+
+				if (curType == JNode::JType::OBJ){//Key와 Value만 생각하기
+					if (CurWrd == ',' && BrcCnt == 1){//이때만 FullVal가 추가됨
+						//setObjRss();
+						delete FullVal;
+						delete Key;
+						delete Value;
+
+						FullVal = new DynamicStr(128);
+						Key = new DynamicStr(128);
+						Value = new DynamicStr(128);
+
+						curWrdType = WrdInfo::IDLE;
+					}
+
+
+					if (CurWrd == '}' && BrcCnt == 0){//종료 판별
+						//setObjRss();
+						break;
+					}
+
+
+					//FullVal 처리
+					FullVal->Append_Char(&CurWrd);
+
+					//Key 찾기
+					if (curWrdType == WrdInfo::IDLE && CurWrd == '"' && qtStt == true){
+						curWrdType = WrdInfo::KEY;
+					}
+					else if (curWrdType == WrdInfo::KEY){
+						if (CurWrd == '"' && qtStt == false){	//Key끝
+							curWrdType = WrdInfo::IDLE;
+						}
+						Key->Append_Char(&CurWrd);
+					}
+					
+					//Value 찾기
+					else if (curWrdType == WrdInfo::IDLE && CurWrd == ':'){
+						curWrdType = WrdInfo::VALUE;
+					}
+					else if (curWrdType == WrdInfo::VALUE){
+						Value->Append_Char(&CurWrd);
+					}
+
+					
+
+
+					
+					
+				}
+				else if (curType == JNode::JType::ARR){//Value만 생각하기
+					if (CurWrd == ',' && (BrkCnt == 1 && BrcCnt == 0)){ //이때만 FullVal가 추가됨
+						//setArrRss();
+						delete FullVal;
+						delete Key;
+						delete Value;
+
+						FullVal = new DynamicStr(128);
+						Key = new DynamicStr(128);
+						Value = new DynamicStr(128);
+					}
+
+					if (CurWrd == ']' && (BrkCnt == 1 && BrcCnt == 0)){ //종료판별
+						//setArrRss();
+						break;
+					}
+
+
+					//FullVal 처리
+					
+
+
+					
+				}
+				gCsr++;
+			}
+			delete FullVal;
+			delete Key;
+			delete Value;
+		}
+
+		
+
+
+	private:
+		JNode* RootNode;		//자체적으로 절대로 변질되어선 안됨 내부 구조를 바꾸는건 가능하지만 이미 자체 참조가 된상태임
+		JNode* CtrlNode;
+		DynamicStr* RootStr;		//변질되도 의미는 없음 RootNode가 제일 중요한거라
+		DynamicStr* CtrlStr;
+
+		DynamicStr* FullVal;		//밸류뽑기 위한 문자들
+		DynamicStr* Key;
+		DynamicStr* Value;
+
+		JNode::JType RootNodeType;
+		int gCsr;			//문자 컨트롤을 위한 값들
+		char CurWrd;		//
+		char NxtWrd;		//
+		char PrvWrd;		//
+	};
 
 
 	//JNode 파싱 -> Json으로 변환
@@ -1376,5 +1138,5 @@ namespace JSON {
 	private:
 
 	};
-	
+
 }
