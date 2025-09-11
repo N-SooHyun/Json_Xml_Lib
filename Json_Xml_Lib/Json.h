@@ -1003,7 +1003,7 @@ namespace JSON {
 		}	
 
 
-		void Parser(){
+		void Parser() {
 			short BrcCnt = 0;		//'{'의 개수 추적
 			short BrkCnt = 0;		//'['의 개수 추적
 			bool qtStt = false;		//'"'상태 추적
@@ -1013,23 +1013,27 @@ namespace JSON {
 			Value = new DynamicStr(128);
 
 			JNode::JType curType = RootNodeType;
-			WrdInfo curWrdType = WrdInfo::Init;
+			WrdInfo curWrdType = WrdInfo::IDLE;
 
-			while (1){
+			while (1) {
 				PrvWrd = RootStr->Char_Get_Str(gCsr - 1);
 				CurWrd = RootStr->Char_Get_Str(gCsr);
 				NxtWrd = RootStr->Char_Get_Str(gCsr + 1);
 
-				if (CurWrd == '{') BrcCnt++; continue;
-				if (CurWrd == '[') BrkCnt++; continue;
+				if (CurWrd == '{') {
+					BrcCnt++;
+				}
+				if (CurWrd == '[') {
+					BrkCnt++;
+				}
 				if (CurWrd == '"' && PrvWrd != '\\') {
 					if (qtStt == true) qtStt = false;
 					else if (qtStt == false) qtStt = true;
 				}
 
 
-				if (curType == JNode::JType::OBJ){//Key와 Value만 생각하기
-					if (CurWrd == ',' && BrcCnt == 1){//이때만 FullVal가 추가됨
+				if (curType == JNode::JType::OBJ) {//Key와 Value만 생각하기
+					if (CurWrd == ',' && BrcCnt == 1) {//이때만 FullVal가 추가됨
 						//setObjRss();
 						delete FullVal;
 						delete Key;
@@ -1043,7 +1047,7 @@ namespace JSON {
 					}
 
 
-					if (CurWrd == '}' && BrcCnt == 0){//종료 판별
+					if (CurWrd == '}' && BrcCnt == 0) {//종료 판별
 						//setObjRss();
 						break;
 					}
@@ -1053,32 +1057,33 @@ namespace JSON {
 					FullVal->Append_Char(&CurWrd);
 
 					//Key 찾기
-					if (curWrdType == WrdInfo::IDLE && CurWrd == '"' && qtStt == true){
+					if (curWrdType == WrdInfo::IDLE && CurWrd == '"' && qtStt == true) {
 						curWrdType = WrdInfo::KEY;
 					}
-					else if (curWrdType == WrdInfo::KEY){
-						if (CurWrd == '"' && qtStt == false){	//Key끝
+					else if (curWrdType == WrdInfo::KEY) {
+						if (CurWrd == '"' && qtStt == false) {	//Key끝
 							curWrdType = WrdInfo::IDLE;
 						}
-						Key->Append_Char(&CurWrd);
+						else
+							Key->Append_Char(&CurWrd);
 					}
-					
+
 					//Value 찾기
-					else if (curWrdType == WrdInfo::IDLE && CurWrd == ':'){
+					else if (curWrdType == WrdInfo::IDLE && CurWrd == ':') {
 						curWrdType = WrdInfo::VALUE;
 					}
-					else if (curWrdType == WrdInfo::VALUE){
+					else if (curWrdType == WrdInfo::VALUE) {
 						Value->Append_Char(&CurWrd);
 					}
 
-					
 
 
-					
-					
+
+
+
 				}
-				else if (curType == JNode::JType::ARR){//Value만 생각하기
-					if (CurWrd == ',' && (BrkCnt == 1 && BrcCnt == 0)){ //이때만 FullVal가 추가됨
+				else if (curType == JNode::JType::ARR) {//Value만 생각하기
+					if (CurWrd == ',' && (BrkCnt == 1 && BrcCnt == 0)) { //이때만 FullVal가 추가됨
 						//setArrRss();
 						delete FullVal;
 						delete Key;
@@ -1089,17 +1094,17 @@ namespace JSON {
 						Value = new DynamicStr(128);
 					}
 
-					if (CurWrd == ']' && (BrkCnt == 1 && BrcCnt == 0)){ //종료판별
+					if (CurWrd == ']' && (BrkCnt == 1 && BrcCnt == 0)) { //종료판별
 						//setArrRss();
 						break;
 					}
 
 
 					//FullVal 처리
-					
 
 
-					
+
+
 				}
 				gCsr++;
 			}
