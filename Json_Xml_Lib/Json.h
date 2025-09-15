@@ -1004,9 +1004,9 @@ namespace JSON {
 
 
 		void Parser() {
-			short BrcCnt = 0;		//'{'의 개수 추적
-			short BrkCnt = 0;		//'['의 개수 추적
-			bool qtStt = false;		//'"'상태 추적
+			short BrcCnt = 0;      //'{'의 개수 추적
+			short BrkCnt = 0;      //'['의 개수 추적
+			bool qtStt = false;      //'"'상태 추적
 
 			FullVal = new DynamicStr(128);
 			Key = new DynamicStr(128);
@@ -1023,9 +1023,16 @@ namespace JSON {
 				if (CurWrd == '{') {
 					BrcCnt++;
 				}
+				else if (CurWrd == '}') {
+					BrcCnt--;
+				}
 				if (CurWrd == '[') {
 					BrkCnt++;
 				}
+				else if (CurWrd == ']') {
+					BrkCnt--;
+				}
+
 				if (CurWrd == '"' && PrvWrd != '\\') {
 					if (qtStt == true) qtStt = false;
 					else if (qtStt == false) qtStt = true;
@@ -1033,8 +1040,13 @@ namespace JSON {
 
 
 				if (curType == JNode::JType::OBJ) {//Key와 Value만 생각하기
-					if (CurWrd == ',' && BrcCnt == 1) {//이때만 FullVal가 추가됨
-						//setObjRss();
+					if (CurWrd == ',' && (BrcCnt == 1 && BrkCnt == 0)) {//이때만 FullVal가 추가됨
+						FullVal->Append_Char(&CurWrd);
+						//setObjRss(FullVal, Key, Value);
+						//FullVal은 그대로 있고
+						//Key는 배열 한개 추가해서 할당하고
+						//Value도 배열 한개 추가해서 할당하는걸로 진행하는게 나을 듯
+
 						delete FullVal;
 						delete Key;
 						delete Value;
@@ -1047,8 +1059,10 @@ namespace JSON {
 					}
 
 
-					if (CurWrd == '}' && BrcCnt == 0) {//종료 판별
-						//setObjRss();
+					if (CurWrd == '}' && (BrcCnt == 0 && BrkCnt == 0)) {//종료 판별
+						FullVal->Append_Char(&CurWrd);
+						
+						//
 						break;
 					}
 
@@ -1061,7 +1075,7 @@ namespace JSON {
 						curWrdType = WrdInfo::KEY;
 					}
 					else if (curWrdType == WrdInfo::KEY) {
-						if (CurWrd == '"' && qtStt == false) {	//Key끝
+						if (CurWrd == '"' && qtStt == false) {   //Key끝
 							curWrdType = WrdInfo::IDLE;
 						}
 						else

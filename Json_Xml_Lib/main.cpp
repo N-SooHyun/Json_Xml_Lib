@@ -106,6 +106,10 @@ void Test_Json() {
 
 	int* arr_num = static_cast<int*>(arr_node->P_Type);
 
+    const char* Test = "{\"Key0\" : {\"Key0\" : 123} }";
+
+    node = Test;
+
 }
 
 int main() {
