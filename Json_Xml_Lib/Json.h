@@ -883,9 +883,9 @@ namespace JSON {
 
 	class ValRss{
 	public :
-		ValRss() : FullVal(128), Key(128), Value(128), curType(JNode::JType::NULLTYPE){}
+		ValRss() : /*FullVal(128),*/ Key(128), Value(128), curType(JNode::JType::NULLTYPE){}
 		~ValRss(){}
-		Dynamic::DynamicStr FullVal;
+		//Dynamic::DynamicStr FullVal;		//없어도 될듯 여기서 관리하진 말자
 		Dynamic::DynamicStr Key;
 		Dynamic::DynamicStr Value;
 		JNode::JType curType;
@@ -908,6 +908,57 @@ namespace JSON {
 			}
 		}
 
+	private:
+#define KeyFst  0
+#define KeyLst  1
+#define ValFst  2
+#define ValLst  3
+#define IS_TRIM_CHAR(c) ((c) == ' '|| (c) == '\n' || (c) == '\t')
+
+		void setTrim(){
+			char key_fstWrd;
+			char key_lstWrd;
+			char val_fstWrd;
+			char val_lstWrd;
+			
+
+			//0 1 - key     2,3 - Value
+			int FstLstIdx[4] = { 0, Val[curCsr].Key.current_size - 1, 0, Val[curCsr].Value.current_size - 1 };
+			
+
+
+			key_fstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyFst]);
+			key_lstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyLst]);
+
+			val_fstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValFst]);
+			val_lstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValLst]);
+
+			DynamicStr* copyStr = new DynamicStr(128);
+
+			while (IS_TRIM_CHAR(key_fstWrd) || IS_TRIM_CHAR(key_lstWrd) ||
+				IS_TRIM_CHAR(val_fstWrd) || IS_TRIM_CHAR(val_lstWrd)){
+				
+				if (IS_TRIM_CHAR(key_fstWrd)){		//앞글자를 지워줘야함
+					Val[curCsr].Key.Str_Trim_Front();
+					key_fstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyFst]);
+				}
+				if (IS_TRIM_CHAR(key_lstWrd)){		//뒷글자를 지워줘야함
+					Val[curCsr].Key.Str_Trim_Back();
+					key_lstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyLst]);
+				}
+				if (IS_TRIM_CHAR(val_fstWrd)){		//앞글자를 지워줘야함
+					Val[curCsr].Value.Str_Trim_Front();
+					val_fstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValFst]);
+				}
+				if (IS_TRIM_CHAR(val_lstWrd)){		//뒷글자를 지워줘야함
+					Val[curCsr].Value.Str_Trim_Back();
+					val_lstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValLst]);
+				}
+			}
+		}
+
+	public:
+
 		//사이즈 늘리기
 		void UpBuf(int _capacity){
 			if (capacity >= _capacity){
@@ -916,7 +967,7 @@ namespace JSON {
 			}
 			ValRss* newVal = new ValRss[_capacity];
 			for (int i = 0; i <= capacity; i ++){
-				newVal[i].FullVal.Set_Str(Val[i].FullVal.Get_Str());
+				//newVal[i].FullVal.Set_Str(Val[i].FullVal.Get_Str());
 				newVal[i].Key.Set_Str(Val[i].Key.Get_Str());
 				newVal[i].Value.Set_Str(Val[i].Value.Get_Str());
 			}
@@ -927,24 +978,29 @@ namespace JSON {
 		}
 
 		//맨뒤에 삽입
-		void setObjRss(Dynamic::DynamicStr* FullVal, Dynamic::DynamicStr* Key, Dynamic::DynamicStr* Value){
+		void setObjRss(Dynamic::DynamicStr* Key, Dynamic::DynamicStr* Value){
 			if (curCsr >= capacity - 1){
 				//마지막 커서 UpBuf해줘야함
 				UpBuf(capacity * 2);
 			}
 			Val[curCsr].Key.Set_Str(Key->Get_Str());
 			Val[curCsr].Value.Set_Str(Value->Get_Str());
-			Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
-			Val[curCsr++].curType = JNode::JType::OBJ;
+			//Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
+			Val[curCsr].curType = JNode::JType::OBJ;
+
+			//혹시 모르니까 정리해주는 메소드 사용
+			setTrim();
+			curCsr++;
 		}
 
-		void setArrRss(Dynamic::DynamicStr* FullVal, Dynamic::DynamicStr* Value){
+		//배열전용 값 넣기 배열일때는 키값이 필요없으니까 넣은거임
+		void setArrRss(Dynamic::DynamicStr* Value){
 			if (curCsr >= capacity - 1){
 				//마지막 커서 UpBuf해줘야함
 				UpBuf(capacity * 2);
 			}
 			Val[curCsr].Value.Set_Str(Value->Get_Str());
-			Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
+			//Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
 			Val[curCsr++].curType = JNode::JType::ARR;
 		}
 
@@ -952,6 +1008,7 @@ namespace JSON {
 		int capacity;		//용량	동적으로 늘릴예정
 		int curCsr;
 		ValRss* Val;
+		//FullVal 굳이 만들어야 할까?
 	};
 
 	//문자열 파싱 -> JNode로 변환
@@ -1000,7 +1057,7 @@ namespace JSON {
 		void ValueParser(){
 			
 
-		}	
+		}
 
 
 		void Parser() {
@@ -1042,16 +1099,14 @@ namespace JSON {
 				if (curType == JNode::JType::OBJ) {//Key와 Value만 생각하기
 					if (CurWrd == ',' && (BrcCnt == 1 && BrkCnt == 0)) {//이때만 FullVal가 추가됨
 						FullVal->Append_Char(&CurWrd);
-						//setObjRss(FullVal, Key, Value);
-						//FullVal은 그대로 있고
-						//Key는 배열 한개 추가해서 할당하고
-						//Value도 배열 한개 추가해서 할당하는걸로 진행하는게 나을 듯
+						
+						setObjRss(Key, Value);
 
 						delete FullVal;
 						delete Key;
 						delete Value;
 
-						FullVal = new DynamicStr(128);
+						//FullVal = new DynamicStr(128);
 						Key = new DynamicStr(128);
 						Value = new DynamicStr(128);
 
@@ -1061,8 +1116,10 @@ namespace JSON {
 
 					if (CurWrd == '}' && (BrcCnt == 0 && BrkCnt == 0)) {//종료 판별
 						FullVal->Append_Char(&CurWrd);
-						
-						//
+
+
+
+						//여기서 계층 구조를 파싱하기 위한 메소드가 필요할거 같음 
 						break;
 					}
 

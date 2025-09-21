@@ -112,6 +112,39 @@ namespace Dynamic {
 			Str[current_size] = '\0';
 		}
 
+		//맨앞글자를 지우기 앞으로 이동복사는 O(n) 시간복잡도 때문에 그냥 새롭게 버퍼 하나 파서 복사해줄 예정
+		void Str_Trim_Front(){
+			char* new_Str = new char[capacity_size];
+			
+			for (int idx=0; ; idx++){
+				if (idx == capacity_size-1){
+					new_Str[idx] = Str[idx];		//그냥 마지막은 마지막 넣어주기 '\0' 이게 있을수도 있어서 해줘야할듯
+					break;
+				}
+				new_Str[idx] = Str[idx + 1];		//앞글자 제외하고 넣기
+			}
+			current_size = current_size > -1 ? (current_size-1) : -1;
+			delete Str;
+			Str = new_Str;
+			new_Str = nullptr;
+		}
+
+		//맨뒤에 글자 지우기 이거는 그냥 앞뒤랑 복사붙여넣기 하면 될듯
+		void Str_Trim_Back(){
+			if (current_size >= capacity_size){
+				SizeUpStr();
+			}
+
+			if (current_size == -1){
+				//지울게 없음 문자가 없으니까
+				return;
+			}
+
+			Str[current_size - 1] = Str[current_size];
+			Str[current_size] = '\0';	//이론상 원래 '\0'일테지만 한번더 안전하게 넣어주기		
+		}
+		
+
 	private:
 		//<문자열 처리 로직에 대한 API>
 
