@@ -895,86 +895,94 @@ namespace JSON {
 	class ValArr{
 	public:
 		ValArr(){
-			Val = new ValRss[128];
-			curCsr = 0;
+			//Val = new ValRss[128];
+			Vals = new ValRss*[128];
+			InitVals(Vals, 128);
+			curCsr = -1;
 		}
-		ValArr(int capacity) {
-			Val = new ValRss[capacity];
-			curCsr = 0;
+		ValArr(int _capacity) {
+			capacity = _capacity;
+			//Val = new ValRss[capacity];
+			Vals = new ValRss*[capacity];
+			InitVals(Vals, capacity);
+			curCsr = -1;
 		}
 		~ValArr(){
-			if (Val != nullptr){
-				delete[] Val;
+			/*if (Val != nullptr){
+			delete[] Val;
+			}*/
+			DelVals(Vals, capacity);
+		}
+
+		void DelVals(ValRss** _Vals, int _capacity){
+			if (_Vals != nullptr){
+				for (int i = 0; i < _capacity; i++){
+					if (_Vals[i] != nullptr){
+						delete _Vals[i];
+					}
+				}
+				delete[] _Vals;
 			}
 		}
 
-	private:
-#define KeyFst  0
-#define KeyLst  1
-#define ValFst  2
-#define ValLst  3
-#define IS_TRIM_CHAR(c) ((c) == ' '|| (c) == '\n' || (c) == '\t')
-
-		void setTrim(){
-			char key_fstWrd;
-			char key_lstWrd;
-			char val_fstWrd;
-			char val_lstWrd;
-			
-
-			//0 1 - key     2,3 - Value
-			int FstLstIdx[4] = { 0, Val[curCsr].Key.current_size - 1, 0, Val[curCsr].Value.current_size - 1 };
-			
-
-
-			key_fstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyFst]);
-			key_lstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyLst]);
-
-			val_fstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValFst]);
-			val_lstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValLst]);
-
-			DynamicStr* copyStr = new DynamicStr(128);
-
-			while (IS_TRIM_CHAR(key_fstWrd) || IS_TRIM_CHAR(key_lstWrd) ||
-				IS_TRIM_CHAR(val_fstWrd) || IS_TRIM_CHAR(val_lstWrd)){
-				
-				if (IS_TRIM_CHAR(key_fstWrd)){		//앞글자를 지워줘야함
-					Val[curCsr].Key.Str_Trim_Front();
-					key_fstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyFst]);
-				}
-				if (IS_TRIM_CHAR(key_lstWrd)){		//뒷글자를 지워줘야함
-					Val[curCsr].Key.Str_Trim_Back();
-					key_lstWrd = Val[curCsr].Key.Char_Get_Str(FstLstIdx[KeyLst]);
-				}
-				if (IS_TRIM_CHAR(val_fstWrd)){		//앞글자를 지워줘야함
-					Val[curCsr].Value.Str_Trim_Front();
-					val_fstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValFst]);
-				}
-				if (IS_TRIM_CHAR(val_lstWrd)){		//뒷글자를 지워줘야함
-					Val[curCsr].Value.Str_Trim_Back();
-					val_lstWrd = Val[curCsr].Value.Char_Get_Str(FstLstIdx[ValLst]);
-				}
+		void InitVals(ValRss** _Vals, int _capacity){
+			for (int i = 0; i < _capacity; i++){
+				_Vals[i] = nullptr;
 			}
 		}
 
 	public:
-
+		int getIdxCnt(){
+			return curCsr;
+		}
 		//사이즈 늘리기
 		void UpBuf(int _capacity){
 			if (capacity >= _capacity){
 				//기존 용량보다 작아서 불가능
 				return;
 			}
-			ValRss* newVal = new ValRss[_capacity];
-			for (int i = 0; i <= capacity; i ++){
-				//newVal[i].FullVal.Set_Str(Val[i].FullVal.Get_Str());
-				newVal[i].Key.Set_Str(Val[i].Key.Get_Str());
-				newVal[i].Value.Set_Str(Val[i].Value.Get_Str());
+
+			ValRss** newVals = new ValRss*[_capacity];
+			InitVals(newVals, _capacity);
+			for (int i = 0; i < capacity; i++){
+				newVals[i] = Vals[i];
+				Vals[i] = nullptr;
 			}
-			delete[] Val;
-			Val = nullptr;
-			Val = newVal;
+			DelVals(Vals, capacity);
+			Vals = newVals;
+			newVals = nullptr;
 			capacity = _capacity;
+
+
+			//ValRss* newVal = new ValRss[_capacity];
+			//for (int i = 0; i < capacity; i++){
+			//   //newVal[i].FullVal.Set_Str(Val[i].FullVal.Get_Str());
+			//   newVal[i].Key.Set_Str(Val[i].Key.Get_Str());
+			//   newVal[i].Value.Set_Str(Val[i].Value.Get_Str());
+			//}
+			//delete[] Val;
+			//Val = nullptr;
+			//Val = newVal;
+			//capacity = _capacity;
+		}
+
+		//메모리 얕은복사로 불필요한 배열 크기 줄이기
+		void setCmpValArr(){
+			if (curCsr == capacity){
+				return;
+				//굳이 안해줘도 될듯
+			}
+			ValRss** newVals = new ValRss*[curCsr];
+			InitVals(newVals, curCsr);
+
+			for (int i = 0; i <= curCsr; i++){
+				newVals[i] = Vals[i];
+				Vals[i] = nullptr;
+			}
+			DelVals(Vals, capacity);
+			Vals = newVals;
+			newVals = nullptr;
+			capacity = curCsr;
 		}
 
 		//맨뒤에 삽입
@@ -983,14 +991,24 @@ namespace JSON {
 				//마지막 커서 UpBuf해줘야함
 				UpBuf(capacity * 2);
 			}
-			Val[curCsr].Key.Set_Str(Key->Get_Str());
-			Val[curCsr].Value.Set_Str(Value->Get_Str());
-			//Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
-			Val[curCsr].curType = JNode::JType::OBJ;
+			curCsr++;
+
+			Key->Str_Trim();
+			Value->Str_Trim();
+
+			Vals[curCsr] = new ValRss();
+
+			Vals[curCsr]->Key.Set_Str(Key->Get_Str());
+			Vals[curCsr]->Value.Set_Str(Value->Get_Str());
+			Vals[curCsr]->curType = JNode::JType::OBJ;
+
+			//Val[curCsr].Key.Set_Str(Key->Get_Str());
+			//Val[curCsr].Value.Set_Str(Value->Get_Str());
+			////Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
+			//Val[curCsr].curType = JNode::JType::OBJ;
 
 			//혹시 모르니까 정리해주는 메소드 사용
-			setTrim();
-			curCsr++;
+			//setTrim();
 		}
 
 		//배열전용 값 넣기 배열일때는 키값이 필요없으니까 넣은거임
@@ -999,24 +1017,44 @@ namespace JSON {
 				//마지막 커서 UpBuf해줘야함
 				UpBuf(capacity * 2);
 			}
-			Val[curCsr].Value.Set_Str(Value->Get_Str());
-			//Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
-			Val[curCsr++].curType = JNode::JType::ARR;
+			curCsr++;
+
+			Value->Str_Trim();
+
+			Vals[curCsr] = new ValRss();
+			Vals[curCsr]->Value.Set_Str(Value->Get_Str());
+			Vals[curCsr]->curType = JNode::JType::ARR;
+
+			//Val[curCsr].Value.Set_Str(Value->Get_Str());
+			////Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
+			//Val[curCsr].curType = JNode::JType::ARR;
 		}
 
+		//큰따옴표 제거
+		void RemoveQuotes(DynamicStr& Str){
+			Str.Str_Trim_Front();
+			//Str.Str_Trim_Front();
+			Str.Str_Trim_Back();
+			//Str.Str_Trim_Back();
+			//이거 두번 하는건 생각해봐야할듯?  \"
+		}
+
+
 	protected:
-		int capacity;		//용량	동적으로 늘릴예정
-		int curCsr;
-		ValRss* Val;
+		int capacity;      //용량   동적으로 늘릴예정
+		int curCsr;         //index의 크기?
+		//ValRss* Val;
+		ValRss** Vals;
 		//FullVal 굳이 만들어야 할까?
 	};
+
 
 	//문자열 파싱 -> JNode로 변환
 	class StrParser : public ValArr {
 	public:
-		StrParser(JNode* RootNode, Dynamic::DynamicStr* RootStr, JNode::JType RootNodeType) : ValArr(64),
-					RootNode(RootNode), RootStr(RootStr), RootNodeType(RootNodeType), gCsr(0), 
-					Key(nullptr), Value(nullptr), FullVal(nullptr){
+		StrParser(JNode* RootNode, Dynamic::DynamicStr* RootStr, JNode::JType RootNodeType) : ValArr(2),
+			RootNode(RootNode), RootStr(RootStr), RootNodeType(RootNodeType), gCsr(0),
+			Key(nullptr), Value(nullptr), FullVal(nullptr){
 			ParserMain();
 		}
 
@@ -1025,37 +1063,248 @@ namespace JSON {
 			KEY,
 			STR,
 			VALUE,
-			IDLE,		//아직 어떠한 확정도 없는 상태
+			IDLE,      //아직 어떠한 확정도 없는 상태
 		};
 
 		void Test(){
-			
+
 		}
-		
+
 		void ParserMain(){
-			//if (RootNodeType == JNode::JType::OBJ){
-			//	//RootNode의 P_Type(Str) 생김새가 Obj "{}" 생김새 파싱진행
-			//	ObjParser();
-			//}
-			//else if (RootNodeType == JNode::JType::ARR){
-			//	//RootNode의 P_Type(Str) 생김새가 Arr "[]" 생김새 파싱진행
-			//	ArrParser();
-			//}
 
 			Parser();
 		}
 
-		//objValue.Value 혹은 arrValue.Value를 실제 값으로 타입변환 해주기
-		void ValueAsciiParser(){
+		void Value_Ascii_Parser(ValRss* Vals, JNode::JType JsStt, JNode* CurNode){
+			int result_int = 0;
+			double result_double = 0.0;
+			bool is_double = false;      //false -> int, true -> double
+			bool result_bool = false;
 
-			//만약에 중첩된게 들어왔다면
-			//JNode 새롭게 만들고 JNode = Str; 넣어서 중첩된걸 파싱하면 됨
+			int stack_glb_csr = 0;
+
+
+
+			JObj* obj = nullptr;   //이거는 단순히 디버깅 용도임
+			JArr* arr = nullptr;   //이거는 단순히 디버깅 용도임
+
+			//디버깅 용도임 실제는 CurNode 사용할거임
+			if (JsStt == JNode::JType::OBJ)
+				obj = static_cast<JObj*>(CurNode->P_Type);
+			else if (JsStt == JNode::JType::ARR)
+				arr = static_cast<JArr*>(CurNode->P_Type);
+
+			enum ck_word{
+				DEF,
+				STR,
+				M_NUM,
+				P_NUM,
+				OBJ,   //Str로 넣어버리기
+				ARR,   //Str로 넣어버리기
+				BL,
+				END
+			};
+
+			ck_word crnt_value = DEF;
+
+			for (;; stack_glb_csr++){//Key는 차피 문자열이라 안해도 됨 Value만 하면 됨				
+				PrvWrd = Vals->Value.Char_Get_Str(stack_glb_csr - 1);
+				CurWrd = Vals->Value.Char_Get_Str(stack_glb_csr);
+				NxtWrd = Vals->Value.Char_Get_Str(stack_glb_csr + 1);
+
+				//시작판별
+				if (crnt_value == DEF){
+					if (CurWrd == '\"'){
+						crnt_value = STR;
+						stack_glb_csr--;
+					}
+					//음의 숫자일 경우(음의 정수, 음의 실수)
+					else if (CurWrd == '-' && (NxtWrd >= '0' && NxtWrd <= '9')) {
+						crnt_value = M_NUM;
+					}
+					//양의 숫자일 경우(양의 정수, 양의 실수)
+					else if (CurWrd >= '0' && CurWrd <= '9') {
+						crnt_value = P_NUM;
+						stack_glb_csr--;
+					}
+					//bool일 경우
+					else if (CurWrd == 't' || CurWrd == 'f') {
+						crnt_value = BL;
+						stack_glb_csr--;
+					}
+					else if (CurWrd == '{') {
+						crnt_value = OBJ;
+						stack_glb_csr--;
+					}
+					else if (CurWrd == '[') {
+						crnt_value = ARR;
+						stack_glb_csr--;
+					}
+					continue;
+				}
+				//종료판별
+				else if (crnt_value == END){
+					break;
+				}
+				else{
+					if (crnt_value == STR) {
+						RemoveQuotes(Vals->Value);
+						char* chKeys = Vals->Key.Get_Str();
+						char* chVals = Vals->Value.Get_Str();
+
+						if (obj != nullptr){
+							(*CurNode)[static_cast<const char*>(chKeys)] = chVals;
+						}
+						else if (arr != nullptr){
+							(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = chVals;
+						}
+						
+
+						//디버깅 확인용
+						//JNode* debug = static_cast<JNode*>(obj->Value);
+						//DynamicStr* db = static_cast<DynamicStr*>(debug->P_Type);
+						//디버깅 확인용
+
+						crnt_value = END;
+					}
+					else if (crnt_value == M_NUM || crnt_value == P_NUM) {
+						result_int = result_int * 10 + (CurWrd - '0');
+
+						//소수판별
+						if (NxtWrd == '.') {
+							is_double = true;
+							stack_glb_csr += 2;
+							double decimal_part = 0;
+							int divisor = 10;		//소수점 뒤 숫자를 10으로 나누는데 사용할 변수
+							for (;; stack_glb_csr++) {
+								PrvWrd = Vals->Value.Char_Get_Str(stack_glb_csr - 1);
+								CurWrd = Vals->Value.Char_Get_Str(stack_glb_csr);
+								NxtWrd = Vals->Value.Char_Get_Str(stack_glb_csr + 1);
+								decimal_part = decimal_part + (CurWrd - '0') / (double)divisor;
+								divisor *= 10;
+								if (NxtWrd == '\0') break;
+							}
+							result_double = result_int + decimal_part;
+						}
+
+						//종료 판별
+						if (NxtWrd == '\0') {
+							if (crnt_value == M_NUM) {
+								result_int = result_int * -1;
+								result_double = result_double * -1;
+							}
+							//값 넣어주기
+							if (obj != nullptr) {
+								char* chKeys = Vals->Key.Get_Str();
+								(*CurNode)[static_cast<const char*>(chKeys)] = is_double ? result_double : result_int;
+							}
+							else if (arr != nullptr) {
+								(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = is_double ? result_double : result_int;
+							}
+							else {
+								return;
+							}
+
+							//디버깅용
+							//JNode* debug = static_cast<JNode*>(obj->next->Value);
+							//double* db = static_cast<double*>(debug->P_Type);
+							//디버깅용
+
+							crnt_value = END;
+						}
+					}
+					else if (crnt_value == BL) {
+						char first_word = Vals->Value.Char_Get_Str(0);
+						char second_word = Vals->Value.Char_Get_Str(1);
+						char third_word = Vals->Value.Char_Get_Str(2);
+						char four_word = Vals->Value.Char_Get_Str(3);
+						char five_word = Vals->Value.Char_Get_Str(4);	//true면 '\0'
+						char six_word = Vals->Value.Char_Get_Str(5);	//false면 '\0'
+						if (first_word == 't') {
+							if (second_word == 'r' &&
+								third_word == 'u' &&
+								four_word == 'e') {
+								result_bool = true;
+							}
+						}
+						else if (first_word == 'f') {
+							if (second_word == 'a' &&
+								third_word == 'l' &&
+								four_word == 's' &&
+								five_word == 'e') {
+								result_bool = false;
+							}
+						}
+
+						//종료판별
+						if (five_word == '\0' || six_word == '\0') {
+							//값 넣어주기
+							if (obj != nullptr) {
+								char* chKeys = Vals->Key.Get_Str();
+								(*CurNode)[static_cast<const char*>(chKeys)] = result_bool;
+							}
+							else if (arr != nullptr) {
+								(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = result_bool;
+							}
+							else {
+								return;
+							}
+							//디버깅용
+							JNode* debug = static_cast<JNode*>(obj->next->Value);
+							bool* db = static_cast<bool*>(debug->P_Type);
+							//디버깅용
+							crnt_value = END;
+						}
+					}
+					else if (crnt_value == OBJ) {
+						char* chKeys = Vals->Key.Get_Str();
+						char* chVals = Vals->Value.Get_Str();
+						JNode* newObjNode = new JNode(JNode::JType::STRING);
+						*newObjNode = chVals;
+						(*CurNode)[static_cast<const char*>(chKeys)] = newObjNode;
+						
+						int debug = 10;
+
+
+					}
+					else if (crnt_value == ARR) {
+						char* chVals = Vals->Value.Get_Str();
+						JNode* newArrNode = new JNode(JNode::JType::STRING);
+						*newArrNode = chVals;
+						(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = newArrNode;
+					}
+				}
+			}
+
+
 		}
 
-
 		// FullVal - (Key:Value), FullVal - (Value)
-		void ValueParser(){
-			
+		void ValueParser(JNode::JType curType){
+			//배열 정리 한번만 하기
+			setCmpValArr();
+
+			RootNode->delType();
+
+			//배열의 개수를 파악하기
+			int ValIdxCnt = getIdxCnt();
+
+			//객체 타입일때
+			if (curType == JNode::JType::OBJ)
+				*RootNode = JNode::JType::OBJ;
+			//배열타입일때
+			else if (curType == JNode::JType::ARR)
+				*RootNode = JNode::JType::ARR;
+
+
+
+
+			if (ValIdxCnt > -1){
+				for (int i = 0; i <= ValIdxCnt; i++){
+					Value_Ascii_Parser(Vals[i], curType, RootNode);
+				}
+
+			}
 
 		}
 
@@ -1071,6 +1320,7 @@ namespace JSON {
 
 			JNode::JType curType = RootNodeType;
 			WrdInfo curWrdType = WrdInfo::IDLE;
+			bool isValStr = true;
 
 			while (1) {
 				PrvWrd = RootStr->Char_Get_Str(gCsr - 1);
@@ -1097,12 +1347,13 @@ namespace JSON {
 
 
 				if (curType == JNode::JType::OBJ) {//Key와 Value만 생각하기
-					if (CurWrd == ',' && (BrcCnt == 1 && BrkCnt == 0)) {//이때만 FullVal가 추가됨
-						FullVal->Append_Char(&CurWrd);
-						
+					if (CurWrd == ',' && (BrcCnt == 1 && BrkCnt == 0) && (curWrdType != WrdInfo::KEY) && isValStr) {//이때만 FullVal가 추가됨
+						//FullVal->Append_Char(&CurWrd);
+
+
 						setObjRss(Key, Value);
 
-						delete FullVal;
+						//delete FullVal;
 						delete Key;
 						delete Value;
 
@@ -1115,7 +1366,11 @@ namespace JSON {
 
 
 					if (CurWrd == '}' && (BrcCnt == 0 && BrkCnt == 0)) {//종료 판별
+						setObjRss(Key, Value);
 						FullVal->Append_Char(&CurWrd);
+
+						ValueParser(curType);
+
 
 
 
@@ -1144,37 +1399,51 @@ namespace JSON {
 						curWrdType = WrdInfo::VALUE;
 					}
 					else if (curWrdType == WrdInfo::VALUE) {
+						if (CurWrd == '\"'){
+							isValStr = !isValStr;      //true 가 되면 문제가 없는거임
+						}
 						Value->Append_Char(&CurWrd);
 					}
 
-
-
-
-
-
 				}
 				else if (curType == JNode::JType::ARR) {//Value만 생각하기
-					if (CurWrd == ',' && (BrkCnt == 1 && BrcCnt == 0)) { //이때만 FullVal가 추가됨
+					if (CurWrd == ',' && (BrkCnt == 1 && BrcCnt == 0) && isValStr) { //이때만 FullVal가 추가됨
 						//setArrRss();
-						delete FullVal;
-						delete Key;
+
+						setArrRss(Value);
+
+						//delete FullVal;
+						//delete Key;
 						delete Value;
 
-						FullVal = new DynamicStr(128);
-						Key = new DynamicStr(128);
+						//FullVal = new DynamicStr(128);
+						//Key = new DynamicStr(128);
 						Value = new DynamicStr(128);
+						curWrdType = WrdInfo::IDLE;
 					}
 
-					if (CurWrd == ']' && (BrkCnt == 1 && BrcCnt == 0)) { //종료판별
-						//setArrRss();
+					if (CurWrd == ']' && (BrkCnt == 0 && BrcCnt == 0)) { //종료판별
+						setArrRss(Value);
+						FullVal->Append_Char(&CurWrd);
+
+						ValueParser(curType);
 						break;
 					}
 
 
 					//FullVal 처리
+					FullVal->Append_Char(&CurWrd);
 
-
-
+					//Value 처리
+					if (curWrdType == WrdInfo::IDLE){
+						curWrdType = WrdInfo::VALUE;
+					}
+					else if (curWrdType == WrdInfo::VALUE){
+						if (CurWrd == '\"'){
+							isValStr = !isValStr;      //true 가 되면 문제가 없는거임
+						}
+						Value->Append_Char(&CurWrd);
+					}
 
 				}
 				gCsr++;
@@ -1184,25 +1453,26 @@ namespace JSON {
 			delete Value;
 		}
 
-		
+
 
 
 	private:
-		JNode* RootNode;		//자체적으로 절대로 변질되어선 안됨 내부 구조를 바꾸는건 가능하지만 이미 자체 참조가 된상태임
+		JNode* RootNode;      //자체적으로 절대로 변질되어선 안됨 내부 구조를 바꾸는건 가능하지만 이미 자체 참조가 된상태임
 		JNode* CtrlNode;
-		DynamicStr* RootStr;		//변질되도 의미는 없음 RootNode가 제일 중요한거라
+		DynamicStr* RootStr;      //변질되도 의미는 없음 RootNode가 제일 중요한거라
 		DynamicStr* CtrlStr;
 
-		DynamicStr* FullVal;		//밸류뽑기 위한 문자들
+		DynamicStr* FullVal;      //밸류뽑기 위한 문자들   디버깅용이라고 생각하고 추후 지울것
 		DynamicStr* Key;
 		DynamicStr* Value;
 
 		JNode::JType RootNodeType;
-		int gCsr;			//문자 컨트롤을 위한 값들
-		char CurWrd;		//
-		char NxtWrd;		//
-		char PrvWrd;		//
+		int gCsr;         //문자 컨트롤을 위한 값들
+		char CurWrd;      //
+		char NxtWrd;      //
+		char PrvWrd;      //
 	};
+
 
 
 	//JNode 파싱 -> Json으로 변환
@@ -1214,5 +1484,4 @@ namespace JSON {
 	private:
 
 	};
-
 }

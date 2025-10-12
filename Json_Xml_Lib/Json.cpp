@@ -176,7 +176,10 @@ void JNode::isObjArrCk(DynamicStr* str){
 	if (Str[first_focus] == '{' && Str[last_focus] == '}'){
 		//객체 Mode
 		//Parsing 시작 함수 호출 하든가 하셈
-		StrParser obj_parser(this, str, JNode::JType::OBJ);
+		//StrParser obj_parser(this, str, JNode::JType::OBJ);
+		StrParser* obj_parser = new StrParser(this, str, JNode::JType::OBJ);
+		//소멸해서 중첩이 안됨 누수가 발생해버림 이거 고쳐야할 듯
+		int debug = 0;
 	}
 	else if (Str[first_focus] == '[' && Str[last_focus] == ']'){
 		//배열 Mode

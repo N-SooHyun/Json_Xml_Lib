@@ -135,15 +135,34 @@ namespace Dynamic {
 				SizeUpStr();
 			}
 
-			if (current_size == -1){
+			if (current_size <= 0){
 				//지울게 없음 문자가 없으니까
 				return;
 			}
-
-			Str[current_size - 1] = Str[current_size];
-			Str[current_size] = '\0';	//이론상 원래 '\0'일테지만 한번더 안전하게 넣어주기		
+			current_size--;
+			Str[current_size] = '\0';	//이론상 원래 '\0'일테지만 한번더 안전하게 넣어주기	
 		}
-		
+
+		//앞뒤로 공백 \n \t 지워주기
+		void Str_Trim(){
+			int fstIdx = 0;
+			int lstIdx = current_size - 1;
+
+			while ((Str[fstIdx] == ' ' || Str[fstIdx] == '\n' || Str[fstIdx] == '\t')
+				|| (Str[lstIdx] == ' ' || Str[lstIdx] == '\n' || Str[lstIdx] == '\t')){
+				if ((Str[fstIdx] == ' ' || Str[fstIdx] == '\n' || Str[fstIdx] == '\t')){
+					//앞글자 지우기
+					Str_Trim_Front();
+					lstIdx = current_size - 1;
+				}
+
+				if ((Str[lstIdx] == ' ' || Str[lstIdx] == '\n' || Str[lstIdx] == '\t')){
+					//뒤글자 지우기
+					Str_Trim_Back();
+					lstIdx = current_size - 1;
+				}
+			}
+		}
 
 	private:
 		//<문자열 처리 로직에 대한 API>

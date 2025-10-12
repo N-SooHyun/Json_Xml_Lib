@@ -106,10 +106,76 @@ void Test_Json() {
 
 	int* arr_num = static_cast<int*>(arr_node->P_Type);
 
-    const char* Test = "{\"Key0\" : {\"Key0\" : 123} }";
+	const char* json_str_2 = R"({
+  "user": {
+    "id": "u123",
+    "name": {
+      "first": "Alice",
+      "last": "Kim"
+    },
+    "contact": {
+      "email": "alice@example.com",
+      "phone": {
+        "mobile": "010-1234-5678",
+        "home": "02-987-6543"
+      }
+    },
+    "address": {
+      "city": "Seoul",
+      "zip": "04524",
+      "geo": {
+        "lat": 37.5665,
+        "lng": 126.9780
+      }
+    },
+    "preferences": {
+      "language": "Korean",
+      "notifications": {
+        "email": true,
+        "sms": false
+      }
+    }
+  },
+  "system": {
+    "version": "1.4.2",
+    "status": "active",
+    "maintenance": {
+      "scheduled": false,
+      "last_checked": "2025-09-20T12:34:56Z"
+    }
+  },
+  "metadata": {
+    "created_at": "2025-09-23T08:00:00Z",
+    "updated_by": {
+      "admin_id": "admin42",
+      "role": "superuser"
+    }
+  }
+}
+)";
 
-    node = Test;
+	const char* PlainJson = R"({
+  "name": "gilDong",
+  "Test" :    false      ,
+  "score":      true      ,
+  "Flt" : 123.123,
+  "age": 30,
+  "email": -123,
+  "isMember": 123
+})";
 
+	const char* dbJson = R"({
+  "name": "gildong",
+  "age": 30,
+  "address": {
+    "city": "seoul",
+    "zip": "12345"
+  }
+})";
+
+	//node = json_str_2;
+	//node = PlainJson;
+	node = dbJson;
 }
 
 int main() {
@@ -122,9 +188,9 @@ int main() {
 
 	while (1){
 		fflush(stdin);
-		std::cout << "프로그램 종료(q or Q) : ";
-		scanf_s("%c", &c);
-		if (c == 'q' || c == 'Q') break;
+		std::cout << "아무키나 입력하시면 종료됩니다";
+		getchar();
+		break;
 		fflush(stdin);
 		
 	}
