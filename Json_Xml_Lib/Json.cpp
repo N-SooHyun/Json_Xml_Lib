@@ -177,9 +177,9 @@ void JNode::isObjArrCk(DynamicStr* str){
 		//객체 Mode
 		//Parsing 시작 함수 호출 하든가 하셈
 		//StrParser obj_parser(this, str, JNode::JType::OBJ);
-		StrParser* obj_parser = new StrParser(this, str, JNode::JType::OBJ);
-		//소멸해서 중첩이 안됨 누수가 발생해버림 이거 고쳐야할 듯
-		int debug = 0;
+		StrParser obj_parser(this, str, JNode::JType::OBJ);
+		//StrParser *obj_parser = new StrParser(this, str, JNode::JType::OBJ);
+		//delete obj_parser;
 	}
 	else if (Str[first_focus] == '[' && Str[last_focus] == ']'){
 		//배열 Mode
@@ -817,6 +817,8 @@ void JsonCallObjArr::operator=(JNode::JType curType) {
 		Cur_Obj->Value->setType(curType);
 	}
 }
+
+
 
 
 

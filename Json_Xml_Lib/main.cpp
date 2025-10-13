@@ -173,9 +173,81 @@ void Test_Json() {
   }
 })";
 
+	const char* plainArr = R"([1,2,3,4,5])";
+
+	const char* fin_obj_arr = R"({
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "profile": {
+        "bio": "Software developer, lover of travel and books.",
+        "location": "Seoul, South Korea",
+        "skills": ["Python", "JavaScript", "React"]
+      },
+      "posts": [
+        {
+          "id": 101,
+          "content": "Sharing ideas for a new project today!",
+          "comments": [
+            {
+              "user": "Jane Smith",
+              "comment": "Very interesting idea! I hope the project goes well."
+            },
+            {
+              "user": "Michael Brown",
+              "comment": "I'd love to hear more about the direction of the project."
+            }
+          ]
+        },
+        {
+          "id": 102,
+          "content": "Sharing my amazing experience from a recent trip. It was great learning about the people and culture there.",
+          "comments": [
+            {
+              "user": "Emily Davis",
+              "comment": "Where did you go? I¡¯d love to visit!"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Jane Williams",
+      "profile": {
+        "bio": "Digital marketing expert, passionate about art and design.",
+        "location": "Busan, South Korea",
+        "skills": ["SEO", "Content Strategy", "Adobe Suite"]
+      },
+      "posts": [
+        {
+          "id": 103,
+          "content": "Let's talk about digital marketing strategies. I want to emphasize the importance of SEO and content strategy again.",
+          "comments": [
+            {
+              "user": "David Lee",
+              "comment": "I didn¡¯t realize how important SEO was. Thanks for the insight!"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+)";
+
 	//node = json_str_2;
 	//node = PlainJson;
-	node = dbJson;
+	//node = dbJson;
+
+	node = fin_obj_arr;
+
+	JObj* pobj = static_cast<JObj*>(node.P_Type);
+
+	JArr* parr = static_cast<JArr*>(pobj->Value->P_Type);
+
+	int debug = 10;
 }
 
 int main() {

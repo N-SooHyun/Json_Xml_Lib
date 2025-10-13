@@ -919,6 +919,7 @@ namespace JSON {
 				for (int i = 0; i < _capacity; i++){
 					if (_Vals[i] != nullptr){
 						delete _Vals[i];
+						_Vals[i] = nullptr;
 					}
 				}
 				delete[] _Vals;
@@ -968,12 +969,13 @@ namespace JSON {
 
 		//메모리 얕은복사로 불필요한 배열 크기 줄이기
 		void setCmpValArr(){
+			int newCsr = curCsr + 1;
 			if (curCsr == capacity){
 				return;
 				//굳이 안해줘도 될듯
 			}
-			ValRss** newVals = new ValRss*[curCsr];
-			InitVals(newVals, curCsr);
+			ValRss** newVals = new ValRss*[newCsr];
+			InitVals(newVals, newCsr);
 
 			for (int i = 0; i <= curCsr; i++){
 				newVals[i] = Vals[i];
@@ -982,7 +984,7 @@ namespace JSON {
 			DelVals(Vals, capacity);
 			Vals = newVals;
 			newVals = nullptr;
-			capacity = curCsr;
+			capacity = newCsr;
 		}
 
 		//맨뒤에 삽입
@@ -1058,6 +1060,10 @@ namespace JSON {
 			ParserMain();
 		}
 
+		~StrParser(){
+			int debug = 10;
+		}
+
 		enum class WrdInfo{
 			Init,
 			KEY,
@@ -1085,15 +1091,6 @@ namespace JSON {
 
 
 
-			JObj* obj = nullptr;   //이거는 단순히 디버깅 용도임
-			JArr* arr = nullptr;   //이거는 단순히 디버깅 용도임
-
-			//디버깅 용도임 실제는 CurNode 사용할거임
-			if (JsStt == JNode::JType::OBJ)
-				obj = static_cast<JObj*>(CurNode->P_Type);
-			else if (JsStt == JNode::JType::ARR)
-				arr = static_cast<JArr*>(CurNode->P_Type);
-
 			enum ck_word{
 				DEF,
 				STR,
@@ -1107,10 +1104,25 @@ namespace JSON {
 
 			ck_word crnt_value = DEF;
 
+			JObj* obj = nullptr;   //이거는 단순히 디버깅 용도임
+			JArr* arr = nullptr;   //이거는 단순히 디버깅 용도임
+
+			//디버깅 용도임 실제는 CurNode 사용할거임
+			if (JsStt == JNode::JType::OBJ){
+				obj = static_cast<JObj*>(CurNode->P_Type);
+				crnt_value = OBJ;
+			}
+			else if (JsStt == JNode::JType::ARR){
+				arr = static_cast<JArr*>(CurNode->P_Type);
+				crnt_value = ARR;
+			}
+
 			for (;; stack_glb_csr++){//Key는 차피 문자열이라 안해도 됨 Value만 하면 됨				
 				PrvWrd = Vals->Value.Char_Get_Str(stack_glb_csr - 1);
 				CurWrd = Vals->Value.Char_Get_Str(stack_glb_csr);
 				NxtWrd = Vals->Value.Char_Get_Str(stack_glb_csr + 1);
+
+
 
 				//시작판별
 				if (crnt_value == DEF){
@@ -1132,14 +1144,14 @@ namespace JSON {
 						crnt_value = BL;
 						stack_glb_csr--;
 					}
-					else if (CurWrd == '{') {
+					/*else if (CurWrd == '{') {
 						crnt_value = OBJ;
 						stack_glb_csr--;
 					}
 					else if (CurWrd == '[') {
 						crnt_value = ARR;
 						stack_glb_csr--;
-					}
+					}*/
 					continue;
 				}
 				//종료판별
@@ -1156,7 +1168,8 @@ namespace JSON {
 							(*CurNode)[static_cast<const char*>(chKeys)] = chVals;
 						}
 						else if (arr != nullptr){
-							(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = chVals;
+							int arrCnt = CurNode->ArrCnt + 1;
+							(*CurNode)[arrCnt] = chVals;
 						}
 						
 
@@ -1199,7 +1212,11 @@ namespace JSON {
 								(*CurNode)[static_cast<const char*>(chKeys)] = is_double ? result_double : result_int;
 							}
 							else if (arr != nullptr) {
-								(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = is_double ? result_double : result_int;
+								int arrCnt = CurNode->ArrCnt + 1;
+								if (is_double)
+									(*CurNode)[arrCnt] = result_double;
+								else
+									(*CurNode)[arrCnt] = result_int;
 							}
 							else {
 								return;
@@ -1244,14 +1261,15 @@ namespace JSON {
 								(*CurNode)[static_cast<const char*>(chKeys)] = result_bool;
 							}
 							else if (arr != nullptr) {
-								(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = result_bool;
+								int arrCnt = CurNode->ArrCnt + 1;
+								(*CurNode)[arrCnt] = result_bool;
 							}
 							else {
 								return;
 							}
 							//디버깅용
-							JNode* debug = static_cast<JNode*>(obj->next->Value);
-							bool* db = static_cast<bool*>(debug->P_Type);
+							//JNode* debug = static_cast<JNode*>(obj->next->Value);
+							//bool* db = static_cast<bool*>(debug->P_Type);
 							//디버깅용
 							crnt_value = END;
 						}
@@ -1263,15 +1281,17 @@ namespace JSON {
 						*newObjNode = chVals;
 						(*CurNode)[static_cast<const char*>(chKeys)] = newObjNode;
 						
-						int debug = 10;
-
-
+						//종료판별
+						crnt_value = END;
 					}
 					else if (crnt_value == ARR) {
 						char* chVals = Vals->Value.Get_Str();
 						JNode* newArrNode = new JNode(JNode::JType::STRING);
 						*newArrNode = chVals;
-						(*CurNode)[CurNode->ArrCnt == -1 ? 0 : CurNode->ArrCnt] = newArrNode;
+						int arrCnt = CurNode->ArrCnt + 1;
+						(*CurNode)[arrCnt] = newArrNode;
+
+						crnt_value = END;
 					}
 				}
 			}
@@ -1458,9 +1478,7 @@ namespace JSON {
 
 	private:
 		JNode* RootNode;      //자체적으로 절대로 변질되어선 안됨 내부 구조를 바꾸는건 가능하지만 이미 자체 참조가 된상태임
-		JNode* CtrlNode;
 		DynamicStr* RootStr;      //변질되도 의미는 없음 RootNode가 제일 중요한거라
-		DynamicStr* CtrlStr;
 
 		DynamicStr* FullVal;      //밸류뽑기 위한 문자들   디버깅용이라고 생각하고 추후 지울것
 		DynamicStr* Key;
