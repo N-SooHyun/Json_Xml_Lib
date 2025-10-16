@@ -1503,3 +1503,7 @@ namespace JSON {
 
 	};
 }
+
+using namespace JSON;
+
+void PrtNode(JNode& node);

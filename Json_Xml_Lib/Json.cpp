@@ -852,3 +852,65 @@ JsonCallObjArr::JsonCallObjArr(JNode* node, JNode::JType curType, bool trg_del){
 
 
 // StrParser class ----------------------------------------------------------------------------------
+
+
+union MyUnion {
+	int num;
+	bool bl;
+	double dnum;
+};
+MyUnion Val;
+
+using namespace JSON;
+
+void PrtNode(JNode& node){
+	DynamicStr* Str;
+	switch (node.Cur_Type){
+	case JNode::JType::NULLTYPE:   //Á¾·á
+		return;
+	case JNode::JType::NUMBER:
+		Val.num = node;
+		printf("%d", Val.num);
+		break;
+	case JNode::JType::STRING:
+		Str = static_cast<DynamicStr*>(node.P_Type);
+		printf("%s", Str->Get_Str());
+		break;
+	case JNode::JType::BOOL:
+		Val.bl = node;
+		printf("%s", Val.bl == true ? "true" : "false");
+		break;
+	case JNode::JType::DOUBLE:
+		Val.dnum = node;
+		printf("%.3f", Val.dnum);
+		break;
+	case JNode::JType::OBJ:
+		printf("{");
+		JObj* obj;
+		obj = static_cast<JObj*>(node.P_Type);
+
+		for (int i = 0; i <= node.ObjCnt; i++, obj = obj->next){
+			printf("\"%s\" : ", obj->Key.Get_Str());
+			PrtNode(*obj->Value);
+
+			if (i != node.ObjCnt) printf(", ");
+		}
+		
+		printf("}");
+		break;
+	case JNode::JType::ARR:
+		printf("[");
+		JArr* arr;
+		arr = static_cast<JArr*>(node.P_Type);
+		for (int i = 0; i <= node.ArrCnt; i++, arr = arr->next){
+			PrtNode(*arr->Value);
+
+			if (i != node.ArrCnt) printf(",");
+		}
+		printf("]");
+		break;
+	default:
+		break;
+	}
+}
+
