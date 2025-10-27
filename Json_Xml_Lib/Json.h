@@ -1099,10 +1099,12 @@ namespace JSON {
 				OBJ,   //Str로 넣어버리기
 				ARR,   //Str로 넣어버리기
 				BL,
+				NULLVAL,		//Value가 null일때
+				NULLTYPE,		//빈객체[] 혹은 빈배열[] 일때
 				END
 			};
 
-			ck_word crnt_value = DEF;
+			ck_word crnt_value = DEF;	//Value의 타입임
 
 			JObj* obj = nullptr;   //이거는 단순히 디버깅 용도임
 			JArr* arr = nullptr;   //이거는 단순히 디버깅 용도임
@@ -1110,11 +1112,17 @@ namespace JSON {
 			//디버깅 용도임 실제는 CurNode 사용할거임
 			if (JsStt == JNode::JType::OBJ){
 				obj = static_cast<JObj*>(CurNode->P_Type);
-				crnt_value = OBJ;
+				if (Vals->Key.str_last_focus == -1 && Vals->Value.str_last_focus == -1){
+					//빈객체임
+					crnt_value = NULLTYPE;
+				}
 			}
 			else if (JsStt == JNode::JType::ARR){
 				arr = static_cast<JArr*>(CurNode->P_Type);
-				crnt_value = ARR;
+				if (Vals->Value.str_last_focus == -1){
+					//빈 배열임
+					crnt_value = NULLTYPE;
+				}
 			}
 
 			for (;; stack_glb_csr++){//Key는 차피 문자열이라 안해도 됨 Value만 하면 됨				
@@ -1144,14 +1152,23 @@ namespace JSON {
 						crnt_value = BL;
 						stack_glb_csr--;
 					}
-					/*else if (CurWrd == '{') {
-						crnt_value = OBJ;
+					else if (CurWrd == 'n' && NxtWrd == 'u'
+						&&Vals->Value.Char_Get_Str(stack_glb_csr + 2) == 'l' && Vals->Value.Char_Get_Str(stack_glb_csr + 3 == 'l')){
+						crnt_value = NULLVAL;
 						stack_glb_csr--;
+					}					
+					else if (CurWrd == '{') {
+						if (Vals->Value.Char_Get_Str(Vals->Value.str_last_focus) == '}'){
+							crnt_value = OBJ;
+							stack_glb_csr--;
+						}
 					}
 					else if (CurWrd == '[') {
-						crnt_value = ARR;
-						stack_glb_csr--;
-					}*/
+						if (Vals->Value.Char_Get_Str(Vals->Value.str_last_focus) == ']'){
+							crnt_value = ARR;
+							stack_glb_csr--;
+						}
+					}
 					continue;
 				}
 				//종료판별
@@ -1160,12 +1177,13 @@ namespace JSON {
 				}
 				else{
 					if (crnt_value == STR) {
-						RemoveQuotes(Vals->Value);
+						//RemoveQuotes(Vals->Value);
 						char* chKeys = Vals->Key.Get_Str();
 						char* chVals = Vals->Value.Get_Str();
 
 						if (obj != nullptr){
 							(*CurNode)[static_cast<const char*>(chKeys)] = chVals;
+							//DynamicStr* deb = static_cast<DynamicStr*>(CurNode->P_Type);
 						}
 						else if (arr != nullptr){
 							int arrCnt = CurNode->ArrCnt + 1;
@@ -1275,12 +1293,17 @@ namespace JSON {
 						}
 					}
 					else if (crnt_value == OBJ) {
-						char* chKeys = Vals->Key.Get_Str();
 						char* chVals = Vals->Value.Get_Str();
 						JNode* newObjNode = new JNode(JNode::JType::STRING);
 						*newObjNode = chVals;
-						(*CurNode)[static_cast<const char*>(chKeys)] = newObjNode;
-						
+						if (obj != nullptr){
+							char* chKeys = Vals->Key.Get_Str();
+							(*CurNode)[static_cast<const char*>(chKeys)] = newObjNode;
+						}
+						else if (arr != nullptr){
+							int arrCnt = CurNode->ArrCnt + 1;
+							(*CurNode)[arrCnt] = newObjNode;
+						}						
 						//종료판별
 						crnt_value = END;
 					}
@@ -1288,9 +1311,42 @@ namespace JSON {
 						char* chVals = Vals->Value.Get_Str();
 						JNode* newArrNode = new JNode(JNode::JType::STRING);
 						*newArrNode = chVals;
-						int arrCnt = CurNode->ArrCnt + 1;
-						(*CurNode)[arrCnt] = newArrNode;
-
+						if (obj != nullptr){
+							char* chKeys = Vals->Key.Get_Str();
+							(*CurNode)[static_cast<const char*>(chKeys)] = newArrNode;
+						}
+						else if (arr != nullptr){
+							int arrCnt = CurNode->ArrCnt + 1;
+							(*CurNode)[arrCnt] = newArrNode;
+						}
+						//종료판별
+						crnt_value = END;
+					}
+					else if (crnt_value == NULLVAL){
+						//Value가 null일때
+						char* chKeys = Vals->Key.Get_Str();
+						if (obj != nullptr){
+							(*CurNode)[static_cast<const char*>(chKeys)] = JNode::JType::NULLTYPE;
+						}
+						else if (arr != nullptr){
+							int arrCnt = CurNode->ArrCnt + 1;
+							(*CurNode)[arrCnt] = JNode::JType::NULLTYPE;
+						}
+						crnt_value = END;
+					}
+					else if (crnt_value == NULLTYPE){
+						
+						//빈 객체
+						//char* chKeys = Vals->Key.Get_Str();
+						if (obj != nullptr){
+							//(*CurNode)[static_cast<const char*>(chKeys)] = JNode::JType::NULLTYPE;
+						}
+						//빈배열
+						if (arr != nullptr){
+							//int arrCnt = CurNode->ArrCnt + 1;
+							//(*CurNode)[arrCnt] = JNode::JType::NULLTYPE;
+						}
+						//빈객체 빈배열
 						crnt_value = END;
 					}
 				}

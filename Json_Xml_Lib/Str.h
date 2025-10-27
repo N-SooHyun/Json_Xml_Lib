@@ -10,15 +10,24 @@ namespace Dynamic {
 	private:
 		char* Str;
 		int capacity_size;
+
+		void Mem_Set(void* Data, char Val, size_t block_size){
+			char* tmpData = static_cast<char*>(Data);
+			for (size_t i = 0; i < block_size; i++){
+				tmpData[i] = Val;
+			}
+		}
 	public:
 		int current_size;	//마지막 '\0'까지의 값 ex) New Word\0 => 8
 		int str_last_focus;	//마지막 문자까지의 값 ex) New Word]0 => 7
 		//기본생성자로 호출하면 16비트정도만 가지게 됨
 		DynamicStr() : capacity_size(16), current_size(-1), str_last_focus(-1) {
 			Str = new char[capacity_size];
+			Mem_Set(Str, '\0', capacity_size);
 		}
 		DynamicStr(int _size) : capacity_size(_size), current_size(-1), str_last_focus(-1) {
 			Str = new char[capacity_size];
+			Mem_Set(Str, '\0', capacity_size);
 		}
 		~DynamicStr() {
 			if (Str != nullptr) {

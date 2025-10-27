@@ -810,11 +810,21 @@ void JsonCallObjArr::operator=(JNode* jnode){
 }
 
 void JsonCallObjArr::operator=(JNode::JType curType) {
-	if (!Cur_Obj->Value->isTypeMatch(curType)) {
-		//타입이 안맞으면 덮어쓸꺼니까 지워주셈
-		Cur_Obj->Value->delType();
-		Cur_Obj->Value->Cur_Type = curType;
-		Cur_Obj->Value->setType(curType);
+	if (Cur_Obj != nullptr){
+		if (!Cur_Obj->Value->isTypeMatch(curType)){
+			Cur_Obj->Value->delType();
+			Cur_Obj->Value->Cur_Type = curType;
+			Cur_Obj->Value->setType(curType);
+		}
+		//Cur_Node->ObjCnt--;
+	}
+	if (Cur_Arr != nullptr){
+		if (!Cur_Arr->Value->isTypeMatch(curType)){
+			Cur_Arr->Value->delType();
+			Cur_Arr->Value->Cur_Type = curType;
+			Cur_Arr->Value->setType(curType);
+		}
+		//Cur_Node->ArrCnt--;
 	}
 }
 
@@ -867,6 +877,7 @@ void PrtNode(JNode& node){
 	DynamicStr* Str;
 	switch (node.Cur_Type){
 	case JNode::JType::NULLTYPE:   //종료
+		printf("null");
 		return;
 	case JNode::JType::NUMBER:
 		Val.num = node;
@@ -885,12 +896,13 @@ void PrtNode(JNode& node){
 		printf("%.3f", Val.dnum);
 		break;
 	case JNode::JType::OBJ:
+	{
 		printf("{");
 		JObj* obj;
 		obj = static_cast<JObj*>(node.P_Type);
 
 		for (int i = 0; i <= node.ObjCnt; i++, obj = obj->next){
-			printf("\"%s\" : ", obj->Key.Get_Str());
+			printf("%s : ", obj->Key.Get_Str());
 			PrtNode(*obj->Value);
 
 			if (i != node.ObjCnt) printf(", ");
@@ -898,7 +910,9 @@ void PrtNode(JNode& node){
 		
 		printf("}");
 		break;
+	}
 	case JNode::JType::ARR:
+	{
 		printf("[");
 		JArr* arr;
 		arr = static_cast<JArr*>(node.P_Type);
@@ -909,6 +923,7 @@ void PrtNode(JNode& node){
 		}
 		printf("]");
 		break;
+	}
 	default:
 		break;
 	}

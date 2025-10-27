@@ -247,14 +247,42 @@ void Test_Json() {
 
 	JArr* parr = static_cast<JArr*>(pobj->Value->P_Type);
 
-	int debug = 10;
+	PrtNode(node);
 }
+
+void Test_Json_Func(){
+	const char* TestStr = R"({
+  "empty_object": [],
+  "empty_array": [],
+  "empty_string": "",
+  "null_value": null,
+  "nested": {
+    "empty_object_in_array": [{}],
+    "empty_array_in_object": {
+      "list": []
+    },
+    "array_of_empty_strings": ["", ""],
+    "array_of_nulls": [null, null]
+  }
+})";
+
+	JNode node;
+	node = TestStr;
+
+	JObj* fstObj = static_cast<JObj*>(node.P_Type);
+
+	PrtNode(node);
+}
+
 
 int main() {
 
 	//test_str();
 
-    Test_Json();
+    //Test_Json();
+	
+	Test_Json_Func();
+
 
 	char c = 'a';
 
