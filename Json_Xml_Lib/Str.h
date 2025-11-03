@@ -17,6 +17,39 @@ namespace Dynamic {
 				tmpData[i] = Val;
 			}
 		}
+
+		//char* str_cat(char* dest, const char* src) {
+		//	char* ptr = dest;
+
+		//	// dest의 끝(널 문자 위치)로 이동
+		//	while (*ptr != '\0') ptr++;
+
+		//	// src를 끝까지 복사
+		//	while (*src != '\0') {
+		//		*ptr++ = *src++;
+		//	}
+
+		//	*ptr = '\0'; // 마지막에 널 문자 추가
+		//	return dest;
+		//}
+
+		//int str_len(const char* src){
+		//	for (int i = 0;; i++){
+		//		if (src[i] == '\0') return i;
+		//	}
+		//}
+
+		//void* mem_cpy(void* dest, const void* src, size_t n) {
+		//	unsigned char* d = (unsigned char*)dest;
+		//	unsigned char* s = (unsigned char*)src;
+
+		//	for (size_t i = 0; i < n; i++) {
+		//		d[i] = s[i]; // 한 바이트씩 복사
+		//	}
+
+		//	return dest;
+		//}
+
 	public:
 		int current_size;	//마지막 '\0'까지의 값 ex) New Word\0 => 8
 		int str_last_focus;	//마지막 문자까지의 값 ex) New Word]0 => 7
@@ -121,6 +154,22 @@ namespace Dynamic {
 			Str[current_size] = '\0';
 		}
 
+		//문자열 추가(한글용) 안써도 될거 같은데
+		/*void Append_Str(const char* new_str){
+			if (!new_str) return;
+
+			int len = strlen(new_str);
+
+			while (current_size + len + 1 >= capacity_size){
+				SizeUpStr();
+			}
+
+			mem_cpy(&Str[current_size], new_str, len);
+			current_size += len;
+			Str[current_size] = '\0';			
+			
+		}*/
+
 		//맨앞글자를 지우기 앞으로 이동복사는 O(n) 시간복잡도 때문에 그냥 새롭게 버퍼 하나 파서 복사해줄 예정
 		void Str_Trim_Front(){
 			char* new_Str = new char[capacity_size];
@@ -152,8 +201,8 @@ namespace Dynamic {
 			Str[current_size] = '\0';	//이론상 원래 '\0'일테지만 한번더 안전하게 넣어주기	
 		}
 
-		//앞뒤로 공백 \n \t 지워주기
-		void Str_Trim(){
+		//앞뒤로 공백 \n \t 지워주기 전부
+		void Str_Trim_All(){
 			int fstIdx = 0;
 			int lstIdx = current_size - 1;
 
@@ -166,6 +215,27 @@ namespace Dynamic {
 				}
 
 				if ((Str[lstIdx] == ' ' || Str[lstIdx] == '\n' || Str[lstIdx] == '\t')){
+					//뒤글자 지우기
+					Str_Trim_Back();
+					lstIdx = current_size - 1;
+				}
+			}
+		}
+
+		//앞뒤로 공백만 지워주기
+		void Str_Trim(){
+			int fstIdx = 0;
+			int lstIdx = current_size - 1;
+
+			while ((Str[fstIdx] == ' ')
+				|| (Str[lstIdx] == ' ')){
+				if ((Str[fstIdx] == ' ')){
+					//앞글자 지우기
+					Str_Trim_Front();
+					lstIdx = current_size - 1;
+				}
+
+				if ((Str[lstIdx] == ' ')){
 					//뒤글자 지우기
 					Str_Trim_Back();
 					lstIdx = current_size - 1;
@@ -201,3 +271,5 @@ namespace Dynamic {
 	};
 
 }
+
+
