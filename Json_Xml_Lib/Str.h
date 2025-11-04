@@ -21,15 +21,15 @@ namespace Dynamic {
 		//char* str_cat(char* dest, const char* src) {
 		//	char* ptr = dest;
 
-		//	// destÀÇ ³¡(³Î ¹®ÀÚ À§Ä¡)·Î ÀÌµ¿
+		//	// destì˜ ë(ë„ ë¬¸ì ìœ„ì¹˜)ë¡œ ì´ë™
 		//	while (*ptr != '\0') ptr++;
 
-		//	// src¸¦ ³¡±îÁö º¹»ç
+		//	// srcë¥¼ ëê¹Œì§€ ë³µì‚¬
 		//	while (*src != '\0') {
 		//		*ptr++ = *src++;
 		//	}
 
-		//	*ptr = '\0'; // ¸¶Áö¸·¿¡ ³Î ¹®ÀÚ Ãß°¡
+		//	*ptr = '\0'; // ë§ˆì§€ë§‰ì— ë„ ë¬¸ì ì¶”ê°€
 		//	return dest;
 		//}
 
@@ -44,16 +44,16 @@ namespace Dynamic {
 		//	unsigned char* s = (unsigned char*)src;
 
 		//	for (size_t i = 0; i < n; i++) {
-		//		d[i] = s[i]; // ÇÑ ¹ÙÀÌÆ®¾¿ º¹»ç
+		//		d[i] = s[i]; // í•œ ë°”ì´íŠ¸ì”© ë³µì‚¬
 		//	}
 
 		//	return dest;
 		//}
 
 	public:
-		int current_size;	//¸¶Áö¸· '\0'±îÁöÀÇ °ª ex) New Word\0 => 8
-		int str_last_focus;	//¸¶Áö¸· ¹®ÀÚ±îÁöÀÇ °ª ex) New Word]0 => 7
-		//±âº»»ı¼ºÀÚ·Î È£ÃâÇÏ¸é 16ºñÆ®Á¤µµ¸¸ °¡Áö°Ô µÊ
+		int current_size;	//ë§ˆì§€ë§‰ '\0'ê¹Œì§€ì˜ ê°’ ex) New Word\0 => 8
+		int str_last_focus;	//ë§ˆì§€ë§‰ ë¬¸ìê¹Œì§€ì˜ ê°’ ex) New Word]0 => 7
+		//ê¸°ë³¸ìƒì„±ìë¡œ í˜¸ì¶œí•˜ë©´ 16ë¹„íŠ¸ì •ë„ë§Œ ê°€ì§€ê²Œ ë¨
 		DynamicStr() : capacity_size(16), current_size(-1), str_last_focus(-1) {
 			Str = new char[capacity_size];
 			Mem_Set(Str, '\0', capacity_size);
@@ -68,18 +68,18 @@ namespace Dynamic {
 			}
 		}
 
-		//º¹»ç»ı¼ºÀÚ È£Ãâ (±íÀºº¹»ç)
+		//ë³µì‚¬ìƒì„±ì í˜¸ì¶œ (ê¹Šì€ë³µì‚¬)
 		DynamicStr(const DynamicStr& other) : capacity_size(other.capacity_size),
 			current_size(other.current_size), str_last_focus(other.str_last_focus) {
 			Str = new char[capacity_size];
 		}
 
-		//ÀÌµ¿»ı¼ºÀÚ È£Ãâ 
+		//ì´ë™ìƒì„±ì í˜¸ì¶œ 
 		DynamicStr(const DynamicStr&& other) : capacity_size(other.capacity_size), current_size(other.current_size),
 			str_last_focus(other.str_last_focus), Str(other.Str) {
 		}
 
-		bool StrCat(const char* Subject) {
+		bool StrCmp(const char* Subject) {
 			for (int i = 0; ; i++) {
 				if (Str[i] != Subject[i]) return false;
 				if (i == current_size) {
@@ -91,7 +91,7 @@ namespace Dynamic {
 			return true;
 		}
 
-		bool StrCmp(const char* lVal, const char* rVal){
+		bool StrCmp_Org(const char* lVal, const char* rVal){
 			while (*lVal && *rVal){
 				if (*lVal != *rVal){
 					return false;
@@ -110,8 +110,8 @@ namespace Dynamic {
 
 		char Char_Get_Str(int focus) {
 			if(focus < 0 || focus >= current_size) {
-				//¿¹¿ÜÃ³¸®
-				return '\0';	//¹üÀ§ ¹ş¾î³ª¸é Null ¹İÈ¯
+				//ì˜ˆì™¸ì²˜ë¦¬
+				return '\0';	//ë²”ìœ„ ë²—ì–´ë‚˜ë©´ Null ë°˜í™˜
 			}
 			return Str[focus];
 		}
@@ -120,7 +120,7 @@ namespace Dynamic {
 			return Str[focus];
 		}
 
-		//¹®ÀÚ¿­ ÅëÀ¸·Î »ğÀÔÇÏ±â
+		//ë¬¸ìì—´ í†µìœ¼ë¡œ ì‚½ì…í•˜ê¸°
 		void Set_Str(const char* new_str) {
 			int i = 0;
 			for (; new_str[i] != '\0'; i++) {
@@ -135,7 +135,7 @@ namespace Dynamic {
 				}
 			}
 
-			Str[i] = new_str[i];	// \0»ğÀÔ
+			Str[i] = new_str[i];	// \0ì‚½ì…
 			current_size = i;
 			str_last_focus = i - 1;
 
@@ -154,7 +154,7 @@ namespace Dynamic {
 			str_last_focus = i - 1;
 		}
 
-		//¹®ÀÚ 1°³¾¿ Ãß°¡
+		//ë¬¸ì 1ê°œì”© ì¶”ê°€
 		void Append_Char(const char* new_char) {
 			if (current_size+1 >= capacity_size) {
 				SizeUpStr();
@@ -166,7 +166,7 @@ namespace Dynamic {
 			Str[current_size] = '\0';
 		}
 
-		//¹®ÀÚ¿­ Ãß°¡(ÇÑ±Û¿ë) ¾È½áµµ µÉ°Å °°Àºµ¥
+		//ë¬¸ìì—´ ì¶”ê°€(í•œê¸€ìš©) ì•ˆì¨ë„ ë ê±° ê°™ì€ë°
 		/*void Append_Str(const char* new_str){
 			if (!new_str) return;
 
@@ -182,16 +182,16 @@ namespace Dynamic {
 			
 		}*/
 
-		//¸Ç¾Õ±ÛÀÚ¸¦ Áö¿ì±â ¾ÕÀ¸·Î ÀÌµ¿º¹»ç´Â O(n) ½Ã°£º¹Àâµµ ¶§¹®¿¡ ±×³É »õ·Ó°Ô ¹öÆÛ ÇÏ³ª ÆÄ¼­ º¹»çÇØÁÙ ¿¹Á¤
+		//ë§¨ì•ê¸€ìë¥¼ ì§€ìš°ê¸° ì•ìœ¼ë¡œ ì´ë™ë³µì‚¬ëŠ” O(n) ì‹œê°„ë³µì¡ë„ ë•Œë¬¸ì— ê·¸ëƒ¥ ìƒˆë¡­ê²Œ ë²„í¼ í•˜ë‚˜ íŒŒì„œ ë³µì‚¬í•´ì¤„ ì˜ˆì •
 		void Str_Trim_Front(){
 			char* new_Str = new char[capacity_size];
 			
 			for (int idx=0; ; idx++){
 				if (idx == capacity_size-1){
-					new_Str[idx] = Str[idx];		//±×³É ¸¶Áö¸·Àº ¸¶Áö¸· ³Ö¾îÁÖ±â '\0' ÀÌ°Ô ÀÖÀ»¼öµµ ÀÖ¾î¼­ ÇØÁà¾ßÇÒµí
+					new_Str[idx] = Str[idx];		//ê·¸ëƒ¥ ë§ˆì§€ë§‰ì€ ë§ˆì§€ë§‰ ë„£ì–´ì£¼ê¸° '\0' ì´ê²Œ ìˆì„ìˆ˜ë„ ìˆì–´ì„œ í•´ì¤˜ì•¼í• ë“¯
 					break;
 				}
-				new_Str[idx] = Str[idx + 1];		//¾Õ±ÛÀÚ Á¦¿ÜÇÏ°í ³Ö±â
+				new_Str[idx] = Str[idx + 1];		//ì•ê¸€ì ì œì™¸í•˜ê³  ë„£ê¸°
 			}
 			current_size = current_size > -1 ? (current_size-1) : -1;
 			delete Str;
@@ -199,21 +199,21 @@ namespace Dynamic {
 			new_Str = nullptr;
 		}
 
-		//¸ÇµÚ¿¡ ±ÛÀÚ Áö¿ì±â ÀÌ°Å´Â ±×³É ¾ÕµÚ¶û º¹»çºÙ¿©³Ö±â ÇÏ¸é µÉµí
+		//ë§¨ë’¤ì— ê¸€ì ì§€ìš°ê¸° ì´ê±°ëŠ” ê·¸ëƒ¥ ì•ë’¤ë‘ ë³µì‚¬ë¶™ì—¬ë„£ê¸° í•˜ë©´ ë ë“¯
 		void Str_Trim_Back(){
 			if (current_size >= capacity_size){
 				SizeUpStr();
 			}
 
 			if (current_size <= 0){
-				//Áö¿ï°Ô ¾øÀ½ ¹®ÀÚ°¡ ¾øÀ¸´Ï±î
+				//ì§€ìš¸ê²Œ ì—†ìŒ ë¬¸ìê°€ ì—†ìœ¼ë‹ˆê¹Œ
 				return;
 			}
 			current_size--;
-			Str[current_size] = '\0';	//ÀÌ·Ğ»ó ¿ø·¡ '\0'ÀÏÅ×Áö¸¸ ÇÑ¹ø´õ ¾ÈÀüÇÏ°Ô ³Ö¾îÁÖ±â	
+			Str[current_size] = '\0';	//ì´ë¡ ìƒ ì›ë˜ '\0'ì¼í…Œì§€ë§Œ í•œë²ˆë” ì•ˆì „í•˜ê²Œ ë„£ì–´ì£¼ê¸°	
 		}
 
-		//¾ÕµÚ·Î °ø¹é \n \t Áö¿öÁÖ±â ÀüºÎ
+		//ì•ë’¤ë¡œ ê³µë°± \n \t ì§€ì›Œì£¼ê¸° ì „ë¶€
 		void Str_Trim_All(){
 			int fstIdx = 0;
 			int lstIdx = current_size - 1;
@@ -221,20 +221,20 @@ namespace Dynamic {
 			while ((Str[fstIdx] == ' ' || Str[fstIdx] == '\n' || Str[fstIdx] == '\t')
 				|| (Str[lstIdx] == ' ' || Str[lstIdx] == '\n' || Str[lstIdx] == '\t')){
 				if ((Str[fstIdx] == ' ' || Str[fstIdx] == '\n' || Str[fstIdx] == '\t')){
-					//¾Õ±ÛÀÚ Áö¿ì±â
+					//ì•ê¸€ì ì§€ìš°ê¸°
 					Str_Trim_Front();
 					lstIdx = current_size - 1;
 				}
 
 				if ((Str[lstIdx] == ' ' || Str[lstIdx] == '\n' || Str[lstIdx] == '\t')){
-					//µÚ±ÛÀÚ Áö¿ì±â
+					//ë’¤ê¸€ì ì§€ìš°ê¸°
 					Str_Trim_Back();
 					lstIdx = current_size - 1;
 				}
 			}
 		}
 
-		//¾ÕµÚ·Î °ø¹é¸¸ Áö¿öÁÖ±â
+		//ì•ë’¤ë¡œ ê³µë°±ë§Œ ì§€ì›Œì£¼ê¸°
 		void Str_Trim(){
 			int fstIdx = 0;
 			int lstIdx = current_size - 1;
@@ -242,13 +242,13 @@ namespace Dynamic {
 			while ((Str[fstIdx] == ' ')
 				|| (Str[lstIdx] == ' ')){
 				if ((Str[fstIdx] == ' ')){
-					//¾Õ±ÛÀÚ Áö¿ì±â
+					//ì•ê¸€ì ì§€ìš°ê¸°
 					Str_Trim_Front();
 					lstIdx = current_size - 1;
 				}
 
 				if ((Str[lstIdx] == ' ')){
-					//µÚ±ÛÀÚ Áö¿ì±â
+					//ë’¤ê¸€ì ì§€ìš°ê¸°
 					Str_Trim_Back();
 					lstIdx = current_size - 1;
 				}
@@ -256,13 +256,13 @@ namespace Dynamic {
 		}
 
 	private:
-		//<¹®ÀÚ¿­ Ã³¸® ·ÎÁ÷¿¡ ´ëÇÑ API>
+		//<ë¬¸ìì—´ ì²˜ë¦¬ ë¡œì§ì— ëŒ€í•œ API>
 
-		//¹®ÀÚ¿­ Å©±â Áõ°¡ ·ÎÁ÷
+		//ë¬¸ìì—´ í¬ê¸° ì¦ê°€ ë¡œì§
 		void SizeUpStr() {
 			int old_capacity = capacity_size;
 			capacity_size = (capacity_size / 2) > 2 ? (capacity_size / 2) + capacity_size : capacity_size + 2;
-			char* new_size_str = new char[capacity_size + 1];		//NullÆ÷ÇÔÀ§ÇÑ +1
+			char* new_size_str = new char[capacity_size + 1];		//Nullí¬í•¨ìœ„í•œ +1
 
 			//Deep Copy (new_size_str <- Str)
 			DEEP_COPY_STR(int i = 0, i < old_capacity, i++, new_size_str, Str);
@@ -271,9 +271,9 @@ namespace Dynamic {
 			Str = new_size_str;
 		}
 
-		//¹®ÀÚ¿­ ºó°ø°£ Á¦°Å °ÅÀÇ »ç¿ëÇÏÁö ¸»°Í ¿À¹öÇìµå ¹ß»ı
+		//ë¬¸ìì—´ ë¹ˆê³µê°„ ì œê±° ê±°ì˜ ì‚¬ìš©í•˜ì§€ ë§ê²ƒ ì˜¤ë²„í—¤ë“œ ë°œìƒ
 		void FitSizeStr() {
-			int null_current_size = current_size + 1;			//Null Æ÷ÇÔÇØ¼­ ³Ö¾îÁà¾ßÇÔ +1
+			int null_current_size = current_size + 1;			//Null í¬í•¨í•´ì„œ ë„£ì–´ì¤˜ì•¼í•¨ +1
 			char* new_size_str = new char[null_current_size];
 			DEEP_COPY_STR(int i = 0, i < null_current_size, i++, new_size_str, Str);
 			capacity_size = null_current_size;
