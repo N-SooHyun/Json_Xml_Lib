@@ -91,6 +91,18 @@ namespace Dynamic {
 			return true;
 		}
 
+		bool StrCmp(const char* lVal, const char* rVal){
+			while (*lVal && *rVal){
+				if (*lVal != *rVal){
+					return false;
+				}
+				++lVal;
+				++rVal;
+			}
+
+			return *lVal == *rVal;
+		}
+
 		char* Get_Str() {
 			return Str;
 		}

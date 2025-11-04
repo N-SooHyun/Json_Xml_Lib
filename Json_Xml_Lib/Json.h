@@ -1574,12 +1574,14 @@ namespace JSON {
 
 	//Ini 파일 파싱 -> JNode를 활용해 Dict 구조로 변환 {"SECTION" : {"KEY" : VALUE }}
 	class IniParser{
+	protected:
 		DynamicStr* IniStr;
 		char CurChar;
 		char PrvChar;
 		char NxtChar;
 		int glb_csr;
 		JNode *IniNode;
+		bool ParseFin;
 
 		inline bool isFileCk(FILE* ckFile){
 			if (!ckFile){
@@ -1596,9 +1598,11 @@ namespace JSON {
 			NxtChar = ' ';
 			glb_csr = 0;
 			IniNode = new JNode();
+			ParseFin = false;
 		}
 
-		void Parse(){
+	
+		virtual void Parse(){
 			short BrkCnt = 0;       // '['의 개수 추적
 			bool isKey = false;		// KEY= 임을 확인 Section내부에 '\n'다음이면 무조건 true
 			bool isSecArea = false;		// 특정 영역의 Section임을 확인 이를 통해 키인지 밸류인지 구분가능
@@ -1639,6 +1643,7 @@ namespace JSON {
 					else if (Val != nullptr){
 						delete Val;
 					}
+					ParseFin = true;
 					break;
 				}
 
@@ -1655,6 +1660,8 @@ namespace JSON {
 
 							//debug
 							debugObj = static_cast<JObj*>(IniNode->P_Type);
+							JObj* debugObjVal = static_cast<JObj*>(debugObj->Value->P_Type);
+							
 
 							delete Section;
 							Section = new DynamicStr(128);
@@ -1679,7 +1686,10 @@ namespace JSON {
 						stt = CMT;
 						continue;
 					}
-					else if ((CurChar != ' ' && CurChar != '\n') && isSecArea){
+					else if (CurChar == '\n' || CurChar == '\t' || CurChar == ' '){
+						continue;
+					}
+					else if (isSecArea){
 						glb_csr--;
 						stt = KEY;
 					}
@@ -1791,8 +1801,186 @@ namespace JSON {
 			printf("파일이 없거나 읽어온 문자열이 없습니다.\n");
 		}
 
-
+		JNode* getNode(){
+			if (ParseFin){
+				return IniNode;
+			}
+			return nullptr;
+		}
 		
+
+	};
+
+	//Error List TSHOOT 전용 ErrorList Ini Parser
+	class ErrLst_Ini : public IniParser{
+		ErrLst_Ini(){}
+
+		ErrLst_Ini(const char* Str) : IniParser(Str){}
+
+		ErrLst_Ini(FILE* rFile) : IniParser(rFile){}
+
+		~ErrLst_Ini(){}
+
+		virtual void Parse(){
+			short BrkCnt = 0;       // '['의 개수 추적
+			bool isKey = false;		// KEY= 임을 확인 Section내부에 '\n'다음이면 무조건 true
+			bool isSecArea = false;		// 특정 영역의 Section임을 확인 이를 통해 키인지 밸류인지 구분가능
+			bool bfrVal = false;
+			bool isVal = false;		// Value임을 확인
+
+			enum IniStt{
+				DFT,
+				SEC,
+				KEY,
+				VAL,
+				CMT,	//주석
+			};
+
+			DynamicStr* Section = new DynamicStr(128);
+			DynamicStr* Key = new DynamicStr(128);
+			DynamicStr* Val = new DynamicStr(128);
+
+			JNode* KeyVal = new JNode();
+			JObj* debugObj;
+
+
+
+			IniStt stt = DFT;
+			while (1){
+				PrvChar = IniStr->Char_Get_Str(glb_csr - 1);
+				CurChar = IniStr->Char_Get_Str(glb_csr);
+				NxtChar = IniStr->Char_Get_Str(++glb_csr);
+
+				if (CurChar == EOF){
+					debugObj = static_cast<JObj*>(IniNode->P_Type);
+					if (Section != nullptr){
+						delete Section;
+					}
+					else if (Key != nullptr){
+						delete Key;
+					}
+					else if (Val != nullptr){
+						delete Val;
+					}
+					ParseFin = true;
+					break;
+				}
+
+				//Status 확인
+				if (stt == DFT){
+					if (CurChar == '['){
+						if (isSecArea){
+							isSecArea = false;
+							isKey = false;
+							isVal = false;
+							//전에 있던거 넣어주기
+							char* Sect = Section->Get_Str();
+							(*IniNode)[static_cast<const char*>(Sect)] = KeyVal;
+
+							//debug
+							debugObj = static_cast<JObj*>(IniNode->P_Type);
+							JObj* debugObjVal = static_cast<JObj*>(debugObj->Value->P_Type);
+
+
+							delete Section;
+							Section = new DynamicStr(128);
+						}
+						BrkCnt++;
+						isSecArea = true;
+						stt = SEC;
+						continue;
+					}
+					else if (CurChar == ']'){
+						BrkCnt--;
+						isKey = true;
+						stt = KEY;
+						continue;
+					}
+					else if (CurChar == '='){
+						isVal = true;
+						stt = VAL;
+						continue;
+					}
+					else if (CurChar == '#' || CurChar == ';'){
+						stt = CMT;
+						continue;
+					}
+					else if (CurChar == '\n' || CurChar == '\t' || CurChar == ' '){
+						continue;
+					}
+					else if (isSecArea){
+						glb_csr--;
+						stt = KEY;
+					}
+				}
+
+				switch (stt){
+				case SEC:
+				{
+					Section->Append_Char(&CurChar);
+					if (NxtChar == ']'){
+						Section->Str_Trim_All();
+						stt = DFT;
+					}
+					break;
+				}
+				case KEY:
+				{
+					Key->Append_Char(&CurChar);
+					if (NxtChar == '='){
+						Key->Str_Trim_All();
+
+						if (Key->StrCmp(Key->Get_Str(), "TSHOOT")){
+							while (1){
+								PrvChar = IniStr->Char_Get_Str(glb_csr - 1);
+								CurChar = IniStr->Char_Get_Str(glb_csr);
+								NxtChar = IniStr->Char_Get_Str(++glb_csr);
+
+
+							}
+						}
+
+						stt = DFT;
+						isKey = false;
+					}
+					break;
+				}
+				case VAL:
+				{
+					Val->Append_Char(&CurChar);
+					if (NxtChar == '\n'){
+						Val->Str_Trim_All();
+						stt = DFT;
+						isVal = false;
+
+						char* SectKey = Key->Get_Str();
+						char* SectVal = Val->Get_Str();
+
+						(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
+
+						//debug 용
+						debugObj = static_cast<JObj*>(KeyVal->P_Type);
+
+						delete Key;
+						delete Val;
+
+						Key = new DynamicStr(128);
+						Val = new DynamicStr(128);
+					}
+					break;
+				}
+				case CMT:
+				{
+					if (CurChar == '\n'){
+						stt = DFT;
+					}
+					break;
+				}
+				}
+			}
+
+		}
+
 
 	};
 }
