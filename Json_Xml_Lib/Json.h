@@ -22,10 +22,10 @@ namespace JSON {
 			DOUBLE,
 			BOOL,
 			STRING,
-			NULLTYPE,	//³Î
+			NULLTYPE,	//ë„
 		};
 
-		//³»ºÎ ¸®¼Ò½º PtypeÀ» »èÁ¦½ÃÄÑÁÜ
+		//ë‚´ë¶€ ë¦¬ì†ŒìŠ¤ Ptypeì„ ì‚­ì œì‹œì¼œì¤Œ
 		void delType();
 
 		JNode() : Cur_Type(JType::NULLTYPE){
@@ -34,48 +34,48 @@ namespace JSON {
 		JNode(JType Set_Node_Type) : Cur_Type(Set_Node_Type){
 			setType(Cur_Type);
 		}
-		//¼Ò¸êÀÚ
+		//ì†Œë©¸ì
 		~JNode(){
 			delType();
 		}
 
-		//º¹»ç »ı¼ºÀÚ
+		//ë³µì‚¬ ìƒì„±ì
 		JNode(const JNode& other) : Cur_Type(other.Cur_Type), P_Type(other.P_Type){
 
 		}
-		// ÀÌµ¿ »ı¼ºÀÚ
+		// ì´ë™ ìƒì„±ì
 		JNode(const JNode&& other) : Cur_Type(other.Cur_Type), P_Type(other.P_Type) {
 
 		}
 		
 		JsonCallObjArr push();
 	private:
-		JsonCallObjArr obj_push(const char* key);	//ÃßÈÄ »ı¼º ¿¹Á¤ ¾È¾²´Â°Ô ÁÁÀ»°Å °°±âµµ ÇÏ°í
+		JsonCallObjArr obj_push(const char* key);	//ì¶”í›„ ìƒì„± ì˜ˆì • ì•ˆì“°ëŠ”ê²Œ ì¢‹ì„ê±° ê°™ê¸°ë„ í•˜ê³ 
 	public:
 
-		JsonCallObjArr arr_del(int index);			//¼±ÅÃÇØ¼­ »èÁ¦
-		JsonCallObjArr* arr_del();					//³¡¿¡¸¸ »èÁ¦
-		JsonCallObjArr obj_del(const char* key);	//¼±ÅÃÇØ¼­ »èÁ¦
-		JsonCallObjArr* obj_del();					//³¡¿¡¸¸ »èÁ¦
+		JsonCallObjArr arr_del(int index);			//ì„ íƒí•´ì„œ ì‚­ì œ
+		JsonCallObjArr* arr_del();					//ëì—ë§Œ ì‚­ì œ
+		JsonCallObjArr obj_del(const char* key);	//ì„ íƒí•´ì„œ ì‚­ì œ
+		JsonCallObjArr* obj_del();					//ëì—ë§Œ ì‚­ì œ
 
-		//push del ÅëÇÕ ¸Ş¼Òµå È£Ãâ¿ë ¸Ş¼Òµå
+		//push del í†µí•© ë©”ì†Œë“œ í˜¸ì¶œìš© ë©”ì†Œë“œ
 		JsonCallObjArr* del();
-		void all_del();		//¸ğµç °´Ã¼ »èÁ¦
+		void all_del();		//ëª¨ë“  ê°ì²´ ì‚­ì œ
 
 		void operator=(JType);
 
-		bool isTypeNull();	//true¸é P_Type == nullptr
-		bool isTypeMatch(JType); //true¸é P_Type == Type ¸ÅÄ¡µÈ»óÅÂ
-		bool isOverWrite();	//µ¤¾î¾²±â È¤Àº »ı¼ºÇÏ±â
+		bool isTypeNull();	//trueë©´ P_Type == nullptr
+		bool isTypeMatch(JType); //trueë©´ P_Type == Type ë§¤ì¹˜ëœìƒíƒœ
+		bool isOverWrite();	//ë®ì–´ì“°ê¸° í˜¹ì€ ìƒì„±í•˜ê¸°
 
 		void setType(JType);
 		void* getPType();
 		JType getType();
 
-		//¹®ÀÚ¿­ ÆÄ½Ì ºÎºĞ
+		//ë¬¸ìì—´ íŒŒì‹± ë¶€ë¶„
 		void isObjArrCk(DynamicStr* str);
 
-		//¹İÈ¯
+		//ë°˜í™˜
 		operator int();
 		operator int*();
 		operator double();
@@ -85,15 +85,15 @@ namespace JSON {
 		operator char();
 		operator char*();
 	private:
-		operator JObj();			//¾È¸¸µé ¿¹Á¤ ¼Ò¸êÇÒ¶§ °ñÄ¡¾ÆÇÄ(Áö¿ªº¯¼ö µ¿Àûº¯¼ö ±¸ºĞÇØ¾ßÇÔ)
-		operator JArr();			//¾È¸¸µé ¿¹Á¤ ¼Ò¸êÇÒ¶§ °ñÄ¡¾ÆÇÄ(Áö¿ªº¯¼ö µ¿Àûº¯¼ö ±¸ºĞÇØ¾ßÇÔ)
-		operator JArr*();			//¾È¸¸µé ¿¹Á¤ ¼Ò¸êÇÒ¶§ °ñÄ¡¾ÆÇÄ(Áö¿ªº¯¼ö µ¿Àûº¯¼ö ±¸ºĞÇØ¾ßÇÔ)
-		operator JObj*();			//¾È¸¸µé ¿¹Á¤ ¼Ò¸êÇÒ¶§ °ñÄ¡¾ÆÇÄ(Áö¿ªº¯¼ö µ¿Àûº¯¼ö ±¸ºĞÇØ¾ßÇÔ)
-		operator JNode();			//JNode = JNode ÀÌ·±°æ¿ì lValue¸¸ »ç¿ëµÇ±â¿¡ ¹İÈ¯Àº È£ÃâÀÌ ¾ÈµÊ
-		operator JNode*();			//°í·Î ÀÖÀ¸³ª ¸¶³ª ¹İÈ¯Àº ¾²ÀÌÁö ¾ÊÀ»¿¹Á¤
+		operator JObj();			//ì•ˆë§Œë“¤ ì˜ˆì • ì†Œë©¸í• ë•Œ ê³¨ì¹˜ì•„í””(ì§€ì—­ë³€ìˆ˜ ë™ì ë³€ìˆ˜ êµ¬ë¶„í•´ì•¼í•¨)
+		operator JArr();			//ì•ˆë§Œë“¤ ì˜ˆì • ì†Œë©¸í• ë•Œ ê³¨ì¹˜ì•„í””(ì§€ì—­ë³€ìˆ˜ ë™ì ë³€ìˆ˜ êµ¬ë¶„í•´ì•¼í•¨)
+		operator JArr*();			//ì•ˆë§Œë“¤ ì˜ˆì • ì†Œë©¸í• ë•Œ ê³¨ì¹˜ì•„í””(ì§€ì—­ë³€ìˆ˜ ë™ì ë³€ìˆ˜ êµ¬ë¶„í•´ì•¼í•¨)
+		operator JObj*();			//ì•ˆë§Œë“¤ ì˜ˆì • ì†Œë©¸í• ë•Œ ê³¨ì¹˜ì•„í””(ì§€ì—­ë³€ìˆ˜ ë™ì ë³€ìˆ˜ êµ¬ë¶„í•´ì•¼í•¨)
+		operator JNode();			//JNode = JNode ì´ëŸ°ê²½ìš° lValueë§Œ ì‚¬ìš©ë˜ê¸°ì— ë°˜í™˜ì€ í˜¸ì¶œì´ ì•ˆë¨
+		operator JNode*();			//ê³ ë¡œ ìˆìœ¼ë‚˜ ë§ˆë‚˜ ë°˜í™˜ì€ ì“°ì´ì§€ ì•Šì„ì˜ˆì •
 	public:
 
-		//´ëÀÔ
+		//ëŒ€ì…
 		void operator=(int);
 		void operator=(int*);
 		void operator=(double);
@@ -102,18 +102,18 @@ namespace JSON {
 		void operator=(bool*);
 		void operator=(char);
 		void operator=(const char*);
-		void operator=(char*);//º¯¼ö·Î µé¾î¿À´Â °æ¿ì¸¦ À§ÇÔ
+		void operator=(char*);//ë³€ìˆ˜ë¡œ ë“¤ì–´ì˜¤ëŠ” ê²½ìš°ë¥¼ ìœ„í•¨
 	private:
-		void operator=(JObj);		//¾È¸¸µé ¿¹Á¤ ¼Ò¸êÇÒ¶§ °ñÄ¡¾ÆÇÄ(Áö¿ªº¯¼ö µ¿Àûº¯¼ö ±¸ºĞÇØ¾ßÇÔ)
-		void operator=(JArr);		//¾È¸¸µé ¿¹Á¤ ¼Ò¸êÇÒ¶§ °ñÄ¡¾ÆÇÄ(Áö¿ªº¯¼ö µ¿Àûº¯¼ö ±¸ºĞÇØ¾ßÇÔ)
-		void operator=(JNode);		//rValue¸¦ º¹»çÈÄ rValue.P_Type = nullptr·Î ¸¸µé¾îÁÖ¾îµµ º¹»ç»ı¼ºÀÚ·Î »ı¼ºµÈ °´Ã¼°¡ µÇ¾î¼­ °á±¹ ÀÌÁß¼Ò¸êµÊ
+		void operator=(JObj);		//ì•ˆë§Œë“¤ ì˜ˆì • ì†Œë©¸í• ë•Œ ê³¨ì¹˜ì•„í””(ì§€ì—­ë³€ìˆ˜ ë™ì ë³€ìˆ˜ êµ¬ë¶„í•´ì•¼í•¨)
+		void operator=(JArr);		//ì•ˆë§Œë“¤ ì˜ˆì • ì†Œë©¸í• ë•Œ ê³¨ì¹˜ì•„í””(ì§€ì—­ë³€ìˆ˜ ë™ì ë³€ìˆ˜ êµ¬ë¶„í•´ì•¼í•¨)
+		void operator=(JNode);		//rValueë¥¼ ë³µì‚¬í›„ rValue.P_Type = nullptrë¡œ ë§Œë“¤ì–´ì£¼ì–´ë„ ë³µì‚¬ìƒì„±ìë¡œ ìƒì„±ëœ ê°ì²´ê°€ ë˜ì–´ì„œ ê²°êµ­ ì´ì¤‘ì†Œë©¸ë¨
 		void operator=(JObj*);		
 		void operator=(JArr*);		
 	public:
-		//ÇØ´ç ´ëÀÔµéÀº rValue°¡ ¹«Á¶°Ç nullptr·Î º¯ÇÑµÈ´Ù°í °¡Á¤ Áï, lValue = rValue¿¡¼­ lValue·Î ¿ÏÀüÇÑ ÀÌµ¿ÀÎ¼À
+		//í•´ë‹¹ ëŒ€ì…ë“¤ì€ rValueê°€ ë¬´ì¡°ê±´ nullptrë¡œ ë³€í•œëœë‹¤ê³  ê°€ì • ì¦‰, lValue = rValueì—ì„œ lValueë¡œ ì™„ì „í•œ ì´ë™ì¸ì…ˆ
 		void operator=(JNode*);
 
-		//°´Ã¼ ¹è¿­ ¿¬»êÀÚ ¿À¹ö·Îµù
+		//ê°ì²´ ë°°ì—´ ì—°ì‚°ì ì˜¤ë²„ë¡œë”©
 		JsonCallObjArr operator[](const char* key);
 		JsonCallObjArr operator[](int index);
 
@@ -147,20 +147,20 @@ namespace JSON {
 			}
 		}
 
-		//ÀÚ½ÅÀÇ Obj±âÁØ nextÂüÁ¶ÇØ¼­ key¿Í ¸ÅÄ¡µÇ´Â Obj ¹İÈ¯
+		//ìì‹ ì˜ Objê¸°ì¤€ nextì°¸ì¡°í•´ì„œ keyì™€ ë§¤ì¹˜ë˜ëŠ” Obj ë°˜í™˜
 		JObj* searchKey(const char* key){
-			//ÇöÀç À§Ä¡¸¦ ±âÁØÀ¸·Î Ã£´Â°ÅÀÓ
+			//í˜„ì¬ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ì°¾ëŠ”ê±°ì„
 			JObj* cur_obj = this;
 			
 			do{
-				if (cur_obj->Key.StrCat(key)) return cur_obj;
+				if (cur_obj->Key.StrCmp(key)) return cur_obj;
 				cur_obj = cur_obj->next;
 			} while (cur_obj != nullptr);
 
 			return nullptr;
 		}
 
-		//ÀÚ½ÅÀÇ Obj±âÁØ TailÀ§Ä¡ ¹İÈ¯
+		//ìì‹ ì˜ Objê¸°ì¤€ Tailìœ„ì¹˜ ë°˜í™˜
 		JObj* getTailObj(){
 			JObj* cur_obj = this;
 
@@ -191,22 +191,22 @@ namespace JSON {
 			return root_obj;	//cur_obj == root_obj->next
 		}
 
-		//Å°°ª »ı¼º
+		//í‚¤ê°’ ìƒì„±
 		void setKey(const char* key){
 			if (Value->Cur_Type != JNode::JType::NULLTYPE) 
-				return;//¸¸¾à¿¡ ÀÌ·±°æ¿ì¸é ±âÁ¸Å°°ªÀÌ º¯°æµÊ ±×·¡¼­ ½ÇÆĞ
+				return;//ë§Œì•½ì— ì´ëŸ°ê²½ìš°ë©´ ê¸°ì¡´í‚¤ê°’ì´ ë³€ê²½ë¨ ê·¸ë˜ì„œ ì‹¤íŒ¨
 			Key.Set_Str(key);
 		}
 
 		void setValue(JNode::JType setNodeType){
-			//µ¤¾î¾²´Â°ÅÀÓ
+			//ë®ì–´ì“°ëŠ”ê±°ì„
 			Value->delType();
 			Value->setType(Value->Cur_Type);
 		}
 
 	//private:
-		DynamicStr Key;		//Å°°ª
-		JNode* const Value;		//ÀÌÄ£±¸´Â »ó¼öÈ­ ½ÃÄÑ¾ß ÇÏ³ª
+		DynamicStr Key;		//í‚¤ê°’
+		JNode* const Value;		//ì´ì¹œêµ¬ëŠ” ìƒìˆ˜í™” ì‹œì¼œì•¼ í•˜ë‚˜
 		JObj* next;
 		friend JsonCallObjArr;
 	};
@@ -226,9 +226,9 @@ namespace JSON {
 			}
 		}
 
-		//Arr±âÁØ Root¶ó°í °¡Á¤ nextÂüÁ¶ÇØ¼­ index¸¦ ¹İÈ¯
+		//Arrê¸°ì¤€ Rootë¼ê³  ê°€ì • nextì°¸ì¡°í•´ì„œ indexë¥¼ ë°˜í™˜
 		JArr* RootSearchIndex(int index){
-			if (index <= -1) return nullptr;	//¿¹¿ÜÃ³¸® -1
+			if (index <= -1) return nullptr;	//ì˜ˆì™¸ì²˜ë¦¬ -1
 
 			JArr* cur_arr = this;
 			
@@ -246,7 +246,7 @@ namespace JSON {
 			return nullptr;
 		}
 
-		//ÀÚ½ÅÀÇ arr±âÁØ tailÀ§Ä¡ ¹İÈ¯
+		//ìì‹ ì˜ arrê¸°ì¤€ tailìœ„ì¹˜ ë°˜í™˜
 		JArr* getTailArr(){
 			JArr* cur_arr = this;
 
@@ -259,7 +259,7 @@ namespace JSON {
 			return cur_arr;
 		}
 
-		//ÀÚ½ÅÀÇ arr±âÁØ tailÀ§Ä¡ ¹İÈ¯ + idx°ªµµ ¹İÈ¯ÇØÁÙ ¼ö ÀÖÀ½ Æ÷ÀÎÅÍ·Î
+		//ìì‹ ì˜ arrê¸°ì¤€ tailìœ„ì¹˜ ë°˜í™˜ + idxê°’ë„ ë°˜í™˜í•´ì¤„ ìˆ˜ ìˆìŒ í¬ì¸í„°ë¡œ
 		JArr* getTailArr(int *idx){
 			JArr* cur_arr = this;
 			JArr* prev_arr = nullptr;
@@ -296,7 +296,7 @@ namespace JSON {
 		}
 
 		void setValue(JNode::JType setNodeType){
-			//µ¤¾î¾²±â
+			//ë®ì–´ì“°ê¸°
 			Value->delType();
 			Value->setType(Value->Cur_Type);
 		}
@@ -317,38 +317,38 @@ namespace JSON {
 			JObj* search_key_obj = Root_Obj->searchKey(key);
 			JObj* tail_obj = Root_Obj->getTailObj();
 
-			//1. Root_NodeÀÇ »óÅÂ°¡ "{}" ÀÌ·± »óÅÂÀÏ¶§ ¾Æ¹« °´Ã¼µµ ¾øÀ»¶§
+			//1. Root_Nodeì˜ ìƒíƒœê°€ "{}" ì´ëŸ° ìƒíƒœì¼ë•Œ ì•„ë¬´ ê°ì²´ë„ ì—†ì„ë•Œ
 			if (Root_Node->ObjCnt == -1){
 				if (trg_del == true){
-					//»èÁ¦ ÇÒ °´Ã¼°¡ Á¸ÀçÇÏÁö ¾ÊÀ»¶§
+					//ì‚­ì œ í•  ê°ì²´ê°€ ì¡´ì¬í•˜ì§€ ì•Šì„ë•Œ
 					Cur_Obj = nullptr;
 					Cur_Arr = nullptr;
 					Cur_Node = nullptr;
 					return;
 				}
-				Root_Obj->setKey(key);			//Å°°ª ¼³Á¤
-				Root_Obj->setValue(JNode::JType::NULLTYPE);	//ÀÏ´Ü ÃÊ±âÈ­´Ï±î NullType³Ö¾îÁÖ±â
+				Root_Obj->setKey(key);			//í‚¤ê°’ ì„¤ì •
+				Root_Obj->setValue(JNode::JType::NULLTYPE);	//ì¼ë‹¨ ì´ˆê¸°í™”ë‹ˆê¹Œ NullTypeë„£ì–´ì£¼ê¸°
 				Root_Obj->next = nullptr;
 				Root_Node->ObjCnt++;
 
-				//¿¬»êÀÚ ¿À¹ö·Îµù¿¡¼­ »ç¿ëÇÒ ¸®¼Ò½º ÃÊ±âÈ­ ÇØÁÖ±â
+				//ì—°ì‚°ì ì˜¤ë²„ë¡œë”©ì—ì„œ ì‚¬ìš©í•  ë¦¬ì†ŒìŠ¤ ì´ˆê¸°í™” í•´ì£¼ê¸°
 				Cur_Obj = Root_Obj;
 			}
 
-			//2. Root_NodeÀÇ »óÅÂ°¡ "{...}"ÀÏ¶§ °´Ã¼°¡ Á¸ÀçÇÒ¶§ ÇØ´çÅ°ÀÎ °´Ã¼¸¦ Ã£±â
+			//2. Root_Nodeì˜ ìƒíƒœê°€ "{...}"ì¼ë•Œ ê°ì²´ê°€ ì¡´ì¬í• ë•Œ í•´ë‹¹í‚¤ì¸ ê°ì²´ë¥¼ ì°¾ê¸°
 			
-			else if (search_key_obj != nullptr){	//ÀÌ¹Ì ÇØ´ç Å°¸¦ °¡Áø °´Ã¼°¡ Á¸ÀçÇÔ
+			else if (search_key_obj != nullptr){	//ì´ë¯¸ í•´ë‹¹ í‚¤ë¥¼ ê°€ì§„ ê°ì²´ê°€ ì¡´ì¬í•¨
 				if (trg_del == true){
-					//»èÁ¦ÇÒ °´Ã¼°¡ Á¸ÀçÇÒ¶§
+					//ì‚­ì œí•  ê°ì²´ê°€ ì¡´ì¬í• ë•Œ
 					JObj* prev_obj = search_key_obj->getPrevObj(search_key_obj, Root_Node);
-					//1. 1°³ È¤Àº ¿©·¯°³ ÀÖÀ¸³ª 0¹ø °´Ã¼ÀÏ¶§
+					//1. 1ê°œ í˜¹ì€ ì—¬ëŸ¬ê°œ ìˆìœ¼ë‚˜ 0ë²ˆ ê°ì²´ì¼ë•Œ
 					if (prev_obj == nullptr){
-						//1. 1°³¸¸ ÀÖÀ»¶§
+						//1. 1ê°œë§Œ ìˆì„ë•Œ
 						if (search_key_obj->next == nullptr){
 							Root_Node->delType();
 							Root_Node->setType(JNode::JType::OBJ);
 						}
-						//2. ¿©·¯°³ ÀÖÀ¸³ª 0¹ø °´Ã¼¸¦ Áö¿ì·Á°í ÇÒ¶§
+						//2. ì—¬ëŸ¬ê°œ ìˆìœ¼ë‚˜ 0ë²ˆ ê°ì²´ë¥¼ ì§€ìš°ë ¤ê³  í• ë•Œ
 						else{
 							JObj* next_root_obj = search_key_obj->next;
 							search_key_obj->next = nullptr;
@@ -358,7 +358,7 @@ namespace JSON {
 							Root_Node->ObjCnt--;
 						}
 					}
-					//2. ¿©·¯°³ ÀÖÀ»¶§
+					//2. ì—¬ëŸ¬ê°œ ìˆì„ë•Œ
 					else{
 						prev_obj->next = search_key_obj->next;
 						search_key_obj->next = nullptr;
@@ -368,19 +368,19 @@ namespace JSON {
 
 					return;
 				}
-				//¿¬»êÀÚ ¿À¹ö·Îµù¿¡¼­ Ã³¸®ÇÏµµ·Ï ÇØ´ç Å°¸¦ °¡Áø °´Ã¼¸¦ ³Ñ°ÜÁÖ±â
+				//ì—°ì‚°ì ì˜¤ë²„ë¡œë”©ì—ì„œ ì²˜ë¦¬í•˜ë„ë¡ í•´ë‹¹ í‚¤ë¥¼ ê°€ì§„ ê°ì²´ë¥¼ ë„˜ê²¨ì£¼ê¸°
 				Cur_Obj = search_key_obj;
 			}
-			else{//ÇØ´ç Å°¸¦ °¡Áø °´Ã¼°¡ Á¸ÀçÇÏÁö ¾ÊÀ½
+			else{//í•´ë‹¹ í‚¤ë¥¼ ê°€ì§„ ê°ì²´ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŒ
 				if (trg_del == true){
-					//»èÁ¦ÇÒ °´Ã¼°¡ Á¸ÀçÇÏÁö ¾ÊÀ»¶§
+					//ì‚­ì œí•  ê°ì²´ê°€ ì¡´ì¬í•˜ì§€ ì•Šì„ë•Œ
 					Cur_Obj = nullptr;
 					Cur_Arr = nullptr;
 					Cur_Node = nullptr;
 					return;
 				}
 
-				//»õ·Ó°Ô Å°¸¦ ¸¸µé¾îÁà¾ßÇÔ
+				//ìƒˆë¡­ê²Œ í‚¤ë¥¼ ë§Œë“¤ì–´ì¤˜ì•¼í•¨
 				JObj* new_obj = new JObj(key);
 				new_obj->setValue(JNode::JType::NULLTYPE);
 				new_obj->next = nullptr;
@@ -388,12 +388,12 @@ namespace JSON {
 
 				tail_obj->next = new_obj;
 
-				//¿¬»êÀÚ ¿À¹ö·Îµù¿¡¼­ Ã³¸®ÇÏµµ·Ï ÇØ´ç Å°¸¦ °¡Áø °´Ã¼¸¦ ³Ñ°ÜÁÖ±â
+				//ì—°ì‚°ì ì˜¤ë²„ë¡œë”©ì—ì„œ ì²˜ë¦¬í•˜ë„ë¡ í•´ë‹¹ í‚¤ë¥¼ ê°€ì§„ ê°ì²´ë¥¼ ë„˜ê²¨ì£¼ê¸°
 				Cur_Obj = new_obj;
 			}
 
 
-			//¿¬»êÀÚ ¿À¹ö·Îµù¿¡¼­ »ç¿ëÇÒ ¸®¼Ò½º ÃÊ±âÈ­ ÇØÁÖ±â
+			//ì—°ì‚°ì ì˜¤ë²„ë¡œë”©ì—ì„œ ì‚¬ìš©í•  ë¦¬ì†ŒìŠ¤ ì´ˆê¸°í™” í•´ì£¼ê¸°
 			Cur_Node = Root_Node;
 			Cur_Arr = Root_Arr;			//nullptr
 		}
@@ -404,19 +404,19 @@ namespace JSON {
 			JArr* search_idx_arr = Root_Arr->RootSearchIndex(index);
 			JArr* tail_arr = Root_Arr->getTailArr(&max_idx);
 
-			if (index == -1) index = max_idx + 1;		//-1ÀÌ¸é ±×³É µÚ¿¡ Ãß°¡
+			if (index == -1) index = max_idx + 1;		//-1ì´ë©´ ê·¸ëƒ¥ ë’¤ì— ì¶”ê°€
 
-			//1. Root_NodeÀÇ »óÅÂ°¡ "[]" ÀÌ·± »óÅÂÀÏ¶§ ¾Æ¹« ¹è¿­¿¡ °ªµµ ¾øÀ»¶§ 
+			//1. Root_Nodeì˜ ìƒíƒœê°€ "[]" ì´ëŸ° ìƒíƒœì¼ë•Œ ì•„ë¬´ ë°°ì—´ì— ê°’ë„ ì—†ì„ë•Œ 
 			if (Root_Node->ArrCnt == -1){
 				if (trg_del == true){
-					//»èÁ¦ÇÒ ¹è¿­ÀÌ Á¸ÀçÇÏÁö ¾ÊÀ»¶§
+					//ì‚­ì œí•  ë°°ì—´ì´ ì¡´ì¬í•˜ì§€ ì•Šì„ë•Œ
 					Cur_Obj = nullptr;
 					Cur_Arr = nullptr;
 					Cur_Node = nullptr;
 					return;
 				}
 
-				if (index != 0){//½ÇÆĞ
+				if (index != 0){//ì‹¤íŒ¨
 					Cur_Arr = nullptr;
 				}
 				else{
@@ -428,22 +428,22 @@ namespace JSON {
 				}
 			}
 
-			//2. Root_NodeÀÇ »óÅÂ°¡ "[...]"ÀÌ·± »óÅÂÀÏ¶§ ¹è¿­ÀÇ °ªÀÌ Á¸ÀçÇÒ¶§
+			//2. Root_Nodeì˜ ìƒíƒœê°€ "[...]"ì´ëŸ° ìƒíƒœì¼ë•Œ ë°°ì—´ì˜ ê°’ì´ ì¡´ì¬í• ë•Œ
 
-			// ÇØ´ç idx¸¦ °¡Áø °ªÀÌ Á¸ÀçÇÒ¶§
+			// í•´ë‹¹ idxë¥¼ ê°€ì§„ ê°’ì´ ì¡´ì¬í• ë•Œ
 			else if (search_idx_arr != nullptr){
 				if (trg_del == true){
-					//»èÁ¦ÇÒ ÀÎµ¦½ºÀÇ ¿ä¼Ò°¡ Á¸ÀçÇÒ¶§
+					//ì‚­ì œí•  ì¸ë±ìŠ¤ì˜ ìš”ì†Œê°€ ì¡´ì¬í• ë•Œ
 					JArr* prev_arr = search_idx_arr->getPrevArr(search_idx_arr, Root_Node);
-					//1. 1°³ È¤Àº ¿©·¯°³ ÀÖÀ¸³ª 0¹ø °´Ã¼ÀÏ¶§
+					//1. 1ê°œ í˜¹ì€ ì—¬ëŸ¬ê°œ ìˆìœ¼ë‚˜ 0ë²ˆ ê°ì²´ì¼ë•Œ
 					if (prev_arr == nullptr){
-						//1. 1°³¸¸ ÀÖÀ»¶§
+						//1. 1ê°œë§Œ ìˆì„ë•Œ
 						if (search_idx_arr->next == nullptr){
 							Root_Node->delType();
 							Root_Node->setType(JNode::JType::ARR);
 						}
 
-						//2. ¿©·¯°³ ÀÖÀ¸³ª 0¹ø °´Ã¼¸¦ Áö¿ì·Á°í ÇÒ¶§
+						//2. ì—¬ëŸ¬ê°œ ìˆìœ¼ë‚˜ 0ë²ˆ ê°ì²´ë¥¼ ì§€ìš°ë ¤ê³  í• ë•Œ
 						else{
 							JArr* next_root_arr = search_idx_arr->next;
 							search_idx_arr->next = nullptr;
@@ -453,7 +453,7 @@ namespace JSON {
 							Root_Node->ArrCnt--;
 						}
 					}
-					//2. ¿©·¯°³ ÀÖÀ»¶§
+					//2. ì—¬ëŸ¬ê°œ ìˆì„ë•Œ
 					else{
 						prev_arr->next = search_idx_arr->next;
 						search_idx_arr->next = nullptr;
@@ -465,19 +465,19 @@ namespace JSON {
 				}
 				Cur_Arr = search_idx_arr;
 			}
-			// ÇØ´ç idx¸¦ °¡Áø °ªÀÌ Á¸ÀçÇÏÁö ¾ÊÀ»¶§
+			// í•´ë‹¹ idxë¥¼ ê°€ì§„ ê°’ì´ ì¡´ì¬í•˜ì§€ ì•Šì„ë•Œ
 			
 			else{
 				if (trg_del == true){
-					//»èÁ¦ÇÒ ÀÎµ¦½ºÀÇ ¿ä¼Ò°¡ Á¸ÀçÇÏÁö ¾ÊÀ»¶§
+					//ì‚­ì œí•  ì¸ë±ìŠ¤ì˜ ìš”ì†Œê°€ ì¡´ì¬í•˜ì§€ ì•Šì„ë•Œ
 					Cur_Obj = nullptr;
 					Cur_Arr = nullptr;
 					Cur_Node = nullptr;
 					return;
 				}
 
-				if (index > max_idx+1){		//¹è¿­ÀÇ Å©±âº¸´Ù Å¬¶§ ½ÇÆĞ
-					//¿¬»êÀÚ¿À¹ö·Îµù¿¡¼­ ½ÇÆĞÇÏµµ·Ï ¸¸µé±â
+				if (index > max_idx+1){		//ë°°ì—´ì˜ í¬ê¸°ë³´ë‹¤ í´ë•Œ ì‹¤íŒ¨
+					//ì—°ì‚°ìì˜¤ë²„ë¡œë”©ì—ì„œ ì‹¤íŒ¨í•˜ë„ë¡ ë§Œë“¤ê¸°
 					Cur_Arr = nullptr;
 				}
 				else{
@@ -492,41 +492,41 @@ namespace JSON {
 				}
 			}
 			
-			//¿¬»êÀÚ ¿À¹ö·Îµù¿¡¼­ »ç¿ëÇÒ ¸®¼Ò½º ÃÊ±âÈ­ ÇØÁÖ±â
+			//ì—°ì‚°ì ì˜¤ë²„ë¡œë”©ì—ì„œ ì‚¬ìš©í•  ë¦¬ì†ŒìŠ¤ ì´ˆê¸°í™” í•´ì£¼ê¸°
 			Cur_Node = Root_Node;
 			Cur_Obj = Root_Obj;		//nullptr
 		}
 
-		//±×³É ¸ÇµÚ¿¡ push È¤Àº del ÇÏ±â À§ÇÑ »ı¼ºÀÚ
+		//ê·¸ëƒ¥ ë§¨ë’¤ì— push í˜¹ì€ del í•˜ê¸° ìœ„í•œ ìƒì„±ì
 		JsonCallObjArr(JNode* node, JNode::JType curType, bool trg_del = false);
 
 		
 		
 
-		//³¡¿¡¸¸ push or del ÇÏ±â
-		//obj´Â ¾È¾µ¿¹Á¤
+		//ëì—ë§Œ push or del í•˜ê¸°
+		//objëŠ” ì•ˆì“¸ì˜ˆì •
 		void obj_push(JNode* node){
 			Root_Arr = nullptr;
-			//1. obj¸¸ Ã³¸®ÇØÁÖ±â
+			//1. objë§Œ ì²˜ë¦¬í•´ì£¼ê¸°
 			Root_Node = node;
 			Root_Obj = static_cast<JObj*>(Root_Node->P_Type);
 			JObj* tail_obj = Root_Obj->getTailObj();
-			//2. °´Ã¼¿¡ ¾Æ¹«°ªµµ Á¸ÀçÇÏÁö ¾ÊÀ»¶§ ±×³É »õ·Ó°Ô ÇÏ³ª ¸¸µé±â
+			//2. ê°ì²´ì— ì•„ë¬´ê°’ë„ ì¡´ì¬í•˜ì§€ ì•Šì„ë•Œ ê·¸ëƒ¥ ìƒˆë¡­ê²Œ í•˜ë‚˜ ë§Œë“¤ê¸°
 			if (Root_Node->ObjCnt == -1){
 				
 			}
 
-			//3. °ªÀÌ Á¸ÀçÇØ¼­ ¸ÇµÚ±îÁö µµ´ŞÇØ¾ßÇÒ¶§
+			//3. ê°’ì´ ì¡´ì¬í•´ì„œ ë§¨ë’¤ê¹Œì§€ ë„ë‹¬í•´ì•¼í• ë•Œ
 		}
 
 		void arr_push(JNode* node){
 			Root_Obj = nullptr;
-			//1. arr¸¸ Ã³¸®ÇØÁÖ±â
+			//1. arrë§Œ ì²˜ë¦¬í•´ì£¼ê¸°
 			Root_Node = node;
 			int max_idx = -1;
 			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
 			JArr* tail_arr = Root_Arr->getTailArr(&max_idx);
-			//2. ¹è¿­¿¡ ¾Æ¹«°ªµµ Á¸ÀçÇÏÁö ¾ÊÀ»¶§ ±×³É »õ·Ó°Ô ÇÏ³ª ¸¸µé±â
+			//2. ë°°ì—´ì— ì•„ë¬´ê°’ë„ ì¡´ì¬í•˜ì§€ ì•Šì„ë•Œ ê·¸ëƒ¥ ìƒˆë¡­ê²Œ í•˜ë‚˜ ë§Œë“¤ê¸°
 			if (Root_Node->ArrCnt == -1){
 				Root_Arr->setValue(JNode::JType::NULLTYPE);
 				Root_Arr->next = nullptr;
@@ -535,7 +535,7 @@ namespace JSON {
 				Cur_Arr = Root_Arr;
 			}
 
-			//3. °ªÀÌ Á¸ÀçÇØ¼­ ¸ÇµÚ±îÁö µµ´ŞÇØ¾ßÇÒ¶§
+			//3. ê°’ì´ ì¡´ì¬í•´ì„œ ë§¨ë’¤ê¹Œì§€ ë„ë‹¬í•´ì•¼í• ë•Œ
 			else if(Root_Node->ArrCnt >= 0){
 				JArr* new_arr = new JArr();
 				new_arr->setValue(JNode::JType::NULLTYPE);
@@ -546,35 +546,35 @@ namespace JSON {
 
 				Cur_Arr = new_arr;
 			}
-			//¿¬»êÀÚ ¿À¹ö·Îµù¿¡¼­ »ç¿ëÇÒ ¸®¼Ò½º ÃÊ±âÈ­ ÇØÁÖ±â
+			//ì—°ì‚°ì ì˜¤ë²„ë¡œë”©ì—ì„œ ì‚¬ìš©í•  ë¦¬ì†ŒìŠ¤ ì´ˆê¸°í™” í•´ì£¼ê¸°
 			Cur_Node = Root_Node;
 			Cur_Obj = Root_Obj;		//nullptr
 		}
 
 		void obj_del(JNode* node){
 			Root_Arr = nullptr;
-			//1. obj¸¸ Ã³¸®ÇØÁÖ±â
+			//1. objë§Œ ì²˜ë¦¬í•´ì£¼ê¸°
 			Root_Node = node;
 			Root_Obj = static_cast<JObj*>(Root_Node->P_Type);
 			
-			//2. °´Ã¼ »óÅÂ°¡ "{}"ÀÏ¶§
+			//2. ê°ì²´ ìƒíƒœê°€ "{}"ì¼ë•Œ
 			if (Root_Node->ObjCnt == -1){
 				return;
-				//»èÁ¦¸øÇÔ ±×³É ¹İÈ¯
+				//ì‚­ì œëª»í•¨ ê·¸ëƒ¥ ë°˜í™˜
 			}
 
-			//3. °´Ã¼ »óÅÂ°¡ "{..}"ÀÏ¶§
+			//3. ê°ì²´ ìƒíƒœê°€ "{..}"ì¼ë•Œ
 			else{
 				JObj* tail_obj = Root_Obj->getTailObj();
 				JObj* prev_obj = Root_Obj->getPrevObj(tail_obj, Root_Node);
 
 				if (prev_obj == nullptr){
-					//1°³°¡ ³²¾ÆÀÖÀ»¶§
+					//1ê°œê°€ ë‚¨ì•„ìˆì„ë•Œ
 					Root_Node->delType();
 					Root_Node->setType(JNode::JType::OBJ);
 				}
 				else{
-					//¿©·¯°³°¡ ³²¾ÆÀÖÀ»¶§
+					//ì—¬ëŸ¬ê°œê°€ ë‚¨ì•„ìˆì„ë•Œ
 					prev_obj->next = nullptr;
 					Root_Node->ObjCnt--;
 					delete tail_obj;
@@ -584,28 +584,28 @@ namespace JSON {
 
 		void arr_del(JNode* node){
 			Root_Obj = nullptr;
-			//1. Arr¸¸ Ã³¸®ÇØÁÖ±â
+			//1. Arrë§Œ ì²˜ë¦¬í•´ì£¼ê¸°
 			Root_Node = node;
 			Root_Arr = static_cast<JArr*>(Root_Node->P_Type);
 
-			//2. ¹è¿­ »óÅÂ°¡ "[]"ÀÏ¶§
+			//2. ë°°ì—´ ìƒíƒœê°€ "[]"ì¼ë•Œ
 			if (Root_Node->ArrCnt == -1) {
 				return;
-				//»èÁ¦¸øÇÔ ±×³É ¹İÈ¯
+				//ì‚­ì œëª»í•¨ ê·¸ëƒ¥ ë°˜í™˜
 			}
 
-			//3. ¹è¿­ »óÅÂ°¡ "[..]"ÀÏ¶§
+			//3. ë°°ì—´ ìƒíƒœê°€ "[..]"ì¼ë•Œ
 			else{
 				JArr* tail_arr = Root_Arr->getTailArr();
 				JArr* prev_arr = Root_Arr->getPrevArr(tail_arr, Root_Node);
 
 				if (prev_arr == nullptr){
-					//1°³³²¾ÆÀÖÀ»¶§
+					//1ê°œë‚¨ì•„ìˆì„ë•Œ
 					Root_Node->delType();
 					Root_Node->setType(JNode::JType::ARR);
 				}
 				else{
-					//¿©·¯°³ ³²¾ÆÀÖÀ»¶§
+					//ì—¬ëŸ¬ê°œ ë‚¨ì•„ìˆì„ë•Œ
 					prev_arr->next = nullptr;
 					Root_Node->ArrCnt--;
 					delete tail_arr;
@@ -616,7 +616,7 @@ namespace JSON {
 		}
 
 
-		//¹İÈ¯ ¿¬»êÀÚ = ObjArr["Key"] °ªÀ» ¹İÈ¯
+		//ë°˜í™˜ ì—°ì‚°ì = ObjArr["Key"] ê°’ì„ ë°˜í™˜
 		operator int();
 		operator int*();
 		operator double();
@@ -639,7 +639,7 @@ namespace JSON {
 		void operator=(JArr*);
 	public:
 
-		//´ëÀÔ ¿¬»êÀÚ ObjArr["Key"] = °ªÀ» ´ëÀÔ
+		//ëŒ€ì… ì—°ì‚°ì ObjArr["Key"] = ê°’ì„ ëŒ€ì…
 		void operator=(int);
 		void operator=(int*);
 		void operator=(double);
@@ -652,9 +652,9 @@ namespace JSON {
 		void operator=(JNode*);
 		void operator=(JNode::JType curType);
 
-		//¹İÈ¯¿ë Á¦¾î (True ¼º°ø, False ½ÇÆĞ)
+		//ë°˜í™˜ìš© ì œì–´ (True ì„±ê³µ, False ì‹¤íŒ¨)
 		bool getOper_Ctrl(JNode::JType curType){
-			//¿¹¿ÜÃ³¸®¿ëµµ
+			//ì˜ˆì™¸ì²˜ë¦¬ìš©ë„
 			if (Cur_Obj == nullptr && Cur_Arr == nullptr){
 				return false;
 			}
@@ -727,13 +727,13 @@ namespace JSON {
 				}
 			}
 
-			//¼º°ø
+			//ì„±ê³µ
 			return true;
 		}
 
-		//´ëÀÔ¿ë Á¦¾î (True ¼º°ø, False ½ÇÆĞ)
+		//ëŒ€ì…ìš© ì œì–´ (True ì„±ê³µ, False ì‹¤íŒ¨)
 		void setOper_Ctrl(JNode::JType curType, void* rValue, bool str = false){
-			//¿¹¿ÜÃ³¸®¿ëµµ
+			//ì˜ˆì™¸ì²˜ë¦¬ìš©ë„
 			if (Cur_Obj == nullptr && Cur_Arr == nullptr){
 				return;
 			}
@@ -774,16 +774,16 @@ namespace JSON {
 						Cur_Obj->Value->delType();
 						Cur_Obj->Value->setType(JNode::JType::STRING);
 					}
-					if (str){//¹®ÀÚ¿­
+					if (str){//ë¬¸ìì—´
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
 						char* rval = static_cast<char*>(rValue);
 						lval->Set_Str(rval);
 						
-						//¹®ÀÚ¿­ ÆÄ½Ì ÇØÁÖ´Â°Å ÇÊ¿ä
+						//ë¬¸ìì—´ íŒŒì‹± í•´ì£¼ëŠ”ê±° í•„ìš”
 						Cur_Obj->Value->isObjArrCk(lval);
 
 					}
-					else{//¹®ÀÚ
+					else{//ë¬¸ì
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Obj->Value->P_Type);
 						char* rval = static_cast<char*>(rValue);
 						lval->Set_Char(&rval[0]);
@@ -836,27 +836,27 @@ namespace JSON {
 						Cur_Arr->Value->delType();
 						Cur_Arr->Value->setType(JNode::JType::STRING);
 					}
-					if (str){//¹®ÀÚ¿­
+					if (str){//ë¬¸ìì—´
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);
 						char* rval = static_cast<char*>(rValue);
 						lval->Set_Str(rval);
 
-						//¹®ÀÚ¿­ ÆÄ½Ì ÇØÁÖ´Â°Å ÇÊ¿ä
+						//ë¬¸ìì—´ íŒŒì‹± í•´ì£¼ëŠ”ê±° í•„ìš”
 						Cur_Arr->Value->isObjArrCk(lval);
 					}
-					else{//¹®ÀÚ
+					else{//ë¬¸ì
 						DynamicStr* lval = static_cast<DynamicStr*>(Cur_Arr->Value->P_Type);
 						char* rval = static_cast<char*>(rValue);
 						lval->Set_Char(&rval[0]);
 					}
 				}
 				else if (curType == JNode::JType::OBJ){
-					//ÇÊ¿ä¾øÀ» È®·ü 99
-					//´ëÀÔ½Ã JNode["Key"] = JArr·Î ³Ñ±â´Â°Ç ±İÁöÇÒ°Å±â ¶§¹® ¹«Á¶°Ç ´ëÀÔÀº JNode¸¸ ³Ñ±æ ¼ö ÀÖÀ½
+					//í•„ìš”ì—†ì„ í™•ë¥  99
+					//ëŒ€ì…ì‹œ JNode["Key"] = JArrë¡œ ë„˜ê¸°ëŠ”ê±´ ê¸ˆì§€í• ê±°ê¸° ë•Œë¬¸ ë¬´ì¡°ê±´ ëŒ€ì…ì€ JNodeë§Œ ë„˜ê¸¸ ìˆ˜ ìˆìŒ
 				}
 				else if (curType == JNode::JType::ARR){
-					//ÇÊ¿ä¾øÀ» È®·ü 99
-					//´ëÀÔ½Ã JNode["Key"] = JArr·Î ³Ñ±â´Â°Ç ±İÁöÇÒ°Å±â ¶§¹® ¹«Á¶°Ç ´ëÀÔÀº JNode¸¸ ³Ñ±æ ¼ö ÀÖÀ½
+					//í•„ìš”ì—†ì„ í™•ë¥  99
+					//ëŒ€ì…ì‹œ JNode["Key"] = JArrë¡œ ë„˜ê¸°ëŠ”ê±´ ê¸ˆì§€í• ê±°ê¸° ë•Œë¬¸ ë¬´ì¡°ê±´ ëŒ€ì…ì€ JNodeë§Œ ë„˜ê¸¸ ìˆ˜ ìˆìŒ
 				}
 				else if (curType == JNode::JType::NULLTYPE){
 
@@ -867,12 +867,12 @@ namespace JSON {
 		}
 
 	private:
-		JNode* Root_Node;	//node->P_Type == Obj; ÀÎ°ÅÀÓ objÀÇ Value node ¾Æ´Ô
-						//node->P_Type == Arr; ÀÎ°ÅÀÓ arrÀÇ Value node ¾Æ´Ô
-		JObj* Root_Obj;		//node->P_Type ÀÌ °¡¸®Å°´Â keyÀÇ ObjÀÓ
-		JArr* Root_Arr;		//node->P_Type ÀÌ °¡¸®Å°´Â indexÀÇ ArrÀÓ
+		JNode* Root_Node;	//node->P_Type == Obj; ì¸ê±°ì„ objì˜ Value node ì•„ë‹˜
+						//node->P_Type == Arr; ì¸ê±°ì„ arrì˜ Value node ì•„ë‹˜
+		JObj* Root_Obj;		//node->P_Type ì´ ê°€ë¦¬í‚¤ëŠ” keyì˜ Objì„
+		JArr* Root_Arr;		//node->P_Type ì´ ê°€ë¦¬í‚¤ëŠ” indexì˜ Arrì„
 
-		//operator¿¡¼­ »ç¿ëµÉ Æ÷ÀÎÅÍ º¯¼öµé
+		//operatorì—ì„œ ì‚¬ìš©ë  í¬ì¸í„° ë³€ìˆ˜ë“¤
 		JNode* Cur_Node;
 		JObj* Cur_Obj;
 		JArr* Cur_Arr;
@@ -885,13 +885,13 @@ namespace JSON {
 	public :
 		ValRss() : /*FullVal(128),*/ Key(128), Value(128), curType(JNode::JType::NULLTYPE){}
 		~ValRss(){}
-		//Dynamic::DynamicStr FullVal;		//¾ø¾îµµ µÉµí ¿©±â¼­ °ü¸®ÇÏÁø ¸»ÀÚ
+		//Dynamic::DynamicStr FullVal;		//ì—†ì–´ë„ ë ë“¯ ì—¬ê¸°ì„œ ê´€ë¦¬í•˜ì§„ ë§ì
 		Dynamic::DynamicStr Key;
 		Dynamic::DynamicStr Value;
 		JNode::JType curType;
 	};
 
-	//µ¿Àû ¹è¿­
+	//ë™ì  ë°°ì—´
 	class ValArr{
 	public:
 		ValArr(){
@@ -936,10 +936,10 @@ namespace JSON {
 		int getIdxCnt(){
 			return curCsr;
 		}
-		//»çÀÌÁî ´Ã¸®±â
+		//ì‚¬ì´ì¦ˆ ëŠ˜ë¦¬ê¸°
 		void UpBuf(int _capacity){
 			if (capacity >= _capacity){
-				//±âÁ¸ ¿ë·®º¸´Ù ÀÛ¾Æ¼­ ºÒ°¡´É
+				//ê¸°ì¡´ ìš©ëŸ‰ë³´ë‹¤ ì‘ì•„ì„œ ë¶ˆê°€ëŠ¥
 				return;
 			}
 
@@ -967,12 +967,12 @@ namespace JSON {
 			//capacity = _capacity;
 		}
 
-		//¸Ş¸ğ¸® ¾èÀºº¹»ç·Î ºÒÇÊ¿äÇÑ ¹è¿­ Å©±â ÁÙÀÌ±â
+		//ë©”ëª¨ë¦¬ ì–•ì€ë³µì‚¬ë¡œ ë¶ˆí•„ìš”í•œ ë°°ì—´ í¬ê¸° ì¤„ì´ê¸°
 		void setCmpValArr(){
 			int newCsr = curCsr + 1;
 			if (curCsr == capacity){
 				return;
-				//±»ÀÌ ¾ÈÇØÁàµµ µÉµí
+				//êµ³ì´ ì•ˆí•´ì¤˜ë„ ë ë“¯
 			}
 			ValRss** newVals = new ValRss*[newCsr];
 			InitVals(newVals, newCsr);
@@ -987,10 +987,10 @@ namespace JSON {
 			capacity = newCsr;
 		}
 
-		//¸ÇµÚ¿¡ »ğÀÔ
+		//ë§¨ë’¤ì— ì‚½ì…
 		void setObjRss(Dynamic::DynamicStr* Key, Dynamic::DynamicStr* Value){
 			if (curCsr >= capacity - 1){
-				//¸¶Áö¸· Ä¿¼­ UpBufÇØÁà¾ßÇÔ
+				//ë§ˆì§€ë§‰ ì»¤ì„œ UpBufí•´ì¤˜ì•¼í•¨
 				UpBuf(capacity * 2);
 			}
 			curCsr++;
@@ -1009,14 +1009,14 @@ namespace JSON {
 			////Val[curCsr].FullVal.Set_Str(FullVal->Get_Str());
 			//Val[curCsr].curType = JNode::JType::OBJ;
 
-			//È¤½Ã ¸ğ¸£´Ï±î Á¤¸®ÇØÁÖ´Â ¸Ş¼Òµå »ç¿ë
+			//í˜¹ì‹œ ëª¨ë¥´ë‹ˆê¹Œ ì •ë¦¬í•´ì£¼ëŠ” ë©”ì†Œë“œ ì‚¬ìš©
 			//setTrim();
 		}
 
-		//¹è¿­Àü¿ë °ª ³Ö±â ¹è¿­ÀÏ¶§´Â Å°°ªÀÌ ÇÊ¿ä¾øÀ¸´Ï±î ³ÖÀº°ÅÀÓ
+		//ë°°ì—´ì „ìš© ê°’ ë„£ê¸° ë°°ì—´ì¼ë•ŒëŠ” í‚¤ê°’ì´ í•„ìš”ì—†ìœ¼ë‹ˆê¹Œ ë„£ì€ê±°ì„
 		void setArrRss(Dynamic::DynamicStr* Value){
 			if (curCsr >= capacity - 1){
-				//¸¶Áö¸· Ä¿¼­ UpBufÇØÁà¾ßÇÔ
+				//ë§ˆì§€ë§‰ ì»¤ì„œ UpBufí•´ì¤˜ì•¼í•¨
 				UpBuf(capacity * 2);
 			}
 			curCsr++;
@@ -1032,26 +1032,26 @@ namespace JSON {
 			//Val[curCsr].curType = JNode::JType::ARR;
 		}
 
-		//Å«µû¿ÈÇ¥ Á¦°Å
+		//í°ë”°ì˜´í‘œ ì œê±°
 		void RemoveQuotes(DynamicStr& Str){
 			Str.Str_Trim_Front();
 			//Str.Str_Trim_Front();
 			Str.Str_Trim_Back();
 			//Str.Str_Trim_Back();
-			//ÀÌ°Å µÎ¹ø ÇÏ´Â°Ç »ı°¢ÇØºÁ¾ßÇÒµí?  \"
+			//ì´ê±° ë‘ë²ˆ í•˜ëŠ”ê±´ ìƒê°í•´ë´ì•¼í• ë“¯?  \"
 		}
 
 
 	protected:
-		int capacity;      //¿ë·®   µ¿ÀûÀ¸·Î ´Ã¸±¿¹Á¤
-		int curCsr;         //indexÀÇ Å©±â?
+		int capacity;      //ìš©ëŸ‰   ë™ì ìœ¼ë¡œ ëŠ˜ë¦´ì˜ˆì •
+		int curCsr;         //indexì˜ í¬ê¸°?
 		//ValRss* Val;
 		ValRss** Vals;
-		//FullVal ±»ÀÌ ¸¸µé¾î¾ß ÇÒ±î?
+		//FullVal êµ³ì´ ë§Œë“¤ì–´ì•¼ í• ê¹Œ?
 	};
 
 
-	//¹®ÀÚ¿­ ÆÄ½Ì -> JNode·Î º¯È¯
+	//ë¬¸ìì—´ íŒŒì‹± -> JNodeë¡œ ë³€í™˜
 	class StrParser : public ValArr {
 	public:
 		StrParser(JNode* RootNode, Dynamic::DynamicStr* RootStr, JNode::JType RootNodeType) : ValArr(2),
@@ -1069,7 +1069,7 @@ namespace JSON {
 			KEY,
 			STR,
 			VALUE,
-			IDLE,      //¾ÆÁ÷ ¾î¶°ÇÑ È®Á¤µµ ¾ø´Â »óÅÂ
+			IDLE,      //ì•„ì§ ì–´ë– í•œ í™•ì •ë„ ì—†ëŠ” ìƒíƒœ
 		};
 
 		void ParserMain(){
@@ -1092,58 +1092,58 @@ namespace JSON {
 				STR,
 				M_NUM,
 				P_NUM,
-				OBJ,   //Str·Î ³Ö¾î¹ö¸®±â
-				ARR,   //Str·Î ³Ö¾î¹ö¸®±â
+				OBJ,   //Strë¡œ ë„£ì–´ë²„ë¦¬ê¸°
+				ARR,   //Strë¡œ ë„£ì–´ë²„ë¦¬ê¸°
 				BL,
-				NULLVAL,		//Value°¡ nullÀÏ¶§
-				NULLTYPE,		//ºó°´Ã¼[] È¤Àº ºó¹è¿­[] ÀÏ¶§
+				NULLVAL,		//Valueê°€ nullì¼ë•Œ
+				NULLTYPE,		//ë¹ˆê°ì²´[] í˜¹ì€ ë¹ˆë°°ì—´[] ì¼ë•Œ
 				END
 			};
 
-			ck_word crnt_value = DEF;	//ValueÀÇ Å¸ÀÔÀÓ
+			ck_word crnt_value = DEF;	//Valueì˜ íƒ€ì…ì„
 
-			JObj* obj = nullptr;   //ÀÌ°Å´Â ´Ü¼øÈ÷ µğ¹ö±ë ¿ëµµÀÓ
-			JArr* arr = nullptr;   //ÀÌ°Å´Â ´Ü¼øÈ÷ µğ¹ö±ë ¿ëµµÀÓ
+			JObj* obj = nullptr;   //ì´ê±°ëŠ” ë‹¨ìˆœíˆ ë””ë²„ê¹… ìš©ë„ì„
+			JArr* arr = nullptr;   //ì´ê±°ëŠ” ë‹¨ìˆœíˆ ë””ë²„ê¹… ìš©ë„ì„
 
-			//µğ¹ö±ë ¿ëµµÀÓ ½ÇÁ¦´Â CurNode »ç¿ëÇÒ°ÅÀÓ
+			//ë””ë²„ê¹… ìš©ë„ì„ ì‹¤ì œëŠ” CurNode ì‚¬ìš©í• ê±°ì„
 			if (JsStt == JNode::JType::OBJ){
 				obj = static_cast<JObj*>(CurNode->P_Type);
 				if (Vals->Key.str_last_focus == -1 && Vals->Value.str_last_focus == -1){
-					//ºó°´Ã¼ÀÓ
+					//ë¹ˆê°ì²´ì„
 					crnt_value = NULLTYPE;
 				}
 			}
 			else if (JsStt == JNode::JType::ARR){
 				arr = static_cast<JArr*>(CurNode->P_Type);
 				if (Vals->Value.str_last_focus == -1){
-					//ºó ¹è¿­ÀÓ
+					//ë¹ˆ ë°°ì—´ì„
 					crnt_value = NULLTYPE;
 				}
 			}
 
-			for (;; stack_glb_csr++){//Key´Â Â÷ÇÇ ¹®ÀÚ¿­ÀÌ¶ó ¾ÈÇØµµ µÊ Value¸¸ ÇÏ¸é µÊ				
+			for (;; stack_glb_csr++){//KeyëŠ” ì°¨í”¼ ë¬¸ìì—´ì´ë¼ ì•ˆí•´ë„ ë¨ Valueë§Œ í•˜ë©´ ë¨				
 				PrvWrd = Vals->Value.Char_Get_Str(stack_glb_csr - 1);
 				CurWrd = Vals->Value.Char_Get_Str(stack_glb_csr);
 				NxtWrd = Vals->Value.Char_Get_Str(stack_glb_csr + 1);
 
 
 
-				//½ÃÀÛÆÇº°
+				//ì‹œì‘íŒë³„
 				if (crnt_value == DEF){
 					if (CurWrd == '\"'){
 						crnt_value = STR;
 						stack_glb_csr--;
 					}
-					//À½ÀÇ ¼ıÀÚÀÏ °æ¿ì(À½ÀÇ Á¤¼ö, À½ÀÇ ½Ç¼ö)
+					//ìŒì˜ ìˆ«ìì¼ ê²½ìš°(ìŒì˜ ì •ìˆ˜, ìŒì˜ ì‹¤ìˆ˜)
 					else if (CurWrd == '-' && (NxtWrd >= '0' && NxtWrd <= '9')) {
 						crnt_value = M_NUM;
 					}
-					//¾çÀÇ ¼ıÀÚÀÏ °æ¿ì(¾çÀÇ Á¤¼ö, ¾çÀÇ ½Ç¼ö)
+					//ì–‘ì˜ ìˆ«ìì¼ ê²½ìš°(ì–‘ì˜ ì •ìˆ˜, ì–‘ì˜ ì‹¤ìˆ˜)
 					else if (CurWrd >= '0' && CurWrd <= '9') {
 						crnt_value = P_NUM;
 						stack_glb_csr--;
 					}
-					//boolÀÏ °æ¿ì
+					//boolì¼ ê²½ìš°
 					else if (CurWrd == 't' || CurWrd == 'f') {
 						crnt_value = BL;
 						stack_glb_csr--;
@@ -1167,7 +1167,7 @@ namespace JSON {
 					}
 					continue;
 				}
-				//Á¾·áÆÇº°
+				//ì¢…ë£ŒíŒë³„
 				else if (crnt_value == END){
 					break;
 				}
@@ -1187,22 +1187,22 @@ namespace JSON {
 						}
 						
 
-						//µğ¹ö±ë È®ÀÎ¿ë
+						//ë””ë²„ê¹… í™•ì¸ìš©
 						//JNode* debug = static_cast<JNode*>(obj->Value);
 						//DynamicStr* db = static_cast<DynamicStr*>(debug->P_Type);
-						//µğ¹ö±ë È®ÀÎ¿ë
+						//ë””ë²„ê¹… í™•ì¸ìš©
 
 						crnt_value = END;
 					}
 					else if (crnt_value == M_NUM || crnt_value == P_NUM) {
 						result_int = result_int * 10 + (CurWrd - '0');
 
-						//¼Ò¼öÆÇº°
+						//ì†Œìˆ˜íŒë³„
 						if (NxtWrd == '.') {
 							is_double = true;
 							stack_glb_csr += 2;
 							double decimal_part = 0;
-							int divisor = 10;		//¼Ò¼öÁ¡ µÚ ¼ıÀÚ¸¦ 10À¸·Î ³ª´©´Âµ¥ »ç¿ëÇÒ º¯¼ö
+							int divisor = 10;		//ì†Œìˆ˜ì  ë’¤ ìˆ«ìë¥¼ 10ìœ¼ë¡œ ë‚˜ëˆ„ëŠ”ë° ì‚¬ìš©í•  ë³€ìˆ˜
 							for (;; stack_glb_csr++) {
 								PrvWrd = Vals->Value.Char_Get_Str(stack_glb_csr - 1);
 								CurWrd = Vals->Value.Char_Get_Str(stack_glb_csr);
@@ -1214,13 +1214,13 @@ namespace JSON {
 							result_double = result_int + decimal_part;
 						}
 
-						//Á¾·á ÆÇº°
+						//ì¢…ë£Œ íŒë³„
 						if (NxtWrd == '\0') {
 							if (crnt_value == M_NUM) {
 								result_int = result_int * -1;
 								result_double = result_double * -1;
 							}
-							//°ª ³Ö¾îÁÖ±â
+							//ê°’ ë„£ì–´ì£¼ê¸°
 							if (obj != nullptr) {
 								char* chKeys = Vals->Key.Get_Str();
 								(*CurNode)[static_cast<const char*>(chKeys)] = is_double ? result_double : result_int;
@@ -1236,10 +1236,10 @@ namespace JSON {
 								return;
 							}
 
-							//µğ¹ö±ë¿ë
+							//ë””ë²„ê¹…ìš©
 							//JNode* debug = static_cast<JNode*>(obj->next->Value);
 							//double* db = static_cast<double*>(debug->P_Type);
-							//µğ¹ö±ë¿ë
+							//ë””ë²„ê¹…ìš©
 
 							crnt_value = END;
 						}
@@ -1249,8 +1249,8 @@ namespace JSON {
 						char second_word = Vals->Value.Char_Get_Str(1);
 						char third_word = Vals->Value.Char_Get_Str(2);
 						char four_word = Vals->Value.Char_Get_Str(3);
-						char five_word = Vals->Value.Char_Get_Str(4);	//true¸é '\0'
-						char six_word = Vals->Value.Char_Get_Str(5);	//false¸é '\0'
+						char five_word = Vals->Value.Char_Get_Str(4);	//trueë©´ '\0'
+						char six_word = Vals->Value.Char_Get_Str(5);	//falseë©´ '\0'
 						if (first_word == 't') {
 							if (second_word == 'r' &&
 								third_word == 'u' &&
@@ -1267,9 +1267,9 @@ namespace JSON {
 							}
 						}
 
-						//Á¾·áÆÇº°
+						//ì¢…ë£ŒíŒë³„
 						if (five_word == '\0' || six_word == '\0') {
-							//°ª ³Ö¾îÁÖ±â
+							//ê°’ ë„£ì–´ì£¼ê¸°
 							if (obj != nullptr) {
 								char* chKeys = Vals->Key.Get_Str();
 								(*CurNode)[static_cast<const char*>(chKeys)] = result_bool;
@@ -1281,10 +1281,10 @@ namespace JSON {
 							else {
 								return;
 							}
-							//µğ¹ö±ë¿ë
+							//ë””ë²„ê¹…ìš©
 							//JNode* debug = static_cast<JNode*>(obj->next->Value);
 							//bool* db = static_cast<bool*>(debug->P_Type);
-							//µğ¹ö±ë¿ë
+							//ë””ë²„ê¹…ìš©
 							crnt_value = END;
 						}
 					}
@@ -1300,7 +1300,7 @@ namespace JSON {
 							int arrCnt = CurNode->ArrCnt + 1;
 							(*CurNode)[arrCnt] = newObjNode;
 						}						
-						//Á¾·áÆÇº°
+						//ì¢…ë£ŒíŒë³„
 						crnt_value = END;
 					}
 					else if (crnt_value == ARR) {
@@ -1315,11 +1315,11 @@ namespace JSON {
 							int arrCnt = CurNode->ArrCnt + 1;
 							(*CurNode)[arrCnt] = newArrNode;
 						}
-						//Á¾·áÆÇº°
+						//ì¢…ë£ŒíŒë³„
 						crnt_value = END;
 					}
 					else if (crnt_value == NULLVAL){
-						//Value°¡ nullÀÏ¶§
+						//Valueê°€ nullì¼ë•Œ
 						char* chKeys = Vals->Key.Get_Str();
 						if (obj != nullptr){
 							(*CurNode)[static_cast<const char*>(chKeys)] = JNode::JType::NULLTYPE;
@@ -1332,17 +1332,17 @@ namespace JSON {
 					}
 					else if (crnt_value == NULLTYPE){
 						
-						//ºó °´Ã¼
+						//ë¹ˆ ê°ì²´
 						//char* chKeys = Vals->Key.Get_Str();
 						if (obj != nullptr){
 							//(*CurNode)[static_cast<const char*>(chKeys)] = JNode::JType::NULLTYPE;
 						}
-						//ºó¹è¿­
+						//ë¹ˆë°°ì—´
 						if (arr != nullptr){
 							//int arrCnt = CurNode->ArrCnt + 1;
 							//(*CurNode)[arrCnt] = JNode::JType::NULLTYPE;
 						}
-						//ºó°´Ã¼ ºó¹è¿­
+						//ë¹ˆê°ì²´ ë¹ˆë°°ì—´
 						crnt_value = END;
 					}
 				}
@@ -1353,18 +1353,18 @@ namespace JSON {
 
 		// FullVal - (Key:Value), FullVal - (Value)
 		void ValueParser(JNode::JType curType){
-			//¹è¿­ Á¤¸® ÇÑ¹ø¸¸ ÇÏ±â
+			//ë°°ì—´ ì •ë¦¬ í•œë²ˆë§Œ í•˜ê¸°
 			setCmpValArr();
 
 			RootNode->delType();
 
-			//¹è¿­ÀÇ °³¼ö¸¦ ÆÄ¾ÇÇÏ±â
+			//ë°°ì—´ì˜ ê°œìˆ˜ë¥¼ íŒŒì•…í•˜ê¸°
 			int ValIdxCnt = getIdxCnt();
 
-			//°´Ã¼ Å¸ÀÔÀÏ¶§
+			//ê°ì²´ íƒ€ì…ì¼ë•Œ
 			if (curType == JNode::JType::OBJ)
 				*RootNode = JNode::JType::OBJ;
-			//¹è¿­Å¸ÀÔÀÏ¶§
+			//ë°°ì—´íƒ€ì…ì¼ë•Œ
 			else if (curType == JNode::JType::ARR)
 				*RootNode = JNode::JType::ARR;
 
@@ -1382,9 +1382,9 @@ namespace JSON {
 
 
 		void Parser() {
-			short BrcCnt = 0;      //'{'ÀÇ °³¼ö ÃßÀû
-			short BrkCnt = 0;      //'['ÀÇ °³¼ö ÃßÀû
-			bool qtStt = false;      //'"'»óÅÂ ÃßÀû
+			short BrcCnt = 0;      //'{'ì˜ ê°œìˆ˜ ì¶”ì 
+			short BrkCnt = 0;      //'['ì˜ ê°œìˆ˜ ì¶”ì 
+			bool qtStt = false;      //'"'ìƒíƒœ ì¶”ì 
 
 			FullVal = new DynamicStr(128);
 			Key = new DynamicStr(128);
@@ -1418,8 +1418,8 @@ namespace JSON {
 				}
 
 
-				if (curType == JNode::JType::OBJ) {//Key¿Í Value¸¸ »ı°¢ÇÏ±â
-					if (CurWrd == ',' && (BrcCnt == 1 && BrkCnt == 0) && (curWrdType != WrdInfo::KEY) && isValStr) {//ÀÌ¶§¸¸ FullVal°¡ Ãß°¡µÊ
+				if (curType == JNode::JType::OBJ) {//Keyì™€ Valueë§Œ ìƒê°í•˜ê¸°
+					if (CurWrd == ',' && (BrcCnt == 1 && BrkCnt == 0) && (curWrdType != WrdInfo::KEY) && isValStr) {//ì´ë•Œë§Œ FullValê°€ ì¶”ê°€ë¨
 						//FullVal->Append_Char(&CurWrd);
 
 
@@ -1437,7 +1437,7 @@ namespace JSON {
 					}
 
 
-					if (CurWrd == '}' && (BrcCnt == 0 && BrkCnt == 0)) {//Á¾·á ÆÇº°
+					if (CurWrd == '}' && (BrcCnt == 0 && BrkCnt == 0)) {//ì¢…ë£Œ íŒë³„
 						setObjRss(Key, Value);
 						FullVal->Append_Char(&CurWrd);
 
@@ -1446,40 +1446,40 @@ namespace JSON {
 
 
 
-						//¿©±â¼­ °èÃş ±¸Á¶¸¦ ÆÄ½ÌÇÏ±â À§ÇÑ ¸Ş¼Òµå°¡ ÇÊ¿äÇÒ°Å °°À½ 
+						//ì—¬ê¸°ì„œ ê³„ì¸µ êµ¬ì¡°ë¥¼ íŒŒì‹±í•˜ê¸° ìœ„í•œ ë©”ì†Œë“œê°€ í•„ìš”í• ê±° ê°™ìŒ 
 						break;
 					}
 
 
-					//FullVal Ã³¸®
+					//FullVal ì²˜ë¦¬
 					FullVal->Append_Char(&CurWrd);
 
-					//Key Ã£±â
+					//Key ì°¾ê¸°
 					if (curWrdType == WrdInfo::IDLE && CurWrd == '"' && qtStt == true) {
 						curWrdType = WrdInfo::KEY;
 					}
 					else if (curWrdType == WrdInfo::KEY) {
-						if (CurWrd == '"' && qtStt == false) {   //Key³¡
+						if (CurWrd == '"' && qtStt == false) {   //Keyë
 							curWrdType = WrdInfo::IDLE;
 						}
 						else
 							Key->Append_Char(&CurWrd);
 					}
 
-					//Value Ã£±â
+					//Value ì°¾ê¸°
 					else if (curWrdType == WrdInfo::IDLE && CurWrd == ':') {
 						curWrdType = WrdInfo::VALUE;
 					}
 					else if (curWrdType == WrdInfo::VALUE) {
 						if (CurWrd == '\"'){
-							isValStr = !isValStr;      //true °¡ µÇ¸é ¹®Á¦°¡ ¾ø´Â°ÅÀÓ
+							isValStr = !isValStr;      //true ê°€ ë˜ë©´ ë¬¸ì œê°€ ì—†ëŠ”ê±°ì„
 						}
 						Value->Append_Char(&CurWrd);
 					}
 
 				}
-				else if (curType == JNode::JType::ARR) {//Value¸¸ »ı°¢ÇÏ±â
-					if (CurWrd == ',' && (BrkCnt == 1 && BrcCnt == 0) && isValStr) { //ÀÌ¶§¸¸ FullVal°¡ Ãß°¡µÊ
+				else if (curType == JNode::JType::ARR) {//Valueë§Œ ìƒê°í•˜ê¸°
+					if (CurWrd == ',' && (BrkCnt == 1 && BrcCnt == 0) && isValStr) { //ì´ë•Œë§Œ FullValê°€ ì¶”ê°€ë¨
 						//setArrRss();
 
 						setArrRss(Value);
@@ -1494,7 +1494,7 @@ namespace JSON {
 						curWrdType = WrdInfo::IDLE;
 					}
 
-					if (CurWrd == ']' && (BrkCnt == 0 && BrcCnt == 0)) { //Á¾·áÆÇº°
+					if (CurWrd == ']' && (BrkCnt == 0 && BrcCnt == 0)) { //ì¢…ë£ŒíŒë³„
 						setArrRss(Value);
 						FullVal->Append_Char(&CurWrd);
 
@@ -1503,16 +1503,16 @@ namespace JSON {
 					}
 
 
-					//FullVal Ã³¸®
+					//FullVal ì²˜ë¦¬
 					FullVal->Append_Char(&CurWrd);
 
-					//Value Ã³¸®
+					//Value ì²˜ë¦¬
 					if (curWrdType == WrdInfo::IDLE){
 						curWrdType = WrdInfo::VALUE;
 					}
 					else if (curWrdType == WrdInfo::VALUE){
 						if (CurWrd == '\"'){
-							isValStr = !isValStr;      //true °¡ µÇ¸é ¹®Á¦°¡ ¾ø´Â°ÅÀÓ
+							isValStr = !isValStr;      //true ê°€ ë˜ë©´ ë¬¸ì œê°€ ì—†ëŠ”ê±°ì„
 						}
 						Value->Append_Char(&CurWrd);
 					}
@@ -1529,15 +1529,15 @@ namespace JSON {
 
 
 	private:
-		JNode* RootNode;      //ÀÚÃ¼ÀûÀ¸·Î Àı´ë·Î º¯ÁúµÇ¾î¼± ¾ÈµÊ ³»ºÎ ±¸Á¶¸¦ ¹Ù²Ù´Â°Ç °¡´ÉÇÏÁö¸¸ ÀÌ¹Ì ÀÚÃ¼ ÂüÁ¶°¡ µÈ»óÅÂÀÓ
-		DynamicStr* RootStr;      //º¯ÁúµÇµµ ÀÇ¹Ì´Â ¾øÀ½ RootNode°¡ Á¦ÀÏ Áß¿äÇÑ°Å¶ó
+		JNode* RootNode;      //ìì²´ì ìœ¼ë¡œ ì ˆëŒ€ë¡œ ë³€ì§ˆë˜ì–´ì„  ì•ˆë¨ ë‚´ë¶€ êµ¬ì¡°ë¥¼ ë°”ê¾¸ëŠ”ê±´ ê°€ëŠ¥í•˜ì§€ë§Œ ì´ë¯¸ ìì²´ ì°¸ì¡°ê°€ ëœìƒíƒœì„
+		DynamicStr* RootStr;      //ë³€ì§ˆë˜ë„ ì˜ë¯¸ëŠ” ì—†ìŒ RootNodeê°€ ì œì¼ ì¤‘ìš”í•œê±°ë¼
 
-		DynamicStr* FullVal;      //¹ë·ù»Ì±â À§ÇÑ ¹®ÀÚµé   µğ¹ö±ë¿ëÀÌ¶ó°í »ı°¢ÇÏ°í ÃßÈÄ Áö¿ï°Í
+		DynamicStr* FullVal;      //ë°¸ë¥˜ë½‘ê¸° ìœ„í•œ ë¬¸ìë“¤   ë””ë²„ê¹…ìš©ì´ë¼ê³  ìƒê°í•˜ê³  ì¶”í›„ ì§€ìš¸ê²ƒ
 		DynamicStr* Key;
 		DynamicStr* Value;
 
 		JNode::JType RootNodeType;
-		int gCsr;         //¹®ÀÚ ÄÁÆ®·ÑÀ» À§ÇÑ °ªµé
+		int gCsr;         //ë¬¸ì ì»¨íŠ¸ë¡¤ì„ ìœ„í•œ ê°’ë“¤
 		char CurWrd;      //
 		char NxtWrd;      //
 		char PrvWrd;      //
@@ -1555,14 +1555,14 @@ namespace JSON {
 
 
 
-	//Ini ÆÄÀÏ (¼½¼Ç, Å°, ¹ë·ù 3°¡Áö ÇüÅÂ·Î Á¸ÀçÇÏ¸ç 3 ÇüÅÂ ¸ğµÎ ¹®ÀÚ¿­ÀÓ)
+	//Ini íŒŒì¼ (ì„¹ì…˜, í‚¤, ë°¸ë¥˜ 3ê°€ì§€ í˜•íƒœë¡œ ì¡´ì¬í•˜ë©° 3 í˜•íƒœ ëª¨ë‘ ë¬¸ìì—´ì„)
 	//[Section]
 	//Key = Value
 
-	//JsonÀÇ ÇüÅÂ·Î´Â
+	//Jsonì˜ í˜•íƒœë¡œëŠ”
 	//{Section : {"Key" : "Value"} }
 
-	//JNode ÆÄ½Ì -> JsonÀ¸·Î º¯È¯
+	//JNode íŒŒì‹± -> Jsonìœ¼ë¡œ ë³€í™˜
 	class JsonMaker {
 	public:
 		JsonMaker() {}
@@ -1572,7 +1572,7 @@ namespace JSON {
 
 	};
 
-	//Ini ÆÄÀÏ ÆÄ½Ì -> JNode¸¦ È°¿ëÇØ Dict ±¸Á¶·Î º¯È¯ {"SECTION" : {"KEY" : VALUE }}
+	//Ini íŒŒì¼ íŒŒì‹± -> JNodeë¥¼ í™œìš©í•´ Dict êµ¬ì¡°ë¡œ ë³€í™˜ {"SECTION" : {"KEY" : VALUE }}
 	class IniParser{
 	protected:
 		DynamicStr* IniStr;
@@ -1603,18 +1603,18 @@ namespace JSON {
 
 	
 		virtual void Parse(){
-			short BrkCnt = 0;       // '['ÀÇ °³¼ö ÃßÀû
-			bool isKey = false;		// KEY= ÀÓÀ» È®ÀÎ Section³»ºÎ¿¡ '\n'´ÙÀ½ÀÌ¸é ¹«Á¶°Ç true
-			bool isSecArea = false;		// Æ¯Á¤ ¿µ¿ªÀÇ SectionÀÓÀ» È®ÀÎ ÀÌ¸¦ ÅëÇØ Å°ÀÎÁö ¹ë·ùÀÎÁö ±¸ºĞ°¡´É
+			short BrkCnt = 0;       // '['ì˜ ê°œìˆ˜ ì¶”ì 
+			bool isKey = false;		// KEY= ì„ì„ í™•ì¸ Sectionë‚´ë¶€ì— '\n'ë‹¤ìŒì´ë©´ ë¬´ì¡°ê±´ true
+			bool isSecArea = false;		// íŠ¹ì • ì˜ì—­ì˜ Sectionì„ì„ í™•ì¸ ì´ë¥¼ í†µí•´ í‚¤ì¸ì§€ ë°¸ë¥˜ì¸ì§€ êµ¬ë¶„ê°€ëŠ¥
 			bool bfrVal = false;
-			bool isVal = false;		// ValueÀÓÀ» È®ÀÎ
+			bool isVal = false;		// Valueì„ì„ í™•ì¸
 
 			enum IniStt{
 				DFT,
 				SEC,
 				KEY,
 				VAL,
-				CMT,	//ÁÖ¼®
+				CMT,	//ì£¼ì„
 			};
 
 			DynamicStr* Section = new DynamicStr(128);
@@ -1647,14 +1647,14 @@ namespace JSON {
 					break;
 				}
 
-				//Status È®ÀÎ
+				//Status í™•ì¸
 				if (stt == DFT){
 					if (CurChar == '['){
 						if (isSecArea){
 							isSecArea = false;
 							isKey = false;
 							isVal = false;
-							//Àü¿¡ ÀÖ´ø°Å ³Ö¾îÁÖ±â
+							//ì „ì— ìˆë˜ê±° ë„£ì–´ì£¼ê¸°
 							char* Sect = Section->Get_Str();
 							(*IniNode)[static_cast<const char*>(Sect)] = KeyVal;
 
@@ -1728,7 +1728,7 @@ namespace JSON {
 							
 							(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
 
-							//debug ¿ë
+							//debug ìš©
 							debugObj = static_cast<JObj*>(KeyVal->P_Type);
 
 							delete Key;
@@ -1798,7 +1798,7 @@ namespace JSON {
 			if (IniStr != nullptr){
 				Parse();
 			}
-			printf("ÆÄÀÏÀÌ ¾ø°Å³ª ÀĞ¾î¿Â ¹®ÀÚ¿­ÀÌ ¾ø½À´Ï´Ù.\n");
+			printf("íŒŒì¼ì´ ì—†ê±°ë‚˜ ì½ì–´ì˜¨ ë¬¸ìì—´ì´ ì—†ìŠµë‹ˆë‹¤.\n");
 		}
 
 		JNode* getNode(){
@@ -1811,7 +1811,7 @@ namespace JSON {
 
 	};
 
-	//Error List TSHOOT Àü¿ë ErrorList Ini Parser
+	//Error List TSHOOT ì „ìš© ErrorList Ini Parser
 	class ErrLst_Ini : public IniParser{
 		ErrLst_Ini(){}
 
@@ -1822,18 +1822,18 @@ namespace JSON {
 		~ErrLst_Ini(){}
 
 		virtual void Parse(){
-			short BrkCnt = 0;       // '['ÀÇ °³¼ö ÃßÀû
-			bool isKey = false;		// KEY= ÀÓÀ» È®ÀÎ Section³»ºÎ¿¡ '\n'´ÙÀ½ÀÌ¸é ¹«Á¶°Ç true
-			bool isSecArea = false;		// Æ¯Á¤ ¿µ¿ªÀÇ SectionÀÓÀ» È®ÀÎ ÀÌ¸¦ ÅëÇØ Å°ÀÎÁö ¹ë·ùÀÎÁö ±¸ºĞ°¡´É
+			short BrkCnt = 0;       // '['ì˜ ê°œìˆ˜ ì¶”ì 
+			bool isKey = false;		// KEY= ì„ì„ í™•ì¸ Sectionë‚´ë¶€ì— '\n'ë‹¤ìŒì´ë©´ ë¬´ì¡°ê±´ true
+			bool isSecArea = false;		// íŠ¹ì • ì˜ì—­ì˜ Sectionì„ì„ í™•ì¸ ì´ë¥¼ í†µí•´ í‚¤ì¸ì§€ ë°¸ë¥˜ì¸ì§€ êµ¬ë¶„ê°€ëŠ¥
 			bool bfrVal = false;
-			bool isVal = false;		// ValueÀÓÀ» È®ÀÎ
+			bool isVal = false;		// Valueì„ì„ í™•ì¸
 
 			enum IniStt{
 				DFT,
 				SEC,
 				KEY,
 				VAL,
-				CMT,	//ÁÖ¼®
+				CMT,	//ì£¼ì„
 			};
 
 			DynamicStr* Section = new DynamicStr(128);
@@ -1866,14 +1866,14 @@ namespace JSON {
 					break;
 				}
 
-				//Status È®ÀÎ
+				//Status í™•ì¸
 				if (stt == DFT){
 					if (CurChar == '['){
 						if (isSecArea){
 							isSecArea = false;
 							isKey = false;
 							isVal = false;
-							//Àü¿¡ ÀÖ´ø°Å ³Ö¾îÁÖ±â
+							//ì „ì— ìˆë˜ê±° ë„£ì–´ì£¼ê¸°
 							char* Sect = Section->Get_Str();
 							(*IniNode)[static_cast<const char*>(Sect)] = KeyVal;
 
@@ -1958,7 +1958,7 @@ namespace JSON {
 
 						(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
 
-						//debug ¿ë
+						//debug ìš©
 						debugObj = static_cast<JObj*>(KeyVal->P_Type);
 
 						delete Key;
