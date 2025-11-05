@@ -1633,15 +1633,33 @@ namespace JSON {
 				NxtChar = IniStr->Char_Get_Str(++glb_csr);
 
 				if (CurChar == EOF){
+					if (isSecArea){
+						isSecArea = false;
+						isKey = false;
+						isVal = false;
+						//전에 있던거 넣어주기
+						char* Sect = Section->Get_Str();
+
+						(*IniNode)[static_cast<const char*>(Sect)] = KeyVal;
+
+
+						//debug
+						debugObj = static_cast<JObj*>(IniNode->P_Type);
+						JObj* debugObjVal = static_cast<JObj*>(debugObj->Value->P_Type);
+					}
+
 					debugObj = static_cast<JObj*>(IniNode->P_Type);
 					if (Section != nullptr){
 						delete Section;
 					}
-					else if (Key != nullptr){
+					if (Key != nullptr){
 						delete Key;
 					}
-					else if (Val != nullptr){
+					if (Val != nullptr){
 						delete Val;
+					}
+					if (KeyVal != nullptr){
+						delete KeyVal;
 					}
 					ParseFin = true;
 					break;
@@ -1662,7 +1680,6 @@ namespace JSON {
 							debugObj = static_cast<JObj*>(IniNode->P_Type);
 							JObj* debugObjVal = static_cast<JObj*>(debugObj->Value->P_Type);
 							
-
 							delete Section;
 							Section = new DynamicStr(128);
 						}
@@ -1692,6 +1709,7 @@ namespace JSON {
 					else if (isSecArea){
 						glb_csr--;
 						stt = KEY;
+						continue;
 					}
 				}
 
@@ -1813,6 +1831,7 @@ namespace JSON {
 
 	//Error List TSHOOT 전용 ErrorList Ini Parser
 	class ErrLst_Ini : public IniParser{
+	public:
 		ErrLst_Ini(){}
 
 		ErrLst_Ini(const char* Str) : IniParser(Str){}
@@ -1823,24 +1842,31 @@ namespace JSON {
 
 		virtual void Parse(){
 			short BrkCnt = 0;       // '['의 개수 추적
-			bool isKey = false;		// KEY= 임을 확인 Section내부에 '\n'다음이면 무조건 true
-			bool isSecArea = false;		// 특정 영역의 Section임을 확인 이를 통해 키인지 밸류인지 구분가능
+			bool isKey = false;      // KEY= 임을 확인 Section내부에 '\n'다음이면 무조건 true
+			bool isSecArea = false;      // 특정 영역의 Section임을 확인 이를 통해 키인지 밸류인지 구분가능
 			bool bfrVal = false;
-			bool isVal = false;		// Value임을 확인
+			bool isVal = false;      // Value임을 확인
 
 			enum IniStt{
 				DFT,
 				SEC,
 				KEY,
 				VAL,
-				CMT,	//주석
+				CMT,   //주석
+				TSH,   //TShoot 전용(ErrLst전용)
 			};
 
 			DynamicStr* Section = new DynamicStr(128);
 			DynamicStr* Key = new DynamicStr(128);
 			DynamicStr* Val = new DynamicStr(128);
+			DynamicStr* Tsh = new DynamicStr(128);
+
+			bool isTsh = false;   //Tsh값 유무체크
+			short TshCnt = -1;	  //Tsh 배열 크기 체크
 
 			JNode* KeyVal = new JNode();
+			JNode* TshVal = new JNode();
+			
 			JObj* debugObj;
 
 
@@ -1852,15 +1878,31 @@ namespace JSON {
 				NxtChar = IniStr->Char_Get_Str(++glb_csr);
 
 				if (CurChar == EOF){
+					if (isSecArea){
+						isSecArea = false;
+						isKey = false;
+						isVal = false;
+						//전에 있던거 넣어주기
+						char* Sect = Section->Get_Str();
+						(*IniNode)[static_cast<const char*>(Sect)] = KeyVal;
+
+						//debug
+						debugObj = static_cast<JObj*>(IniNode->P_Type);
+						JObj* debugObjVal = static_cast<JObj*>(debugObj->Value->P_Type);
+					}
+
 					debugObj = static_cast<JObj*>(IniNode->P_Type);
 					if (Section != nullptr){
 						delete Section;
 					}
-					else if (Key != nullptr){
+					if (Key != nullptr){
 						delete Key;
 					}
-					else if (Val != nullptr){
+					if (Val != nullptr){
 						delete Val;
+					}
+					if (KeyVal != nullptr){
+						delete KeyVal;
 					}
 					ParseFin = true;
 					break;
@@ -1875,8 +1917,9 @@ namespace JSON {
 							isVal = false;
 							//전에 있던거 넣어주기
 							char* Sect = Section->Get_Str();
-							(*IniNode)[static_cast<const char*>(Sect)] = KeyVal;
 
+							(*IniNode)[static_cast<const char*>(Sect)] = KeyVal;
+							
 							//debug
 							debugObj = static_cast<JObj*>(IniNode->P_Type);
 							JObj* debugObjVal = static_cast<JObj*>(debugObj->Value->P_Type);
@@ -1897,8 +1940,14 @@ namespace JSON {
 						continue;
 					}
 					else if (CurChar == '='){
-						isVal = true;
-						stt = VAL;
+						if (Key->StrCmp("TSHOOT")){
+							stt = TSH;
+							if (NxtChar == '\n') glb_csr++;
+						}
+						else{
+							isVal = true;
+							stt = VAL;
+						}
 						continue;
 					}
 					else if (CurChar == '#' || CurChar == ';'){
@@ -1911,71 +1960,137 @@ namespace JSON {
 					else if (isSecArea){
 						glb_csr--;
 						stt = KEY;
+						continue;
 					}
 				}
 
 				switch (stt){
-				case SEC:
-				{
-					Section->Append_Char(&CurChar);
-					if (NxtChar == ']'){
-						Section->Str_Trim_All();
-						stt = DFT;
+					case SEC:
+					{
+						Section->Append_Char(&CurChar);
+						if (NxtChar == ']'){
+							Section->Str_Trim_All();
+							stt = DFT;
+						}
+						break;
 					}
-					break;
-				}
-				case KEY:
-				{
-					Key->Append_Char(&CurChar);
-					if (NxtChar == '='){
-						Key->Str_Trim_All();
+					case KEY:
+					{
+						Key->Append_Char(&CurChar);
+						if (NxtChar == '='){
+							Key->Str_Trim_All();
+							stt = DFT;
+							isKey = false;
+						}
+						break;
+					}
+					case VAL:
+					{
+						Val->Append_Char(&CurChar);
+						if (NxtChar == '\n'){
+							Val->Str_Trim_All();
+							stt = DFT;
+							isVal = false;
 
-						if (Key->StrCmp(Key->Get_Str(), "TSHOOT")){
-							while (1){
-								PrvChar = IniStr->Char_Get_Str(glb_csr - 1);
-								CurChar = IniStr->Char_Get_Str(glb_csr);
-								NxtChar = IniStr->Char_Get_Str(++glb_csr);
+							char* SectKey = Key->Get_Str();
+							char* SectVal = Val->Get_Str();
 
+							(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
+
+							//debug 용
+							debugObj = static_cast<JObj*>(KeyVal->P_Type);
+
+							delete Key;
+							delete Val;
+
+							Key = new DynamicStr(128);
+							Val = new DynamicStr(128);
+						}
+						break;
+					}
+					case CMT:
+					{
+						if (CurChar == '\n'){
+							stt = DFT;
+						}
+						break;
+					}
+					case TSH:
+					{
+						if (NxtChar == '['){
+							//glb_csr--;
+							stt = DFT;
+							TshCnt = -1;
+							char* SectKey = Key->Get_Str();
+
+							//debug용
+							JArr* TshArr = static_cast<JArr*>(TshVal->P_Type);
+
+							(*KeyVal)[static_cast<const char*>(SectKey)] = TshVal;	//[]배열임
+
+							//debug 용
+							debugObj = static_cast<JObj*>(KeyVal->P_Type);
+							JArr* dd = static_cast<JArr*>(debugObj->next->next->Value->P_Type);
+
+							delete Key;
+
+							Key = new DynamicStr(128);
+							continue;
+						}
+						else if (NxtChar == EOF){
+							stt = DFT;
+							TshCnt = -1;
+							char* SectKey = Key->Get_Str();
+
+							Tsh->Str_Trim_All();
+							(*TshVal)[TshCnt] = Tsh->Get_Str();
+							isTsh = false;
+
+							delete Tsh;
+							Tsh = new DynamicStr(128);
+
+							(*KeyVal)[static_cast<const char*>(SectKey)] = TshVal;	//[]배열임
+
+							//debug 용
+							debugObj = static_cast<JObj*>(KeyVal->P_Type);
+
+							delete Key;
+
+							Key = new DynamicStr(128);
+							continue;
+						}
+
+						//Tshoot 값이 있는지 판별
+						if (CurChar != '\n' && CurChar != ' ' && CurChar != '\t'){
+							if (!isTsh){
+								isTsh = true;
+								TshCnt++;
+							}
+						}
+						
+						//Tshoot 값이 있는지 확인 했으니 값 넣기
+						if(isTsh){
+							Tsh->Append_Char(&CurChar);
+
+							if (NxtChar == '\n'){//값 끝났음을 의미
+								Tsh->Str_Trim_All();
+								(*TshVal)[TshCnt] = Tsh->Get_Str();
+
+								//debug
+								JArr* arr = static_cast<JArr*>(TshVal->P_Type);
+								int num = 10;
+
+								isTsh = false;
+
+								delete Tsh;
+								Tsh = new DynamicStr(128);
 
 							}
 						}
 
-						stt = DFT;
-						isKey = false;
+
+						break;
 					}
-					break;
-				}
-				case VAL:
-				{
-					Val->Append_Char(&CurChar);
-					if (NxtChar == '\n'){
-						Val->Str_Trim_All();
-						stt = DFT;
-						isVal = false;
-
-						char* SectKey = Key->Get_Str();
-						char* SectVal = Val->Get_Str();
-
-						(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
-
-						//debug 용
-						debugObj = static_cast<JObj*>(KeyVal->P_Type);
-
-						delete Key;
-						delete Val;
-
-						Key = new DynamicStr(128);
-						Val = new DynamicStr(128);
-					}
-					break;
-				}
-				case CMT:
-				{
-					if (CurChar == '\n'){
-						stt = DFT;
-					}
-					break;
-				}
 				}
 			}
 
