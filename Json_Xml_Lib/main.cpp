@@ -276,15 +276,32 @@ void Test_Json_Func(){
 
 
 int main() {
+	const char* OrgPath = "Ini/Origin.ini";
+	const char* TshPath = "Ini/Tshoot.ini";
 
-	//test_str();
+	FILE* oFile;
+	FILE* tFile;
 
-    //Test_Json();
+	fopen_s(&oFile, OrgPath, "r");
+	fopen_s(&tFile, TshPath, "r");
+
+	IniParser OrgParse(oFile);
+	OrgParse.ParseMain();
+	JNode* OrgNode = OrgParse.getNode();
+	ErrLst_Ini TshParse(tFile);
+	TshParse.ParseMain();
+	JNode* TshNode = TshParse.getNode();
+
+	printf("Origin Ini\n");
+	PrtNode(*OrgNode);
+
+	printf("\n\n\n\n\n");
 	
-	Test_Json_Func();
+	printf("Tsh Ini\n");
+	PrtNode(*TshNode);
 
-
-	char c = 'a';
+	fclose(oFile);
+	fclose(tFile);
 
 	while (1){
 		fflush(stdin);
