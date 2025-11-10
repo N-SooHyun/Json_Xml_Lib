@@ -1567,3 +1567,5 @@ namespace JSON {
 using namespace JSON;
 
 void PrtNode(JNode& node);
+
+void PrtNode_File(FILE* fp, JNode& node);

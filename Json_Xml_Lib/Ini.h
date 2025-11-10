@@ -32,6 +32,177 @@ protected:
 		ParseFin = false;
 	}
 
+	void AsciiToVal(JNode* KeyValNode, DynamicStr* KeyStr, DynamicStr* ValStr){
+		//ValStr 기준으로 가는거임 이걸 기준으로 실값인지 아닌지 판단해서 넣어주기
+		//숫자, 논리, 문자열만 파싱해주고 {} []타입은 그냥 Node에 넣어주면 알아서 해줄거임
+		int RstInt = 0;
+		double RstDbl = 0.0;
+		bool IsDbl = false;      //false -> int, true -> double
+		bool RstBl = false;
+
+		int ValStrCsr = 0;	//Value 문자열용 커서
+
+		enum CkWrd{
+			DFT,
+			STR,
+			M_NUM,
+			P_NUM,
+			OBJ,   //Str로 넣어버리기
+			ARR,   //Str로 넣어버리기
+			BL,
+			END
+		};
+
+		CkWrd CrntVal = DFT;
+		char PrvWrd, CurWrd, NxtWrd = ' ';
+		char* SectKey = KeyStr->Get_Str();
+
+
+		for (;; ValStrCsr++){
+			PrvWrd = ValStr->Char_Get_Str(ValStrCsr - 1);
+			CurWrd = ValStr->Char_Get_Str(ValStrCsr);
+			NxtWrd = ValStr->Char_Get_Str(ValStrCsr + 1);
+
+			//시작 판별
+			if (CrntVal == DFT){
+				//음의 숫자일 경우(음의 정수, 음의 실수)
+				if (CurWrd == '-' && (NxtWrd >= '0' && NxtWrd <= '9')) {
+					CrntVal = M_NUM;
+				}
+				//양의 숫자일 경우(양의 정수, 양의 실수)
+				else if (CurWrd >= '0' && CurWrd <= '9') {
+					CrntVal = P_NUM;
+					ValStrCsr--;
+				}
+				//bool일 경우
+				else if (CurWrd == 't' || CurWrd == 'f') {
+					CrntVal = BL;
+					ValStrCsr--;
+				}
+				else if (CurWrd == '{'){
+					if (ValStr->Char_Get_Str(ValStr->current_size - 1) == '}'){
+						CrntVal = OBJ;
+						ValStrCsr--;
+					}
+				}
+				else if (CurWrd == '['){
+					if (ValStr->Char_Get_Str(ValStr->current_size - 1) == ']'){
+						CrntVal = ARR;
+						ValStrCsr--;
+					}
+				}
+				else{	//위에거 제외하면 그냥 문자열로 처리하셈 귀찮으니까
+					CrntVal = STR;
+					ValStrCsr--;
+				}
+			continue;
+			}
+			//종료 판별
+			else if (CrntVal == END){
+				break;
+			}
+			//값 처리
+			else{
+				switch (CrntVal){
+				case STR:
+				case OBJ:
+				case ARR:
+					
+					//OBJ든 ARR이든 그냥 문자열로 JNode에 넣어주면 알아서 객체라고 판단해서 결과 내보내줄거임
+					(*KeyValNode)[static_cast<const char*>(SectKey)] = ValStr->Get_Str();
+					CrntVal = END;
+					break;
+				case M_NUM: 
+				case P_NUM:
+				{
+					if (CurWrd < '0' || CurWrd > '9') {
+						//값자기 값이  123T 이러면 문자열이니까 문자열로 처리해주기
+						CrntVal = STR;
+						break;
+					}
+					//값 넣기
+					RstInt = RstInt * 10 + (CurWrd - '0');
+
+					//소수 판별
+					if (NxtWrd == '.'){
+						IsDbl = true;
+						ValStrCsr += 2;
+						double decimal_part = 0;
+						int divisor = 10;
+						bool isStr = false;
+						for (;; ValStrCsr++){
+							PrvWrd = ValStr->Char_Get_Str(ValStrCsr - 1);
+							CurWrd = ValStr->Char_Get_Str(ValStrCsr);
+							NxtWrd = ValStr->Char_Get_Str(ValStrCsr + 1);
+							if (CurWrd < '0' || CurWrd > '9') {
+								//값자기 값이  123.12T 이러면 문자열이니까 문자열로 처리
+								CrntVal = STR;
+								isStr = true;
+								break;
+							}
+							decimal_part = decimal_part + (CurWrd - '0') / (double)divisor;
+							divisor *= 10;
+							if (NxtWrd == '\0') break;
+						}
+						if (isStr) break;
+						RstDbl = RstInt + decimal_part;
+					}
+
+					//정수 밸류 완성 종료 판별
+					if (NxtWrd == '\0'){
+						if (CrntVal == M_NUM){
+							RstInt = RstInt * -1;
+							RstDbl = RstDbl * -1;
+						}
+						if (IsDbl) (*KeyValNode)[static_cast<const char*>(SectKey)] = RstDbl;
+						else (*KeyValNode)[static_cast<const char*>(SectKey)] = RstInt;
+						//(*KeyValNode)[static_cast<const char*>(SectKey)] = IsDbl==true ? RstDbl : RstInt;
+						CrntVal = END;
+					}
+				}
+					break;
+				case BL:
+				{
+					char FstWrd = ValStr->Char_Get_Str(0);
+					char ScdWrd = ValStr->Char_Get_Str(1);
+					char ThdWrd = ValStr->Char_Get_Str(2);
+					char FrWrd = ValStr->Char_Get_Str(3);
+					char FivWrd = ValStr->Char_Get_Str(4);
+					char SixWrd = ValStr->Char_Get_Str(5);
+					if (FstWrd == 't' || FstWrd == 'T'){
+						if (ScdWrd == 'r' && ThdWrd == 'u' && FrWrd == 'e' && FivWrd == '\0'){
+							RstBl = true;
+						}
+						else{
+							CrntVal = STR;
+							break;
+						}
+					}
+					else if (FstWrd == 'f' || FstWrd == 'F'){
+						if (ScdWrd == 'a' && ThdWrd == 'l' && FrWrd == 's' && FivWrd == 'e' && SixWrd == '\0'){
+							RstBl = false;
+						}
+						else{
+							CrntVal = STR;
+							break;
+						}
+					}
+				}
+					(*KeyValNode)[static_cast<const char*>(SectKey)] = RstBl ? true : false;
+					CrntVal = END;
+					break;				
+				}
+
+			}
+
+		}
+
+
+
+		
+		(*KeyValNode)[static_cast<const char*>(SectKey)];	// = 실제 타입 값 넣어주기 Ascii 파싱해서
+
+	}
 
 	virtual void Parse(){
 		short BrkCnt = 0;       // '['의 개수 추적
@@ -191,13 +362,15 @@ protected:
 				Val->Append_Char(&CurChar);
 				if (NxtChar == '\n' || NxtChar == EOF){
 					Val->Str_Trim_All();
+					//Ascii 처리해주기 문자열에서 -> 실제값으로 처리해주기
+					AsciiToVal(KeyVal, Key, Val);
 					stt = DFT;
 					isVal = false;
 
-					char* SectKey = Key->Get_Str();
-					char* SectVal = Val->Get_Str();
+					//char* SectKey = Key->Get_Str();
+					//char* SectVal = Val->Get_Str();
 
-					(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
+					//(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
 
 					//debug 용
 					debugObj = static_cast<JObj*>(KeyVal->P_Type);
@@ -472,13 +645,14 @@ public:
 				Val->Append_Char(&CurChar);
 				if (NxtChar == '\n' || NxtChar == EOF){
 					Val->Str_Trim_All();
+					AsciiToVal(KeyVal, Key, Val);
 					stt = DFT;
 					isVal = false;
 
-					char* SectKey = Key->Get_Str();
-					char* SectVal = Val->Get_Str();
-
-					(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
+					//char* SectKey = Key->Get_Str();
+					//char* SectVal = Val->Get_Str();
+					//
+					//(*KeyVal)[static_cast<const char*>(SectKey)] = SectVal;
 
 					//debug 용
 					debugObj = static_cast<JObj*>(KeyVal->P_Type);
@@ -580,12 +754,23 @@ public:
 
 
 class JsonToIni{
+private:
+	DynamicStr* IniStr;
+	char CurChar;
+	char PrvChar;
+	char NxtChar;
+	int glb_csr;
+	JNode *IniNode;
+
+	void Parse(){
+
+	}
 public:
 	JsonToIni(){}
 
 	~JsonToIni(){}
 
-private:
+	void ParseMain(){
 
-
+	}
 };

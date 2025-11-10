@@ -885,7 +885,7 @@ void PrtNode(JNode& node){
 		break;
 	case JNode::JType::STRING:
 		Str = static_cast<DynamicStr*>(node.P_Type);
-		printf("%s", Str->Get_Str());
+		printf("\"%s\"", Str->Get_Str());
 		break;
 	case JNode::JType::BOOL:
 		Val.bl = node;
@@ -929,3 +929,66 @@ void PrtNode(JNode& node){
 	}
 }
 
+void PrtNode_File(FILE* fp, JNode& node) {
+	DynamicStr* Str;
+
+	switch (node.Cur_Type) {
+	case JNode::JType::NULLTYPE:
+		fprintf(fp, "null");
+		return;
+
+	case JNode::JType::NUMBER:
+		Val.num = node;
+		fprintf(fp, "%d", Val.num);
+		break;
+
+	case JNode::JType::STRING:
+		Str = static_cast<DynamicStr*>(node.P_Type);
+		fprintf(fp, "\"%s\"", Str->Get_Str());
+		break;
+
+	case JNode::JType::BOOL:
+		Val.bl = node;
+		fprintf(fp, "%s", Val.bl ? "true" : "false");
+		break;
+
+	case JNode::JType::DOUBLE:
+		Val.dnum = node;
+		fprintf(fp, "%.3f", Val.dnum);
+		break;
+
+	case JNode::JType::OBJ:
+	{
+		fprintf(fp, "{");
+		JObj* obj = static_cast<JObj*>(node.P_Type);
+
+		for (int i = 0; i <= node.ObjCnt; i++, obj = obj->next) {
+			fprintf(fp, "\"%s\": ", obj->Key.Get_Str());
+			PrtNode_File(fp, *obj->Value); // 재귀 시에도 파일 포인터 전달
+
+			if (i != node.ObjCnt) fprintf(fp, ", ");
+		}
+
+		fprintf(fp, "}");
+		break;
+	}
+
+	case JNode::JType::ARR:
+	{
+		fprintf(fp, "[");
+		JArr* arr = static_cast<JArr*>(node.P_Type);
+
+		for (int i = 0; i <= node.ArrCnt; i++, arr = arr->next) {
+			PrtNode_File(fp, *arr->Value);
+
+			if (i != node.ArrCnt) fprintf(fp, ", ");
+		}
+
+		fprintf(fp, "]");
+		break;
+	}
+
+	default:
+		break;
+	}
+}

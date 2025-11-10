@@ -275,15 +275,21 @@ void Test_Json_Func(){
 }
 
 
-int main() {
+void JsToIni(){
 	const char* OrgPath = "Ini/Origin.ini";
 	const char* TshPath = "Ini/Tshoot.ini";
+	const char* OrgOutPath = "Ini/Origin.json";
+	const char* TshOutPath = "Ini/Tshoot.json";
 
-	FILE* oFile;
-	FILE* tFile;
+	FILE* oFile;	//Input 颇老
+	FILE* tFile;	//Input 颇老
+	FILE* woFile;	//Output 颇老
+	FILE* toFile;	//Output 颇老
 
 	fopen_s(&oFile, OrgPath, "r");
 	fopen_s(&tFile, TshPath, "r");
+	fopen_s(&woFile, OrgOutPath, "w");
+	fopen_s(&toFile, TshOutPath, "w");
 
 	IniParser OrgParse(oFile);
 	OrgParse.ParseMain();
@@ -294,14 +300,23 @@ int main() {
 
 	printf("Origin Ini\n");
 	PrtNode(*OrgNode);
+	PrtNode_File(woFile, *OrgNode);
+
 
 	printf("\n\n\n\n\n");
-	
+
 	printf("Tsh Ini\n");
 	PrtNode(*TshNode);
+	PrtNode_File(toFile, *TshNode);
 
 	fclose(oFile);
 	fclose(tFile);
+	fclose(woFile);
+	fclose(toFile);
+}
+
+int main() {
+	JsToIni();
 
 	while (1){
 		fflush(stdin);
