@@ -944,7 +944,7 @@ void PrtNode_File(FILE* fp, JNode& node) {
 
 	case JNode::JType::STRING:
 		Str = static_cast<DynamicStr*>(node.P_Type);
-		fprintf(fp, "\"%s\"", Str->Get_Str());
+		fprintf(fp, "%s", Str->Get_Str());
 		break;
 
 	case JNode::JType::BOOL:

@@ -252,7 +252,7 @@ void Test_Json() {
 
 void Test_Json_Func(){
 	const char* TestStr = R"({
-  "empty_object": [],
+  "empty_object": [1],
   "empty_array": [],
   "empty_string": "",
   "null_value": null,
@@ -269,13 +269,36 @@ void Test_Json_Func(){
 	JNode node;
 	node = TestStr;
 
-	JObj* fstObj = static_cast<JObj*>(node.P_Type);
+
 
 	PrtNode(node);
 }
 
+void Test(){
+	DynamicStr* Key = new DynamicStr(2);
 
-void JsToIni(){
+	Key->Set_Str("TestTEst");
+
+	JNode node;
+
+	node = Key->Get_Str() ;
+
+	delete Key;
+
+	Key = nullptr;
+
+	Key = static_cast<DynamicStr*>(node.P_Type);
+
+	printf("%s\n", Key->Get_Str());
+
+	JNode* pnode = new JNode();
+
+	const char* sKey = "TESTTEST";
+
+	(*pnode)[sKey] = JNode::JType::OBJ;
+}
+
+void JsToIni__(){
 	const char* OrgPath = "Ini/Origin.ini";
 	const char* TshPath = "Ini/Tshoot.ini";
 	const char* OrgOutPath = "Ini/Origin.json";
@@ -315,7 +338,63 @@ void JsToIni(){
 	fclose(toFile);
 }
 
+
+FILE* RdFile(const char* rPath){
+	FILE* rf;
+	fopen_s(&rf, rPath, "r");
+	return rf;
+}
+
+FILE* WtFile(const char* wPath){
+	FILE* wf;
+	fopen_s(&wf, wPath, "w");
+	return wf;
+}
+
+//Ini -> Parse -> Json
+void IniToJson(){
+	const char* ReadPath = "Ini/In/TestIni.ini";
+	const char* WritePath = "Ini/Out/IniToRstJs.json";
+
+	//File_Kor_Test(ReadPath, WritePath);
+
+	FILE* rF = RdFile(ReadPath);
+	FILE* wF = WtFile(WritePath);
+
+	//ErrLst_Ini test(rF);
+	IniParser test(rF);
+	test.ParseMain();
+	JNode* node = test.getNode();
+
+	PrtNode(*node);
+	PrtNode_File(wF, *node);
+
+	fclose(rF);
+	fclose(wF);
+}
+
+//Json -> Parse -> Ini
+void JsToIni(){
+	const char* ReadPath = "Ini/In/TestJs.json";
+	const char* WritePath = "Ini/Out/JsToRstIni.ini";
+
+	FILE* rF = RdFile(ReadPath);
+	FILE* wF = WtFile(WritePath);
+
+	JsonToIni Ini(rF);
+	Ini.ParseMain();
+	JNode* node = Ini.getNode();
+
+	PrtNode(*node);
+	PrtNode_File(wF, *node);
+
+	fclose(rF);
+	fclose(wF);
+	delete node;
+}
+
 int main() {
+	//IniToJson();
 	JsToIni();
 
 	while (1){

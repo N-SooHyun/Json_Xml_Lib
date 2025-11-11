@@ -154,8 +154,10 @@ protected:
 							RstInt = RstInt * -1;
 							RstDbl = RstDbl * -1;
 						}
-						if (IsDbl) (*KeyValNode)[static_cast<const char*>(SectKey)] = RstDbl;
-						else (*KeyValNode)[static_cast<const char*>(SectKey)] = RstInt;
+						if (IsDbl) 
+							(*KeyValNode)[static_cast<const char*>(SectKey)] = RstDbl;
+						else (*KeyValNode)
+							[static_cast<const char*>(SectKey)] = RstInt;
 						//(*KeyValNode)[static_cast<const char*>(SectKey)] = IsDbl==true ? RstDbl : RstInt;
 						CrntVal = END;
 					}
@@ -432,9 +434,8 @@ public:
 		char c = ' ';
 
 		while (1){
-			if (c == EOF) break;
-
 			c = fgetc(rFile);
+			if (c == EOF) break;
 			IniStr->Append_Char(&c);
 		}
 	}
@@ -753,24 +754,19 @@ public:
 //Key=Value
 
 
-class JsonToIni{
+class JsonToIni : public IniParser{
 private:
-	DynamicStr* IniStr;
-	char CurChar;
-	char PrvChar;
-	char NxtChar;
-	int glb_csr;
-	JNode *IniNode;
 
-	void Parse(){
-
-	}
 public:
 	JsonToIni(){}
+	JsonToIni(const char* Str) : IniParser(Str){}
+	JsonToIni(FILE* rFile) : IniParser(rFile){}
 
 	~JsonToIni(){}
 
-	void ParseMain(){
-
+	virtual void Parse(){
+		(*IniNode) = IniStr->Get_Str();
+		ParseFin = true;
+		IniStr = nullptr;
 	}
 };

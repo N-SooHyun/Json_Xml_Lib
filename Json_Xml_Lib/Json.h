@@ -1223,7 +1223,13 @@ namespace JSON {
 							//값 넣어주기
 							if (obj != nullptr) {
 								char* chKeys = Vals->Key.Get_Str();
-								(*CurNode)[static_cast<const char*>(chKeys)] = is_double ? result_double : result_int;
+
+								if (is_double) {
+									(*CurNode)[static_cast<const char*>(chKeys)] = result_double;
+								}
+								else {
+									(*CurNode)[static_cast<const char*>(chKeys)] = result_int;
+								}
 							}
 							else if (arr != nullptr) {
 								int arrCnt = CurNode->ArrCnt + 1;
