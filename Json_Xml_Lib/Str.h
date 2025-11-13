@@ -255,6 +255,27 @@ namespace Dynamic {
 			}
 		}
 
+		//앞뒤로 " ' 지워주기
+		void Str_Trim_Quote(){
+			int fstIdx = 0;
+			int lstIdx = current_size - 1;
+
+			while ((Str[fstIdx] == '\'') || (Str[lstIdx] == '\'')
+				|| (Str[fstIdx] == '\"') || (Str[fstIdx] == '\"')){
+				if ((Str[fstIdx] == '\'') || (Str[fstIdx] == '\"')){
+					//앞글자 지우기
+					Str_Trim_Front();
+					lstIdx = current_size - 1;
+				}
+
+				if ((Str[lstIdx] == '\'') || (Str[lstIdx] == '\"')){
+					//뒤글자 지우기
+					Str_Trim_Back();
+					lstIdx = current_size - 1;
+				}
+			}
+		}
+
 	private:
 		//<문자열 처리 로직에 대한 API>
 

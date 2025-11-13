@@ -469,6 +469,7 @@ public:
 
 	~ErrLst_Ini(){}
 
+private:
 	virtual void Parse(){
 		short BrkCnt = 0;       // '['의 개수 추적
 		bool isKey = false;      // KEY= 임을 확인 Section내부에 '\n'다음이면 무조건 true
@@ -506,7 +507,7 @@ public:
 			CurChar = IniStr->Char_Get_Str(glb_csr);
 			NxtChar = IniStr->Char_Get_Str(++glb_csr);
 
-			if (CurChar == EOF){
+			if (CurChar == EOF || CurChar == '\0'){
 				if (isSecArea){
 					if (stt == VAL){
 						char* SectKey = Key->Get_Str();
@@ -644,7 +645,7 @@ public:
 					break;
 				}
 				Val->Append_Char(&CurChar);
-				if (NxtChar == '\n' || NxtChar == EOF){
+				if (NxtChar == '\n' || NxtChar == EOF || NxtChar == '\0'){
 					Val->Str_Trim_All();
 					AsciiToVal(KeyVal, Key, Val);
 					stt = DFT;
@@ -675,7 +676,7 @@ public:
 			}
 			case TSH:
 			{
-				if (NxtChar == EOF || NxtChar == '['){
+				if (NxtChar == EOF || NxtChar == '[' || NxtChar == '\0'){
 					//종료 처리
 					if (isTsh){
 						Tsh->Append_Char(&CurChar);
@@ -752,21 +753,229 @@ public:
 //{Sect : {Key : Value}} to
 //[Sect]
 //Key=Value
-
-
 class JsonToIni : public IniParser{
 private:
+	union MyUnion {
+		int num;
+		bool bl;
+		double dnum;
+	};
+	MyUnion Val;
+	void PrtNode(JNode& node){
+		DynamicStr* Str;
+		switch (node.Cur_Type){
+		case JNode::JType::NULLTYPE:   //종료
+			printf("null");
+			return;
+		case JNode::JType::NUMBER:
+			Val.num = node;
+			printf("%d", Val.num);
+			break;
+		case JNode::JType::STRING:
+			Str = static_cast<DynamicStr*>(node.P_Type);
+			Str->Str_Trim_Quote();
+			printf("%s", Str->Get_Str());
+			break;
+		case JNode::JType::BOOL:
+			Val.bl = node;
+			printf("%s", Val.bl == true ? "true" : "false");
+			break;
+		case JNode::JType::DOUBLE:
+			Val.dnum = node;
+			printf("%.3f", Val.dnum);
+			break;
+		case JNode::JType::OBJ:
+			printf("{");
+			JObj* obj;
+			obj = static_cast<JObj*>(node.P_Type);
 
-public:
-	JsonToIni(){}
-	JsonToIni(const char* Str) : IniParser(Str){}
-	JsonToIni(FILE* rFile) : IniParser(rFile){}
+			for (int i = 0; i <= node.ObjCnt; i++, obj = obj->next){
+				printf("\"%s\" : ", obj->Key.Get_Str());
+				PrtNode(*obj->Value);
 
-	~JsonToIni(){}
+				if (i != node.ObjCnt) printf(", ");
+			}
+
+			printf("}");
+			break;
+		case JNode::JType::ARR:
+			printf("[");
+			JArr* arr;
+			arr = static_cast<JArr*>(node.P_Type);
+			for (int i = 0; i <= node.ArrCnt; i++, arr = arr->next){
+				PrtNode(*arr->Value);
+
+				if (i != node.ArrCnt) printf(",");
+			}
+			printf("]");
+			break;
+		default:
+			break;
+		}
+	}
+
+	void FPrtNode(FILE* fp, JNode& node) {
+		DynamicStr* Str;
+
+		switch (node.Cur_Type) {
+		case JNode::JType::NULLTYPE:   // 종료
+			//fprintf(fp, "null");
+			return;
+
+		case JNode::JType::NUMBER:
+			Val.num = node;
+			fprintf(fp, "%d", Val.num);
+			break;
+
+		case JNode::JType::STRING:
+			Str = static_cast<DynamicStr*>(node.P_Type);
+			Str->Str_Trim_Quote();
+			fprintf(fp, "%s", Str->Get_Str());
+			break;
+
+		case JNode::JType::BOOL:
+			Val.bl = node;
+			fprintf(fp, "%s", Val.bl == true ? "true" : "false");
+			break;
+
+		case JNode::JType::DOUBLE:
+			Val.dnum = node;
+			fprintf(fp, "%.3f", Val.dnum);
+			break;
+
+		case JNode::JType::OBJ: {
+			fprintf(fp, "{");
+			JObj* obj = static_cast<JObj*>(node.P_Type);
+
+			for (int i = 0; i <= node.ObjCnt; i++, obj = obj->next) {
+				fprintf(fp, "\"%s\" : ", obj->Key.Get_Str());
+				FPrtNode(fp, *obj->Value);
+
+				if (i != node.ObjCnt)
+					fprintf(fp, ", ");
+			}
+
+			fprintf(fp, "}");
+			break;
+		}
+
+		case JNode::JType::ARR: {
+			fprintf(fp, "[");
+			JArr* arr = static_cast<JArr*>(node.P_Type);
+
+			for (int i = 0; i <= node.ArrCnt; i++, arr = arr->next) {
+				FPrtNode(fp, *arr->Value);
+
+				if (i != node.ArrCnt)
+					fprintf(fp, ",");
+			}
+
+			fprintf(fp, "]");
+			break;
+		}
+
+		default:
+			break;
+		}
+	}
 
 	virtual void Parse(){
+		enum NdStt{
+			DFT,
+			SCT,
+			KEY,
+			VAL,
+		};
+
+		//IniNode가 Root임
 		(*IniNode) = IniStr->Get_Str();
-		ParseFin = true;
 		IniStr = nullptr;
+		ParseFin = true;
+	}
+public:
+	JsonToIni(){ InitStr(1024); }
+	JsonToIni(const char* Str){
+		InitStr(1024);
+		if (Str != nullptr) return;
+		char c = ' ';
+		for (int i = 0;; i++){
+			if (c == '\0') break;
+
+			c = Str[i];
+			IniStr->Append_Char(&c);
+		}
+	}
+	JsonToIni(FILE* rFile){
+		if (!isFileCk(rFile))
+			return;
+		InitStr(1024);
+		ReadFileIni(rFile);
+	}
+	JsonToIni(JNode* node){
+		IniNode = node;
+		ParseFin = true;
+	}
+	~JsonToIni(){}
+
+	void IniPrt(){
+		Parse();
+		if (ParseFin == false) return;
+
+		JObj* RootObj = static_cast<JObj*>(IniNode->P_Type);
+		JObj* JmpObj = RootObj;
+		char* pSectKey;
+		for (;;){
+			if (JmpObj == nullptr)
+				break;
+
+			pSectKey = JmpObj->Key.Get_Str();
+			JObj* KeyVal = static_cast<JObj*>(JmpObj->Value->P_Type);
+			printf("[%s]\n", pSectKey);
+			char* pKey;
+			char* pVal;
+			for (;;){
+				if (KeyVal == nullptr) break;
+				//Sect모드
+				KeyVal->Key.Str_Trim_Quote();
+				printf("%s=", KeyVal->Key.Get_Str());
+				PrtNode(*KeyVal->Value);
+				printf("\n");
+				KeyVal = KeyVal->next;
+			}
+			JmpObj = JmpObj->next;
+
+		}
+
+	}
+
+	void IniFPrt(FILE* pf){
+		//Parse();
+		if (ParseFin == false) return;
+
+		JObj* RootObj = static_cast<JObj*>(IniNode->P_Type);
+		JObj* JmpObj = RootObj;
+		char* pSectKey;
+		for (;;){
+			if (JmpObj == nullptr)
+				break;
+
+			pSectKey = JmpObj->Key.Get_Str();
+			JObj* KeyVal = static_cast<JObj*>(JmpObj->Value->P_Type);
+			fprintf(pf, "[%s]\n", pSectKey);
+			char* pKey;
+			char* pVal;
+			for (;;){
+				if (KeyVal == nullptr) break;
+				//Sect모드
+				KeyVal->Key.Str_Trim_Quote();
+				fprintf(pf, "%s=", KeyVal->Key.Get_Str());
+				FPrtNode(pf, *KeyVal->Value);
+				fprintf(pf, "\n");
+				KeyVal = KeyVal->next;
+			}
+			JmpObj = JmpObj->next;
+
+		}
+
 	}
 };
