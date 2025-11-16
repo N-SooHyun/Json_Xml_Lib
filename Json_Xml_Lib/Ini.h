@@ -1,7 +1,10 @@
 #pragma once
 
-#include <stdio.h>
-#include <iostream>
+/*
+	<전체 구조>
+	.ini -> Str생성 -> Json화
+*/
+
 
 //Ini 파일 파싱 -> JNode를 활용해 Dict 구조로 변환 {"SECTION" : {"KEY" : VALUE }}
 class IniParser{
@@ -427,6 +430,7 @@ public:
 
 	~IniParser(){
 		if (IniStr != nullptr) delete IniStr;
+		//if (IniNode != nullptr) delete IniNode;
 	}
 
 
@@ -454,8 +458,6 @@ public:
 		}
 		return nullptr;
 	}
-
-
 };
 
 //Error List TSHOOT 전용 ErrorList Ini Parser
@@ -931,8 +933,8 @@ public:
 			pSectKey = JmpObj->Key.Get_Str();
 			JObj* KeyVal = static_cast<JObj*>(JmpObj->Value->P_Type);
 			printf("[%s]\n", pSectKey);
-			char* pKey;
-			char* pVal;
+			char* pKey = nullptr;
+			char* pVal = nullptr;
 			for (;;){
 				if (KeyVal == nullptr) break;
 				//Sect모드
@@ -962,8 +964,8 @@ public:
 			pSectKey = JmpObj->Key.Get_Str();
 			JObj* KeyVal = static_cast<JObj*>(JmpObj->Value->P_Type);
 			fprintf(pf, "[%s]\n", pSectKey);
-			char* pKey;
-			char* pVal;
+			char* pKey = nullptr;
+			char* pVal = nullptr;
 			for (;;){
 				if (KeyVal == nullptr) break;
 				//Sect모드
@@ -979,3 +981,25 @@ public:
 
 	}
 };
+
+
+
+namespace INI_FUNC{
+	FILE* RdFile(const char* rPath);
+
+	FILE* WtFile(const char* wPath);
+
+	//Ini -> Parse -> Json
+	void Ini_To_Js();
+	//Json -> Parse -> Ini
+	void Js_To_Ini();
+
+	//Ini 읽고 Json화 해서 -> Ini로 다시 파일 만들어내기
+	void Ini_To_Js_To_Ini();
+	//.ini 파일 읽어서 json에 추가하기
+	void Ini_AddTo_Js();
+
+	void Api_Js();
+}
+
+

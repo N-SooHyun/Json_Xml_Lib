@@ -54,7 +54,7 @@ namespace Dynamic {
 		int current_size;	//마지막 '\0'까지의 값 ex) New Word\0 => 8
 		int str_last_focus;	//마지막 문자까지의 값 ex) New Word]0 => 7
 		//기본생성자로 호출하면 16비트정도만 가지게 됨
-		DynamicStr() : capacity_size(16), current_size(-1), str_last_focus(-1) {
+		DynamicStr() : capacity_size(32), current_size(-1), str_last_focus(-1) {
 			Str = new char[capacity_size];
 			Mem_Set(Str, '\0', capacity_size);
 		}
@@ -164,6 +164,27 @@ namespace Dynamic {
 
 			Str[current_size++] = new_char[0];
 			Str[current_size] = '\0';
+		}
+
+		//문자열을 뒤에 추가해주기
+		void Append_Str(const char* new_str){
+			int len = 0;
+			while (new_str[len] != '\0') len++;
+
+			while (current_size + len >= capacity_size){
+				SizeUpStr();
+			}
+
+			if (current_size == -1)
+				current_size++;
+			
+
+			for (int i = 0; i < len; i++){
+				Str[current_size++] = new_str[i];
+			}
+			Str[current_size] = new_str[len];
+			//Str[current_size] = '\0';
+			int debug = 10;
 		}
 
 		//문자열 추가(한글용) 안써도 될거 같은데
