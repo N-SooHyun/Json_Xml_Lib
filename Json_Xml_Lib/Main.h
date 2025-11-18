@@ -6,4 +6,5 @@
 #include "Str.h"
 #include "Json.h"
 #include "Ini.h"
+#include "Xml.h"
 #include <cassert>

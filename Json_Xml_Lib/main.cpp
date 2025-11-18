@@ -1,5 +1,6 @@
 #include "Main.h"
 using namespace JSON;
+using namespace XML;
 
 int main() {
 	//IniToJson();
